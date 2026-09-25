@@ -1368,8 +1368,8 @@ for (const [id, m] of Object.entries(BASE)) {
 const ASISTENCIA = { direccion: true, derrape: 2, agarre: 1.5 };
 const BETA_MAX = [Infinity, 0.8, 0.58];
 
-// Agarre lateral útil (m/s²). c.agil es la dirección asistida del jugador: 1,5 veces el agarre a partir de 40 m/s
-// y hasta 1,9 veces a poca velocidad, para las esquinas del barrio. La policía no la tiene: agil = 1.
+// Agarre lateral útil (m/s²). c.agil es la dirección asistida: el jugador, 1,5 veces el agarre a partir de 40 m/s
+// y hasta 0,4 más a poca velocidad, para las esquinas del barrio. La policía lleva menos (policia.js, AGIL_POLICIA).
 function agilDe(c, v) {
   const extra = c.agil || 1;
   return extra > 1 ? extra + 0.4 * clamp((40 - v) / 25, 0, 1) : 1;
@@ -2231,9 +2231,19 @@ const { radioBusqueda } = __m[6]; // src/logica/ojo.js
 
 const NOMBRES = { lince: 'LINCE', lobo: 'LOBO', toro: 'TORO' };
 
+// Embestida lateral (25/09/2026; Alberto: «que embistan el coche y nos hagan ir frenando»). Sin armas, con el coche.
+// Se pone a tu altura (acercar), avisa (aviso) y cierra contra tu costado (ataque). Si frenas o aceleras a tiempo, falla.
+// frena: parte de tu velocidad que pierdes; danio: lo que se abolla tu coche (menos potencia y agarre); enfriar: s por unidad.
+const EMBESTIDA = { acercar: 4, aviso: 0.9, ataque: 1.3, frena: 0.18, danio: 0.12, danioMax: 0.6, enfriar: 8, enfriarFallo: 5, primera: 8 };
+
+// Agarre extra de la policía (25/09): con la dirección asistida del jugador (×1,5) el Lince ya no le seguía en las curvas.
+// Tú conservas algo de ventaja en curva (unos 131 km/h frente a 117 del Lince); el Lobo sigue siendo el torpe en curva.
+const AGIL_POLICIA = { lince: 1.3, toro: 1.3, lobo: 1.15 };
+
 function crearUnidad(tipo, numero, x, y, h, v = 0, rol = 'perseguir') {
   const coche = crearCoche(tipo, x, y, h, v);
   coche.nitro = 0;
+  coche.agil = AGIL_POLICIA[tipo] ?? 1;
   return {
     id: `${tipo}${numero}`, nombre: `${NOMBRES[tipo]} ${numero}`, tipo, numero, coche, rol,
     sirena: rol !== 'control',
@@ -2241,6 +2251,7 @@ function crearUnidad(tipo, numero, x, y, h, v = 0, rol = 'perseguir') {
     ve: false, veT: 0, los: undefined, ciego: 0, distJugador: Infinity,
     atasco: 0, reversa: 0, reversaDir: 0,
     pit: null, pitEnfriar: 3,
+    emb: null, embEnfriar: EMBESTIDA.primera,
     esquiva: 0, esquivaT: 0,
     modo: 'ruta',
   };
@@ -2359,6 +2370,7 @@ function pasoUnidad(u, ctx, dt) {
   const ev = [];
   u.ciego = Math.max(0, u.ciego - dt);
   u.pitEnfriar = Math.max(0, u.pitEnfriar - dt);
+  u.embEnfriar = Math.max(0, u.embEnfriar - dt);
   u.rutaT -= dt;
   u.esquivaT -= dt;
   const dJ = dist(c.x, c.y, j.x, j.y);
@@ -2386,7 +2398,7 @@ function pasoUnidad(u, ctx, dt) {
     const lon = (c.x - j.x) * fx + (c.y - j.y) * fy, lat = (c.x - j.x) * rx + (c.y - j.y) * ry;
 
     // PIT: solo Lobo y Toro, detrás, alineados, cerca y con el jugador entre 30 y 115 km/h.
-    if ((u.tipo === 'lobo' || u.tipo === 'toro') && !u.pit && u.pitEnfriar <= 0 && u.ve && ojo === 'rojo') {
+    if ((u.tipo === 'lobo' || u.tipo === 'toro') && !u.pit && !u.emb && u.pitEnfriar <= 0 && u.ve && ojo === 'rojo') {
       const vj = Math.abs(j.vf);
       if (lon < -1.5 && lon > -12 && Math.abs(lat) < 3 && Math.abs(angDif(c.h, j.h)) < 0.5 && vj > 8 && vj < 32) {
         let lado = lat >= 0 ? 1 : -1;
@@ -2415,6 +2427,38 @@ function pasoUnidad(u, ctx, dt) {
       }
     }
 
+    // Embestida: una unidad a la vez (ctx.embOcupada), con el jugador entre 43 y 170 km/h y la unidad detrás o a su lado.
+    const vjE = Math.abs(j.vf);
+    if (!u.emb && !u.pit && !ctx.embOcupada && u.embEnfriar <= 0 && u.ve && ojo === 'rojo' && vjE > 12 && vjE < 47
+      && lon < 3 && lon > -28 && Math.abs(angDif(c.h, j.h)) < 0.4) {
+      let lado = lat >= 0 ? 1 : -1;
+      if (ctx.zonaJugador === 'ronda') {
+        const pj = rondaProyectar(j.x, j.y);
+        if (pj.d > -5.5) lado = 1;        // vas pegado a la mediana: te busca por la derecha
+        else if (pj.d < -8.5) lado = -1;  // vas por el carril lento: por la izquierda
+      }
+      u.emb = { fase: 'acercar', t: EMBESTIDA.acercar, lado };
+    }
+    if (u.emb) {
+      const lado = u.emb.lado, al = Math.abs(lat), vaAlLado = Math.abs(lon) < 2.5 && al > 1.4 && al < 5.8 && Math.sign(lat) === lado;
+      u.emb.t -= dt;
+      let fallo = null;
+      if (u.emb.fase === 'acercar') {
+        if (vaAlLado) { u.emb.fase = 'aviso'; u.emb.t = EMBESTIDA.aviso; u.emb.v = c.vf; ev.push({ tipo: 'embisteAviso', unidad: u.id, lado }); }
+        else if (u.emb.t <= 0) fallo = { esquivada: false, enfriar: 4 };
+      } else if (u.emb.fase === 'aviso') {
+        if (u.emb.t <= 0) { u.emb.fase = 'ataque'; u.emb.t = EMBESTIDA.ataque; }
+        else if (Math.abs(lon) > 7) fallo = { esquivada: vjE > 8, enfriar: EMBESTIDA.enfriarFallo }; // frenaste o aceleraste a tiempo
+      } else if (u.emb.t <= 0 || Math.abs(lon) > 7) fallo = { esquivada: dJ < 15 && vjE > 8, enfriar: EMBESTIDA.enfriarFallo };
+      // (vjE > 8: si te has quedado casi parado por otro golpe, no es una esquiva)
+      if (!fallo && (!u.ve || ojo !== 'rojo' || dJ > 40)) fallo = { esquivada: false, enfriar: EMBESTIDA.enfriarFallo };
+      if (fallo) {
+        if (u.emb.fase !== 'acercar' || fallo.esquivada) ev.push({ tipo: 'embisteFallo', unidad: u.id, esquivada: fallo.esquivada });
+        u.emb = null;
+        u.embEnfriar = fallo.enfriar;
+      }
+    }
+
     if (ojo === 'rojo' && u.ve && dJ < 70 && mismo) {
       // Persecución directa: la unidad lo ve y lo tiene cerca. Guarda distancia (no embiste por detrás).
       u.modo = 'directo';
@@ -2424,7 +2468,20 @@ function pasoUnidad(u, ctx, dt) {
       vObj = Math.min(vObj, Math.sqrt(vJ * vJ + 2 * c.m.frenada * 0.65 * Math.max(0, dJ - hueco)));
       if (j.ax < -3) vObj += j.ax * 0.4;
       if (vJ < 4) vObj = Math.min(vObj, Math.max(0, (dJ - 5) * 0.8));
-      if (u.pit) {
+      if (u.emb) {
+        // A tu altura, pegada a tu costado; en el ataque cierra hacia dentro hasta tocarte.
+        const pegado = u.emb.lado * (j.ancho / 2 + c.ancho / 2 + 0.7);
+        const latObj = u.emb.fase === 'ataque' ? u.emb.lado * (j.ancho / 2 + c.ancho / 2 - 1.2) : pegado;
+        if (u.emb.fase === 'acercar') vObj = vJ + clamp(-lon * 0.9, -4, 9);
+        else {
+          // Ya lanzada no copia tus frenazos ni tus acelerones (se adapta a 2 m/s²): por eso se puede esquivar.
+          u.emb.v += clamp(vJ - u.emb.v, -2 * dt, 2 * dt);
+          vObj = u.emb.v;
+        }
+        const tx = j.x + fx * 12 + rx * latObj, ty = j.y + fy * 12 + ry * latObj;
+        u.ruta = prepararRuta([[c.x, c.y], [tx, ty]]);
+        e = pilotar(c, u.ruta, { ...op, vObj: Math.max(vObj, 0) });
+      } else if (u.pit) {
         // Aviso: se pone a su altura, al lado de la rueda trasera. Ataque: cierra contra la aleta trasera.
         let tx, ty;
         if (u.pit.fase === 'aviso') {
@@ -2643,7 +2700,7 @@ function puntoAparicion(mapa, j, azar, zonaJugador, extraVisible, rol = 'persegu
   const n = nodos[0];
   return { x: n.x, y: n.y, h: 0, v: 0 };
 }
-return { NOMBRES, crearUnidad, prepararRuta, puntoRuta, pilotar, rutaRonda, pasoUnidad, puntoBusqueda, puntoAparicion };
+return { NOMBRES, EMBESTIDA, crearUnidad, prepararRuta, puntoRuta, pilotar, rutaRonda, pasoUnidad, puntoBusqueda, puntoAparicion };
 })();
 
 // ---- src/logica/botin.js
@@ -2760,6 +2817,21 @@ const LINEAS = {
     ['{unidad}', 'Aquí no está. ¿Ha salido o sigue en la Ronda?'],
     ['CENTRAL', 'Atentos a cualquier compacto {color}.'],
   ],
+  // Embestida lateral (25/09).
+  embisteAviso: [
+    ['{unidad}', 'Me pongo a su altura. Lo saco de la carretera.'],
+    ['{unidad}', '¡Lo tengo al lado! Voy a por él.'],
+    ['CENTRAL', '{unidad}, autorizado el contacto. Con cuidado.'],
+  ],
+  embestida: [
+    ['{unidad}', '¡Tocado! Pierde velocidad.'],
+    ['{unidad}', '¡Le he dado de lado!'],
+    ['CENTRAL', 'Buen contacto, {unidad}. No lo soltéis.'],
+  ],
+  embisteFallo: [
+    ['{unidad}', '¡Se me ha escapado por los pelos!'],
+    ['{unidad}', 'Negativo, ha frenado a tiempo.'],
+  ],
   // Dificultad creciente del tráfico (25/09).
   trafico2: [
     ['CENTRAL', 'Atención: la Ronda se está cargando. Cuidado con los civiles.'],
@@ -2866,7 +2938,7 @@ const PRIORIDAD = {
   pinchosCaida: 7, pitHecho: 7, inicio: 9, perdido: 6, visto: 5, relevo: 5, rasante: 5,
   salidaPerfecta: 4, choque: 4, tunel: 4, parking: 4, callejon: 4, salidaRonda: 4, fuga120: 5,
   hueco: 3, refuerzo: 3, busqueda: 2, busquedaRonda: 2, pinchosFallo: 4, pitFallo: 4,
-  trafico2: 5, trafico3: 5, trafico4: 6,
+  trafico2: 5, trafico3: 5, trafico4: 6, embisteAviso: 6, embestida: 7, embisteFallo: 4,
 };
 
 function rellenar(texto, datos) {
@@ -2901,9 +2973,9 @@ const { crearMapa, rondaPunto, rondaProyectar, CARRILES, normS, difS, RAMPAS } =
 const { crearCoche, pasoCoche, choqueFijo, choqueEntre, circulosDe, ASISTENCIA } = __m[3]; // src/logica/coche.js
 const { crearAyuda, asistir } = __m[4]; // src/logica/asistencia.js
 const { crearTrafico, pasoTrafico, golpeado, cercaDe, camiones, subirTrafico } = __m[5]; // src/logica/trafico.js
-const { crearUnidad, pasoUnidad, puntoAparicion } = __m[7]; // src/logica/policia.js
+const { crearUnidad, pasoUnidad, puntoAparicion, EMBESTIDA } = __m[7]; // src/logica/policia.js
 const { crearOjo, pasoOjo, finalDeEscape, LIMITE_FANTASMA } = __m[6]; // src/logica/ojo.js
-const { crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, FINALES } = __m[8]; // src/logica/botin.js
+const { crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, premio, FINALES } = __m[8]; // src/logica/botin.js
 const { lineaRadio, PRIORIDAD } = __m[9]; // src/logica/radio.js
 // Una partida: une el mapa, tu coche, el tráfico, la policía, el Ojo, el botín y la radio.
 // Sin pantalla ni 3D: avanza a pasos fijos de 1/60 s y deja eventos para la presentación (sonido, vibración, textos).
@@ -2991,7 +3063,7 @@ function crearPartida(op = {}) {
     cinta: [], ultimaEntrada: '',
     stats: {
       nivelMax: 1, casiChoques: 0, huecos: 0, derrapeSeg: 0, velMaxKmh: 0, choques: 0, vecesVisto: 1,
-      pinchazos: 0, pits: 0, contraSeg: 0, escondidoSeg: 0, traficoMax: 1,
+      pinchazos: 0, pits: 0, contraSeg: 0, escondidoSeg: 0, traficoMax: 1, embestidas: 0, embestidasEsquivadas: 0,
     },
   };
   decir(p, 'inicio', { unidad: lince.nombre });
@@ -3153,7 +3225,14 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     ctx.otros = cercaDe(tr, u.coche.x, u.coche.y, 60);
     for (const o of p.policia) if (o !== u) ctx.otros.push(o.coche);
     ctx.orden = i;
+    ctx.embOcupada = p.policia.some((o) => o !== u && o.emb);
     for (const ev of pasoUnidad(u, ctx, dt)) {
+      if (ev.tipo === 'embisteFallo' && ev.esquivada) {
+        ev.gana = premio(p.botin, Math.round(50 * p.botin.mult));
+        p.stats.embestidasEsquivadas++;
+        decir(p, 'embisteFallo', { unidad: u.nombre });
+      }
+      if (ev.tipo === 'embisteAviso') decir(p, 'embisteAviso', { unidad: u.nombre });
       emitir(p, ev.tipo, ev);
       if (ev.tipo === 'pitAviso') decir(p, 'pit', { unidad: u.nombre });
       if (ev.tipo === 'pitFallo') decir(p, 'pitFallo', { unidad: u.nombre });
@@ -3187,6 +3266,20 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     if (k) {
       const f = choqueEntre(j, u.coche, k.nx, k.ny, k.pen);
       if (f > 1.5) emitir(p, 'golpe', { fuerza: f, con: 'policia' });
+      if (u.emb && u.emb.fase === 'ataque') {
+        // Embestida: pierdes velocidad, el coche se abolla (menos potencia y agarre) y se rompe la cadena de rebases.
+        j.vx *= 1 - EMBESTIDA.frena;
+        j.vy *= 1 - EMBESTIDA.frena;
+        j.danio = Math.min(EMBESTIDA.danioMax, j.danio + EMBESTIDA.danio);
+        u.coche.vx *= 0.9;
+        u.coche.vy *= 0.9;
+        romperCadena(p.botin);
+        emitir(p, 'embestida', { unidad: u.id, lado: u.emb.lado, danio: j.danio });
+        decir(p, 'embestida', { unidad: u.nombre });
+        u.emb = null;
+        u.embEnfriar = EMBESTIDA.enfriar;
+        p.stats.embestidas++;
+      }
       if (u.pit && u.pit.fase === 'ataque') {
         j.trompo = 1.4;
         j.w = u.pit.lado * 3.8;
@@ -5371,7 +5464,7 @@ function crearMenu(raiz, api) {
           <button class="sec" data-ir="ayuda">Cómo se juega</button>
         </div>
         ${rec ? `<p class="record">Tu mejor botín: <b>${fmt(rec)}</b> chapas</p>` : ''}
-        <p class="pie">Prototipo · fase 0 · todo el sonido y la ciudad se generan en tu móvil</p>
+        <p class="pie">Beta v4 · 25/09 · prototipo de la fase 0 · todo el sonido y la ciudad se generan en tu móvil</p>
       </div>`, 'portada-on');
     capa.querySelectorAll('.esc').forEach((b) => b.addEventListener('click', () => api.alJugar(b.dataset.esc)));
     capa.querySelectorAll('[data-control]').forEach((b) => b.addEventListener('click', () => {
@@ -7211,6 +7304,24 @@ function arrancar() {
       case 'radio':
         hud.radio(ev.linea, t);
         audio.evento('radioBip');
+        break;
+      case 'embisteAviso':
+        audio.evento('pit');
+        hud.aviso(`¡EMBESTIDA ${ev.lado > 0 ? '▶' : '◀'}! Frena o acelera de golpe`, 'peligro', 1.6, t);
+        vibra('dobleTic');
+        pista('embestida', 'Una patrulla se pone a tu lado para embestirte: pierdes velocidad y el coche queda tocado. Frena o acelera de golpe y fallará.', 6.5);
+        break;
+      case 'embestida':
+        hud.grande('¡EMBESTIDA!', 'rojo', 1, t);
+        hud.aviso(`Coche tocado: ${Math.round(ev.danio * 100)} % de daño`, 'peligro', 1.8, t);
+        camaras.sacudir(0.8);
+        vibra('zumbido');
+        break;
+      case 'embisteFallo':
+        if (ev.esquivada) {
+          hud.premio(`ESQUIVADA +${ev.gana}`, 'hueco');
+          vibra('tic');
+        }
         break;
       case 'pitAviso':
         audio.evento('pit');
