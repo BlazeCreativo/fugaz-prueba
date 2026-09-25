@@ -1758,13 +1758,104 @@ function topeVelocidad(ayuda, j, e, vT) {
 return { crearAyuda, asistir, crucero };
 })();
 
-// ---- src/logica/trafico.js
+// ---- src/logica/choques.js
 __m[5] = (() => {
-const { clamp, angNorm, angDif, rumbo } = __m[1]; // src/logica/mates.js
+const { clamp, angNorm } = __m[1]; // src/logica/mates.js
+// Choques en cadena, explosiones y patrullas fuera de combate (v7; Alberto, 25/09: «que si te chocas con ellos también
+// reaccionen y se choquen, o incluso que haya una explosión»). Lógica pura: las cifras, las fórmulas y el paso de un
+// coche suelto. Quién choca con quién lo decide partida.js.
+
+
+// Un golpe fuerte suelta al coche de su carril: pasa a ser un cuerpo libre que derrapa hasta pararse.
+// umbral: m/s de golpe para soltarlo · lat, lon: m/s² de frenada de lado (neumáticos cruzados) y de frente (el conductor
+// frena; más si el coche está destrozado) · giro: amortiguación del trompo (1/s) · parado: m/s para darlo por parado ·
+// recuperar: s parado con las luces de emergencia antes de volver a su carril · lejos: m a los que la grúa se lo lleva.
+const SUELTO = { umbral: 9, lat: 10, lon: 7, lonRoto: 9, giro: 1.4, parado: 0.4, recuperar: 6, lejos: 380 };
+
+// Daño del tráfico (0-1), más frágil que tu coche. Desde 0,5 echa humo; desde 0,75 ya no arranca (se queda con las luces
+// de emergencia); al 1 arde y explota cuando se acaba la mecha. Un golpe brutal (m/s) enciende la mecha corta, y rematar
+// uno que arde (m/s) lo hace explotar al momento.
+const DANIO_TRAFICO = { umbral: 4, porMs: 0.03, humo: 0.5, averiado: 0.75, mecha: 2.6, mechaCorta: 0.4, brutal: 40, rematar: 5 };
+
+// Explosión: empuja lo que hay cerca (m/s a 0 m para un coche de 1.400 kg), daña tu coche si estás al lado (solo en
+// De verdad), deja fuera de combate a las patrullas a menos de «patrulla» m y prende a los coches tocados que haya cerca.
+const EXPLOSION = { radio: 14, empuje: 10, jugador: 0.35, radioJugador: 12, patrulla: 9, cadena: 6, cadenaDanio: 0.5 };
+
+// Patrullas fuera de combate: solo cuando chocan contra algo que no seas tú (un muro, el tráfico, los restos, otra
+// patrulla o una explosión). Tu coche no es un arma: el botín premia la pericia, nunca la infracción (botin.js).
+// umbral: m/s sin daño · muro, vehiculo: m/s por encima del umbral que la tumban de un solo golpe (en un choque, además,
+// cuenta la masa de lo que golpea) · relevo: s hasta que llega otra · lejos: m a los que se retiran los restos.
+const TUMBAR = { umbral: 5, muro: 17, vehiculo: 14, relevo: 15, premio: 150, lejos: 300 };
+
+// Cuánto pesa lo que golpeas: un camión duele casi el doble que un coche; un muro, 1,3 veces.
+function factorMasa(masaOtro, masa) {
+  return Number.isFinite(masaOtro) ? clamp((2 * masaOtro) / (masaOtro + masa), 0.6, 1.9) : 1.3;
+}
+
+function danioTrafico(f, masaOtro, masa) {
+  return Math.max(0, (f - DANIO_TRAFICO.umbral) * DANIO_TRAFICO.porMs) * factorMasa(masaOtro, masa);
+}
+
+// Curva con exponente 1,5: los roces apenas cuentan (a mitad del golpe que tumba, un 35 %) y un choque fuerte decide.
+function danioPatrulla(f, masaOtro, masa) {
+  const base = Math.max(0, f - TUMBAR.umbral);
+  const k = Number.isFinite(masaOtro) ? (base / TUMBAR.vehiculo) * factorMasa(masaOtro, masa) : base / TUMBAR.muro;
+  return k ** 1.5;
+}
+
+// Parte de la explosión que alcanza a algo a d metros (1 en el centro, 0 en el borde).
+const alcance = (d, radio) => clamp(1 - d / radio, 0, 1);
+
+// Empujón de una explosión (m/s): menos cuanto más pesa (a un camión apenas lo mueve).
+function empuje(d, masa) {
+  return EXPLOSION.empuje * alcance(d, EXPLOSION.radio) * Math.min(1, 1400 / masa);
+}
+
+// Giro que da un golpe según dónde toca. o: posición del punto de contacto a lo largo del eje del coche (m, + delante);
+// (ix, iy): impulso que recibe (N·s). Rumbo en sentido horario: un empujón a la derecha en la trasera gira el morro a la
+// izquierda. Inercia de una caja, m (L² + A²) / 12, y medio efecto: las ruedas se resisten.
+function giroGolpe(c, o, ix, iy) {
+  const rx = Math.sin(c.h) * o, ry = Math.cos(c.h) * o;
+  const inercia = (c.masa * (c.largo * c.largo + c.ancho * c.ancho)) / 12;
+  c.w = clamp((c.w || 0) - (0.5 * (rx * iy - ry * ix)) / inercia, -4, 4);
+}
+
+const menos = (v, d) => (v > d ? v - d : v < -d ? v + d : 0);
+
+// Un paso de un coche suelto (x, y, vx, vy, h, w): los neumáticos frenan mucho de lado y el conductor frena de frente.
+// Devuelve true cuando ya está parado.
+function pasoSuelto(c, dt) {
+  const fx = Math.sin(c.h), fy = Math.cos(c.h), rx = Math.cos(c.h), ry = -Math.sin(c.h);
+  const lon = c.danio >= DANIO_TRAFICO.averiado ? SUELTO.lonRoto : SUELTO.lon;
+  const vf = menos(c.vx * fx + c.vy * fy, lon * dt), vl = menos(c.vx * rx + c.vy * ry, SUELTO.lat * dt);
+  c.vx = fx * vf + rx * vl;
+  c.vy = fy * vf + ry * vl;
+  c.w = menos(c.w * Math.exp(-SUELTO.giro * dt), 0.8 * dt);
+  c.h = angNorm(c.h + c.w * dt);
+  c.x += c.vx * dt;
+  c.y += c.vy * dt;
+  return Math.hypot(c.vx, c.vy) < SUELTO.parado && Math.abs(c.w) < 0.05;
+}
+
+// Lo que ocupa un coche cruzado, visto desde un carril de rumbo hCarril: largo y ancho aparentes.
+function huella(c, hCarril) {
+  const a = c.h - hCarril, co = Math.abs(Math.cos(a)), se = Math.abs(Math.sin(a));
+  return { largo: co * c.largo + se * c.ancho, ancho: co * c.ancho + se * c.largo };
+}
+return { SUELTO, DANIO_TRAFICO, EXPLOSION, TUMBAR, factorMasa, danioTrafico, danioPatrulla, alcance, empuje, giroGolpe, pasoSuelto, huella };
+})();
+
+// ---- src/logica/trafico.js
+__m[6] = (() => {
+const { clamp, angNorm, angDif, rumbo, proyectarSegmento } = __m[1]; // src/logica/mates.js
 const { LARGO_RONDA, CARRILES, CARRILES_EXT, D_MEDIANA, D_GUARDA, rondaPunto, rondaProyectar, normS, difS, esCurva } = __m[2]; // src/logica/mapa.js
+const { SUELTO, DANIO_TRAFICO, pasoSuelto, huella } = __m[5]; // src/logica/choques.js
 // Tráfico: la Ronda (calzada interior, sentido horario), la calzada exterior (solo decorado) y el barrio.
 // Semicinemático: cada vehículo sigue su carril a su velocidad. Un golpe lo desplaza y lo deja aturdido un rato.
 // Se aparta para la sirena, no para ti; solo frena si te tiene delante.
+// v7: un golpe fuerte lo suelta del carril (choques.js): derrapa como un cuerpo libre, puede llevarse a otros por delante
+// y, parado, pone las luces de emergencia. Si el coche aún anda, a los 6 s vuelve a su carril; si no, espera a la grúa.
+
 
 
 
@@ -1803,6 +1894,7 @@ function nuevo(id, tipo, azar, zona) {
     color: tipo === 'camion' ? azar.elegir(['#D8D2C4', '#3A4A5E', '#7A2E2A', '#E8E8EA']) : azar.elegir(COLORES),
     v: 0, vDes: azar.rango(t.v[0], t.v[1]),
     latV: 0, giro: 0, aturdido: 0, golpes: 0,
+    danio: 0, suelto: false, w: 0, paradoT: 0, emergencia: false, arde: 0, quemado: false,
     fase: azar.rango(0, 6.28), amp: tipo === 'camion' ? 0.15 : azar.rango(0.25, 0.5), frec: azar.rango(0.08, 0.16),
     x: 0, y: 0, h: 0, vx: 0, vy: 0,
   };
@@ -1991,12 +2083,13 @@ function pasoTrafico(tr, dt, cuerpos, mapa, azar) {
 
 function pasoRonda(tr, dt, cuerpos) {
   // Obstáculos en coordenadas de la Ronda.
-  const obs = tr.ronda.map((c) => ({ s: c.s, d: c.d, v: c.v, largo: c.largo, ancho: c.ancho, ref: c, sirena: false }));
+  const obs = tr.ronda.map((c) => ({ s: c.s, d: c.d, v: c.v, largo: c.largoEf ?? c.largo, ancho: c.anchoEf ?? c.ancho, ref: c, sirena: false }));
   for (const b of cuerpos) {
     const p = rondaProyectar(b.x, b.y);
     if (p.d > D_MEDIANA + 1 || p.d < D_GUARDA - 1) continue;
     const q = rondaPunto(p.s, p.d);
-    obs.push({ s: p.s, d: p.d, v: b.vx * q.tx + b.vy * q.ty, largo: b.largo, ancho: b.ancho, ref: b, sirena: !!b.sirena });
+    const hu = huella(b, rumbo(q.tx, q.ty)); // cruzado (un trompo, unos restos) ocupa más carril
+    obs.push({ s: p.s, d: p.d, v: b.vx * q.tx + b.vy * q.ty, largo: hu.largo, ancho: hu.ancho, ref: b, sirena: !!b.sirena });
   }
   const libre = (c, d, atras, delante) => {
     for (const o of obs) {
@@ -2008,6 +2101,10 @@ function pasoRonda(tr, dt, cuerpos) {
     return true;
   };
   for (const c of tr.ronda) {
+    if (c.suelto) {
+      pasoSueltoRonda(c, dt);
+      continue;
+    }
     const dAntes = c.d;
     c.aturdido = Math.max(0, c.aturdido - dt);
     c.cambioT -= dt;
@@ -2029,6 +2126,8 @@ function pasoRonda(tr, dt, cuerpos) {
     if (lider) {
       const seguro = 5 + c.v * 1.1;
       if (gap < seguro) vObj = Math.min(vObj, Math.max(0, lider.v + (gap - seguro) * 0.6));
+      // v7: algo parado delante (un accidente) se ve de lejos: frena a tiempo de pararse, a 6 m/s².
+      if (lider.v < c.v) vObj = Math.min(vObj, Math.sqrt(Math.max(0, lider.v) ** 2 + 12 * Math.max(0, gap - 2)));
       if (gap < 1.5) vObj = 0;
     }
     // Sirena detrás: se aparta a la derecha; si ya va por el carril lento, se pega al guardarraíl y afloja.
@@ -2045,7 +2144,8 @@ function pasoRonda(tr, dt, cuerpos) {
       // Apartarse para la sirena es inmediato; el intermitente se pone igual.
       if (c.carril < 2 && Math.abs(c.d - CARRILES[c.carril]) < 0.4 && libre(c, CARRILES[c.carril + 1], 12, 18)) { c.carril++; c.intermitente = 1; }
       else if (c.carril === 2) { c.apartado = -1.6; vObj = Math.min(vObj, c.vDes * 0.8); }
-    } else if (c.tipo !== 'camion' && c.aturdido <= 0 && c.cambioT <= 0 && lider && gap < 35 && lider.v < c.vDes - 2) {
+    } else if ((c.tipo !== 'camion' || (lider && lider.v < 2)) && c.aturdido <= 0 && c.cambioT <= 0 && lider && gap < 35 && lider.v < c.vDes - 2) {
+      // Los camiones solo cambian de carril para pasar un coche parado (un accidente).
       // Adelantar por la izquierda (carril más rápido) o, si no se puede, por la derecha.
       const cerca = Math.abs(c.d - CARRILES[c.carril]) < 0.4;
       const aluego = 14 + Math.max(0, 30 - c.v) * 0.5;
@@ -2054,7 +2154,7 @@ function pasoRonda(tr, dt, cuerpos) {
       else c.cambioT = 1;
     }
     if (!c.aviso && c.intermitente && Math.abs(c.d - CARRILES[c.carril]) < 0.3) c.intermitente = 0; // ya está en su carril
-    const frenada = gap < 5 + c.v * 0.5 ? 9 : 4.5;
+    const frenada = gap < 5 + c.v * 0.5 ? 9 : lider && lider.v < c.v - 5 ? 7 : 4.5;
     if (vObj > c.v) c.v += Math.min(vObj - c.v, 2.2 * dt);
     else c.v -= Math.min(c.v - vObj, frenada * dt);
     c.v = Math.max(0, c.v);
@@ -2074,6 +2174,10 @@ function pasoRonda(tr, dt, cuerpos) {
 function pasoBarrio(tr, dt, cuerpos, mapa, azar) {
   const todos = tr.barrio.concat(cuerpos);
   for (const c of tr.barrio) {
+    if (c.suelto) {
+      if (pararSuelto(c, pasoSuelto(c, dt), dt)) volverALaCalle(c, mapa);
+      continue;
+    }
     c.aturdido = Math.max(0, c.aturdido - dt);
     const e = mapa.grafo.aristas[c.arista];
     const fx = Math.sin(c.h), fy = Math.cos(c.h), rx = Math.cos(c.h), ry = -Math.sin(c.h);
@@ -2136,6 +2240,131 @@ function pasoBarrio(tr, dt, cuerpos, mapa, azar) {
   }
 }
 
+// ------------------------------------------------------------------ coches sueltos (v7)
+// Lo suelta del carril: desde ahora es un cuerpo libre (la física del golpe ya le ha cambiado vx, vy y el giro).
+function soltar(c) {
+  if (c.suelto) return false;
+  c.suelto = true;
+  c.aviso = null;
+  c.intermitente = 0;
+  c.paradoT = 0;
+  c.w = c.w || 0;
+  return true;
+}
+
+// Cuenta el tiempo parado y pone las luces de emergencia. Devuelve true cuando toca volver a circular.
+function pararSuelto(c, parado, dt) {
+  if (!parado) {
+    c.paradoT = 0;
+    return false;
+  }
+  c.paradoT += dt;
+  c.emergencia = !c.quemado; // el quemado ya no tiene luces
+  return c.paradoT >= SUELTO.recuperar && c.danio < DANIO_TRAFICO.averiado && !(c.arde > 0);
+}
+
+function pasoSueltoRonda(c, dt) {
+  const parado = pasoSuelto(c, dt);
+  const p = rondaProyectar(c.x, c.y);
+  const q = rondaPunto(p.s, p.d);
+  c.s = p.s;
+  c.d = p.d;
+  c.v = c.vx * q.tx + c.vy * q.ty; // lo que avanza por la Ronda, para los que vienen detrás
+  const hu = huella(c, rumbo(q.tx, q.ty));
+  c.largoEf = hu.largo;
+  c.anchoEf = hu.ancho;
+  // Solo vuelve si ha quedado dentro de la calzada (no en una salida).
+  const dentro = c.d < D_MEDIANA - c.ancho / 2 && c.d > D_GUARDA + c.ancho / 2;
+  if (pararSuelto(c, parado, dt) && dentro) volverAlCarril(c, false);
+}
+
+// Vuelve a circular por el carril más cercano. deGolpe (la grúa, tras la niebla): recto y en marcha; si no, arranca
+// despacio y el morro gira poco a poco hasta ponerse recto.
+function volverAlCarril(c, deGolpe) {
+  const p = rondaProyectar(c.x, c.y);
+  const q = rondaPunto(p.s, p.d);
+  c.suelto = false;
+  c.emergencia = false;
+  c.paradoT = 0;
+  c.w = 0;
+  c.largoEf = c.anchoEf = undefined;
+  c.s = p.s;
+  c.d = clamp(p.d, D_GUARDA + c.ancho / 2 + 0.2, D_MEDIANA - c.ancho / 2 - 0.2);
+  let k = 0, md = Infinity;
+  CARRILES.forEach((d, i) => { if (Math.abs(d - c.d) < md) { md = Math.abs(d - c.d); k = i; } });
+  c.carril = k;
+  c.v = deGolpe ? c.vDes * 0.6 : 0;
+  c.latV = 0;
+  c.aturdido = deGolpe ? 0 : 1.5;
+  c.giro = deGolpe ? 0 : angDif(c.h, rumbo(q.tx, q.ty));
+  c.aviso = null;
+  c.intermitente = 0;
+  c.cambioT = 3;
+  colocarRonda(c, c.d, 1);
+}
+
+// Barrio: se vuelve a enganchar a la calle más cercana, en el sentido al que mira, sin saltos (la desviación lateral pasa a
+// «lat» y se recoge sola). Lejos de cualquier calle (en una acera), se queda parado hasta la grúa.
+function volverALaCalle(c, mapa, deGolpe = false) {
+  let mejor = null;
+  for (const e of mapa.grafo.aristas) {
+    if (e.tipo !== 'calle' && e.tipo !== 'glorieta') continue;
+    for (let i = 1; i < e.puntos.length; i++) {
+      const a = e.puntos[i - 1], b = e.puntos[i];
+      const pr = proyectarSegmento(c.x, c.y, a[0], a[1], b[0], b[1]);
+      if (!mejor || pr.d2 < mejor.d2) mejor = { e, i, pr, d2: pr.d2 };
+    }
+  }
+  if (!mejor || mejor.d2 > 36) return false;
+  const { e, i, pr } = mejor;
+  const a = e.puntos[i - 1], b = e.puntos[i];
+  const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  const dx = (b[0] - a[0]) / l, dy = (b[1] - a[1]) / l;
+  const u = e.acum[i - 1] + (e.acum[i] - e.acum[i - 1]) * pr.t;
+  c.sentido = Math.sin(c.h) * dx + Math.cos(c.h) * dy >= 0 ? 1 : -1;
+  if (e.dirigida) c.sentido = 1; // las de sentido único, por su sentido
+  c.arista = e.id;
+  c.rec = clamp(c.sentido === 1 ? u : e.largo - u, 0.5, e.largo - 0.5);
+  const tx = dx * c.sentido, ty = dy * c.sentido;
+  const lado = e.tipo === 'glorieta' ? 0 : e.ancho / 4;
+  const rampa = Math.min(1, c.rec / 8, (e.largo - c.rec) / 8);
+  const off = (c.x - pr.x) * ty - (c.y - pr.y) * tx; // a la derecha de la marcha: (ty, -tx)
+  c.lat = clamp(off - lado * Math.max(0, rampa), -3, 3.5);
+  c.latV = 0;
+  c.suelto = false;
+  c.emergencia = false;
+  c.paradoT = 0;
+  c.w = 0;
+  c.v = deGolpe ? c.vDes * 0.6 : 0;
+  c.aturdido = deGolpe ? 0 : 1.5;
+  c.hSuave = deGolpe ? null : c.h;
+  c.giro = 0;
+  c.colocado = false;
+  colocarBarrio(c, mapa, 1 / 60);
+  return true;
+}
+
+// La grúa: lo que ha quedado destrozado o parado en medio y está lejos de ti (tras la niebla) vuelve a circular como nuevo.
+// Así la Ronda no se llena de restos en una huida larga. Devuelve cuántos se ha llevado.
+function grua(tr, x, y, mapa) {
+  let n = 0;
+  for (const lista of [tr.ronda, tr.barrio]) {
+    for (const c of lista) {
+      if (!c.suelto && !c.quemado && !(c.danio > 0)) continue;
+      if (c.arde > 0 || Math.hypot(c.x - x, c.y - y) < SUELTO.lejos) continue;
+      if (c.suelto) {
+        if (c.zona === 'ronda') volverAlCarril(c, true);
+        else if (!volverALaCalle(c, mapa, true)) continue;
+      }
+      c.danio = 0;
+      c.quemado = false;
+      c.golpes = 0;
+      n++;
+    }
+  }
+  return n;
+}
+
 // Después de un choque (x, y, vx, vy ya cambiados por la física): vuelve a su carril y se aturde.
 function golpeado(c, fuerza) {
   c.aturdido = Math.max(c.aturdido, 1.2 + Math.min(1.5, fuerza * 0.1));
@@ -2176,11 +2405,11 @@ function camiones(tr) {
   for (const c of tr.ronda) if (c.tipo === 'camion') out.push({ x: c.x, y: c.y, h: c.h, ml: c.largo / 2, ma: c.ancho / 2 });
   return out;
 }
-return { TIPOS_TRAFICO, NIVELES_TRAFICO, crearTrafico, subirTrafico, pasoTrafico, golpeado, cercaDe, camiones };
+return { TIPOS_TRAFICO, NIVELES_TRAFICO, crearTrafico, subirTrafico, pasoTrafico, soltar, grua, golpeado, cercaDe, camiones };
 })();
 
 // ---- src/logica/ojo.js
-__m[6] = (() => {
+__m[7] = (() => {
 const { clamp } = __m[1]; // src/logica/mates.js
 // El Ojo: rojo = te ven; ámbar = te buscan donde te vieron por última vez; cerrado = libre.
 
@@ -2255,11 +2484,11 @@ return { GRACIA, BUSQUEDA, LIMITE_FANTASMA, crearOjo, pasoOjo, restante, radioBu
 })();
 
 // ---- src/logica/policia.js
-__m[7] = (() => {
+__m[8] = (() => {
 const { clamp, angDif, rumbo, dist, proyectarSegmento } = __m[1]; // src/logica/mates.js
 const { crearCoche, pasoCoche, agilDe } = __m[3]; // src/logica/coche.js
 const { rondaProyectar, rondaPunto, CARRILES, normS, difS, RAMPAS } = __m[2]; // src/logica/mapa.js
-const { radioBusqueda } = __m[6]; // src/logica/ojo.js
+const { radioBusqueda } = __m[7]; // src/logica/ojo.js
 // La policía de la Metro. Lince: persigue. Lobo: rápido en recta, torpe en curva; hace la maniobra PIT con aviso.
 // Toro: pesado, corta el paso y pone pinchos. Conductas: perseguir, cortar, buscar desde la última posición y cancelar.
 
@@ -2612,6 +2841,8 @@ function pasoUnidad(u, ctx, dt) {
         u.esquivaT = 1.0;
       }
       if (esq.gap < 6 + Math.abs(c.vf) * 0.3) e.vObjEsq = esq.v - 1;
+      // Algo parado o casi (un accidente, unos restos): frena a tiempo para poder pararse, mientras se abre a un lado.
+      if (esq.v < 8) e.vObjEsq = Math.min(e.vObjEsq ?? Infinity, Math.sqrt(esq.v * esq.v + 13 * Math.max(0, esq.gap - 5)));
     } else if (u.esquivaT <= -1) u.esquiva = 0;
     if (u.esquiva && u.ruta && u.modo !== 'directo') {
       e = pilotar(c, u.ruta, { torpeza: u.tipo === 'lobo' ? 1.12 : 1, margen: 0.85, desvio: u.esquiva, vMax: ojo === 'rojo' ? undefined : c.m.vMax * 0.72 });
@@ -2653,7 +2884,8 @@ function pasoUnidad(u, ctx, dt) {
 // Lo primero que tiene delante en su trayectoria (tráfico u otra unidad).
 function obstaculoDelante(c, otros, u) {
   const fx = Math.sin(c.h), fy = Math.cos(c.h), rx = Math.cos(c.h), ry = -Math.sin(c.h);
-  const alcance = 8 + Math.abs(c.vf) * 0.9;
+  // Hasta donde necesita para pararse (6,5 m/s²): un coche cruzado se ve de lejos.
+  const alcance = Math.min(110, 8 + Math.max(Math.abs(c.vf) * 0.9, (c.vf * c.vf) / 13));
   let mejor = null;
   for (const o of otros) {
     if (o === c || o === u) continue;
@@ -2661,10 +2893,12 @@ function obstaculoDelante(c, otros, u) {
     if (Math.abs(dx) > alcance + 6 || Math.abs(dy) > alcance + 6) continue;
     const lon = dx * fx + dy * fy, lat = dx * rx + dy * ry;
     if (lon <= 0 || lon > alcance) continue;
-    if (Math.abs(lat) > (o.ancho + c.ancho) / 2 + 0.4) continue;
+    // Un coche cruzado (suelto tras un choque) ocupa más de lo que mide de ancho.
+    const ancho = o.suelto ? Math.max(o.ancho, o.anchoEf ?? o.largo) : o.ancho, largo = o.suelto ? (o.largoEf ?? o.largo) : o.largo;
+    if (Math.abs(lat) > (ancho + c.ancho) / 2 + 0.4) continue;
     const v = o.vx * fx + o.vy * fy;
     if (v > c.vf - 1.5) continue;
-    const gap = lon - (o.largo + c.largo) / 2;
+    const gap = lon - (largo + c.largo) / 2;
     if (!mejor || gap < mejor.gap) mejor = { gap, v, lat };
   }
   return mejor;
@@ -2681,7 +2915,8 @@ function ladoLibre(c, otros, u, zona) {
       if (Math.abs(dx) > 50 || Math.abs(dy) > 50) continue;
       const lon = dx * fx + dy * fy, lat = dx * rx + dy * ry;
       if (lon < -6 || lon > 40) continue;
-      if (Math.abs(lat - off) < (o.ancho + c.ancho) / 2 + 0.6) pen += 1;
+      const ancho = o.suelto ? Math.max(o.ancho, o.anchoEf ?? o.largo) : o.ancho;
+      if (Math.abs(lat - off) < (ancho + c.ancho) / 2 + 0.6) pen += 1;
     }
     return pen;
   };
@@ -2775,7 +3010,7 @@ return { NOMBRES, EMBESTIDA, PIT_ADAPTA, EMBESTIDA_TIPO, crearUnidad, prepararRu
 })();
 
 // ---- src/logica/botin.js
-__m[8] = (() => {
+__m[9] = (() => {
 
 // Botín en juego: crece con el tiempo, el nivel de alerta y el estilo; se cobra al escapar.
 // El estilo premia la pericia (casi-choques, huecos, derrapes), nunca las infracciones.
@@ -2847,7 +3082,7 @@ return { FINALES, crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrap
 })();
 
 // ---- src/logica/radio.js
-__m[9] = (() => {
+__m[10] = (() => {
 
 // La radio de la Metro narra la persecución. Claves ficticias:
 // 7 persecución · 3 pinchos · 5 control · 9 cancelar · 0 detenido.
@@ -3006,7 +3241,21 @@ const LINEAS = {
     ['{unidad}', 'Lleva el coche tocado, no aguantará mucho.'],
   ],
   siniestro: [
-    ['{unidad}', 'Clave 0. El coche del sospechoso ha quedado destrozado en {lugar}. Lo tenemos.'],
+    ['{unidad}', 'Clave 0. El coche del sospechoso ha quedado destrozado en {lugar}. El conductor está bien: lo tenemos.'],
+  ],
+  // v7: choques en cadena, explosiones y patrullas fuera de combate. Sin heridos a la vista (informe 13: PEGI 7).
+  fueraCombate: [
+    ['{unidad}', 'Aquí {unidad}: estoy fuera. Yo estoy bien; el coche, no.'],
+    ['CENTRAL', '{unidad} fuera de combate. Mando relevo.'],
+    ['{unidad}', '¡He chocado! Estoy entero, pero no puedo seguir. Que alguien lo coja.'],
+  ],
+  explosion: [
+    ['{unidad}', '¡Ha ardido un coche en {lugar}! Los ocupantes han salido a tiempo.'],
+    ['CENTRAL', 'Incendio de un vehículo en {lugar}. Sin heridos. Bomberos en camino.'],
+  ],
+  accidente: [
+    ['{unidad}', 'Choque en cadena en {lugar}. Cuidado, unidades.'],
+    ['CENTRAL', 'Varios coches cruzados en {lugar}. Sin heridos. Reducid.'],
   ],
 };
 
@@ -3017,7 +3266,7 @@ const PRIORIDAD = {
   salidaPerfecta: 4, choque: 4, tunel: 4, parking: 4, callejon: 4, salidaRonda: 4, fuga120: 5,
   hueco: 3, refuerzo: 3, busqueda: 2, busquedaRonda: 2, pinchosFallo: 4, pitFallo: 4,
   trafico2: 5, trafico3: 5, trafico4: 6, embisteAviso: 6, embestida: 7, embisteFallo: 4,
-  humo: 5, siniestro: 10,
+  humo: 5, siniestro: 10, fueraCombate: 8, explosion: 6, accidente: 5,
 };
 
 function rellenar(texto, datos) {
@@ -3045,19 +3294,21 @@ return { LINEAS, PRIORIDAD, lineaRadio, cuantasLineas };
 })();
 
 // ---- src/logica/partida.js
-__m[10] = (() => {
+__m[11] = (() => {
 const { crearAzar, subSemilla, semillaNueva } = __m[0]; // src/logica/azar.js
 const { clamp, dist, rumbo, circuloCaja, circuloMuro, circuloCirculo } = __m[1]; // src/logica/mates.js
 const { crearMapa, rondaPunto, rondaProyectar, CARRILES, normS, difS, RAMPAS } = __m[2]; // src/logica/mapa.js
 const { crearCoche, pasoCoche, choqueFijo, choqueEntre, circulosDe, ASISTENCIA } = __m[3]; // src/logica/coche.js
 const { crearAyuda, asistir } = __m[4]; // src/logica/asistencia.js
-const { crearTrafico, pasoTrafico, golpeado, cercaDe, camiones, subirTrafico } = __m[5]; // src/logica/trafico.js
-const { crearUnidad, pasoUnidad, puntoAparicion, EMBESTIDA, EMBESTIDA_TIPO } = __m[7]; // src/logica/policia.js
-const { crearOjo, pasoOjo, finalDeEscape, LIMITE_FANTASMA } = __m[6]; // src/logica/ojo.js
-const { crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, premio, FINALES } = __m[8]; // src/logica/botin.js
-const { lineaRadio, PRIORIDAD } = __m[9]; // src/logica/radio.js
+const { crearTrafico, pasoTrafico, golpeado, cercaDe, camiones, subirTrafico, soltar, grua } = __m[6]; // src/logica/trafico.js
+const { SUELTO, DANIO_TRAFICO, EXPLOSION, TUMBAR, danioTrafico, danioPatrulla, alcance, empuje, giroGolpe } = __m[5]; // src/logica/choques.js
+const { crearUnidad, pasoUnidad, puntoAparicion, EMBESTIDA, EMBESTIDA_TIPO } = __m[8]; // src/logica/policia.js
+const { crearOjo, pasoOjo, finalDeEscape, LIMITE_FANTASMA } = __m[7]; // src/logica/ojo.js
+const { crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, premio, FINALES } = __m[9]; // src/logica/botin.js
+const { lineaRadio, PRIORIDAD } = __m[10]; // src/logica/radio.js
 // Una partida: une el mapa, tu coche, el tráfico, la policía, el Ojo, el botín y la radio.
 // Sin pantalla ni 3D: avanza a pasos fijos de 1/60 s y deja eventos para la presentación (sonido, vibración, textos).
+
 
 
 
@@ -3078,8 +3329,9 @@ const ESCENARIOS = {
 // Daño por choque (modo De verdad; Alberto, 25/09: «si hay un choque en el modo de verdad, que te dañes y te condicione»).
 // Rozar no daña (por debajo de 4 m/s de golpe). Contra un muro: 10 % a 36 km/h de frente, 35 % a 90 km/h.
 // Contra otro vehículo, según su masa: un camión duele casi el doble que un coche. Al 100 %, SINIESTRO.
-// Ningún golpe suelto pasa del 50 %: hacen falta al menos dos para el siniestro (un frontal no te saca de la huida de golpe).
-const DANIO = { umbral: 4, porMs: 0.013, golpeMax: 0.5, muro: 1.3, humo: 0.5, fuego: 0.8, falloCada: 3, falloDura: 0.25 };
+// Ningún golpe suelto pasa del 40 %: hacen falta al menos tres para el siniestro. Con el 50 % de la v6, dos golpes fuertes
+// acababan la huida (informe 13: evitar la espiral de daño).
+const DANIO = { umbral: 4, porMs: 0.013, golpeMax: 0.4, muro: 1.3, humo: 0.5, fuego: 0.8, falloCada: 3, falloDura: 0.25 };
 function danioGolpe(fuerza, masaOtro = Infinity, masaJ = 1250) {
   const base = Math.max(0, (fuerza - DANIO.umbral) * DANIO.porMs);
   const k = Number.isFinite(masaOtro) ? clamp((2 * masaOtro) / (masaOtro + masaJ), 0.6, 1.9) : DANIO.muro;
@@ -3151,13 +3403,15 @@ function crearPartida(op = {}) {
     radio: { cola: [], espera: 0.6, actual: null, busquedaT: 3 },
     casi: new Map(), ultimoCasi: null, rebufoGap: Infinity, rebufoOn: false, fuga120T: 0, contraAvisos: 0,
     traficoNivel: 1, respiro: 0, pitsAvisados: 0,
+    // v7: patrullas fuera de combate (sus restos siguen en la calle un rato), nombres ya usados y avisos de la radio.
+    restos: [], usados: new Set([lince.id]), explosionT: -99, accidenteT: -99, estruendoT: -99, gruaT: 1, ultimaCausa: null,
     final: null,
     eventos: [],
     cinta: [], ultimaEntrada: '',
     stats: {
       nivelMax: 1, casiChoques: 0, huecos: 0, derrapeSeg: 0, velMaxKmh: 0, choques: 0, vecesVisto: 1,
       pinchazos: 0, pits: 0, contraSeg: 0, escondidoSeg: 0, traficoMax: 1, embestidas: 0, embestidasEsquivadas: 0,
-      danioMax: 0,
+      danioMax: 0, sueltos: 0, cadenas: 0, explosiones: 0, tumbadas: 0,
     },
   };
   decir(p, 'inicio', { unidad: lince.nombre });
@@ -3180,6 +3434,7 @@ function daniar(p, cantidad, causa) {
   const j = p.jugador;
   if (p.modo === 'practica' || !(cantidad > 0) || p.final) return;
   const antes = j.danio;
+  p.ultimaCausa = causa;
   j.danio = Math.min(1, j.danio + cantidad);
   p.stats.danioMax = Math.max(p.stats.danioMax, j.danio);
   emitir(p, 'danio', { danio: j.danio, antes, causa });
@@ -3265,7 +3520,8 @@ function choquesMundo(p, c, dt) {
   return toca ? golpe : 0;
 }
 
-// Contacto entre dos coches (círculos a lo largo de cada eje). Normal de b hacia a.
+// Contacto entre dos coches (círculos a lo largo de cada eje). Normal de b hacia a; oa, ob: dónde tocan, a lo largo del
+// eje de cada uno (m, + delante), para el giro que da el golpe.
 function contacto(a, b) {
   const lim = (a.largo + b.largo) / 2 + 0.3;
   if (Math.abs(a.x - b.x) > lim || Math.abs(a.y - b.y) > lim) return null;
@@ -3278,10 +3534,198 @@ function contacto(a, b) {
       const bx = b.x + fb[0] * kb.o, by = b.y + fb[1] * kb.o;
       const dx = ax - bx, dy = ay - by, d = Math.hypot(dx, dy) || 1e-6;
       const pen = ka.r + kb.r - d;
-      if (pen > 0 && (!mejor || pen > mejor.pen)) mejor = { nx: dx / d, ny: dy / d, pen };
+      if (pen > 0 && (!mejor || pen > mejor.pen)) mejor = { nx: dx / d, ny: dy / d, pen, oa: ka.o, ob: kb.o };
     }
   }
   return mejor;
+}
+
+// ------------------------------------------------------------------ choques en cadena, explosiones y fuera de combate (v7)
+const impulso = (f, ma, mb) => (1.2 * f) / (1 / ma + 1 / mb); // el de choqueEntre (rebote 0,2)
+
+// Un vehículo del tráfico recibe un golpe de «otro» (k: contacto de otro contra él; f: m/s del golpe). Flojo: se aparta
+// y sigue en su carril. Fuerte (o si ya iba suelto): se suelta y gira según dónde le han dado.
+// por: quién le da ('jugador', 'policia', 'trafico' o 'restos'); con los dos últimos es un choque en cadena.
+function golpearTrafico(p, t, otro, k, f, por) {
+  const cadena = por === 'trafico' || por === 'restos';
+  if (f > DANIO_TRAFICO.umbral) {
+    t.porUltimo = por;
+    daniarTrafico(p, t, danioTrafico(f, otro.masa, t.masa), f);
+  }
+  if (!t.suelto && f < SUELTO.umbral) {
+    golpeado(t, f);
+    return;
+  }
+  if (soltar(t)) {
+    p.stats.sueltos++;
+    emitir(p, 'suelto', { id: t.id, por });
+    if (cadena) {
+      p.stats.cadenas++;
+      if (p.t - p.accidenteT > 15 && dist(t.x, t.y, p.jugador.x, p.jugador.y) < 250) {
+        p.accidenteT = p.t;
+        emitir(p, 'accidente', { x: t.x, y: t.y });
+        decir(p, 'accidente', { unidad: cercana(p), lugar: p.mapa.nombreLugar(t.x, t.y) });
+      }
+    }
+  }
+  const J = impulso(f, otro.masa, t.masa);
+  giroGolpe(t, k.ob, -k.nx * J, -k.ny * J);
+}
+
+// Daño de un vehículo del tráfico. Muy tocado, se para (suelto); al 1, arde y explota cuando se acaba la mecha.
+// Si ya arde, un golpe más lo hace explotar al momento.
+function daniarTrafico(p, t, cantidad, f) {
+  if (t.quemado || !(cantidad > 0 || t.arde > 0)) return;
+  if (t.arde > 0) {
+    if (f >= DANIO_TRAFICO.rematar) t.arde = Math.min(t.arde, 1e-3);
+    return;
+  }
+  t.danio = Math.min(1, t.danio + cantidad);
+  if (t.danio >= DANIO_TRAFICO.averiado && soltar(t)) p.stats.sueltos++;
+  if (t.danio >= 1) {
+    t.arde = f >= DANIO_TRAFICO.brutal ? DANIO_TRAFICO.mechaCorta : DANIO_TRAFICO.mecha;
+    emitir(p, 'fuego', { id: t.id, x: t.x, y: t.y, mecha: t.arde });
+  }
+}
+
+// Daño de una patrulla (0-1). Al 1 queda fuera de combate al final de los choques de este paso.
+function daniarPatrulla(u, cantidad, causa) {
+  if (!(cantidad > 0) || u.caida) return;
+  u.coche.danio = Math.min(1, u.coche.danio + cantidad);
+  if (u.coche.danio >= 1) u.caida = causa;
+}
+
+function choquesAccidente(p, dt) {
+  const tr = p.trafico, j = p.jugador;
+  let fuerte = 0, fx = 0, fy = 0;
+  for (const lista of [tr.ronda, tr.barrio]) {
+    for (const t of lista) {
+      if (!t.suelto) continue;
+      if (!t.circulos) t.circulos = circulosDe(t.largo, t.ancho);
+      const g = choquesMundo(p, t, dt);
+      if (g > DANIO_TRAFICO.umbral) daniarTrafico(p, t, danioTrafico(g, Infinity, t.masa), g);
+      for (const o of cercaDe(tr, t.x, t.y, 16)) {
+        if (o === t || (o.suelto && o.id < t.id)) continue; // cada pareja de sueltos, una sola vez
+        const k = contacto(t, o);
+        if (!k) continue;
+        const f = choqueEntre(t, o, k.nx, k.ny, k.pen);
+        if (f <= 0) continue;
+        golpearTrafico(p, o, t, k, f, 'trafico');
+        giroGolpe(t, k.oa, k.nx * impulso(f, t.masa, o.masa), k.ny * impulso(f, t.masa, o.masa));
+        if (f > DANIO_TRAFICO.umbral) daniarTrafico(p, t, danioTrafico(f, o.masa, t.masa), f);
+        if (f > fuerte) { fuerte = f; fx = t.x; fy = t.y; }
+      }
+    }
+  }
+  // Los restos de las patrullas también se llevan por delante al tráfico.
+  for (const r of p.restos) {
+    choquesMundo(p, r.coche, dt);
+    for (const t of cercaDe(tr, r.coche.x, r.coche.y, 16)) {
+      const k = contacto(r.coche, t);
+      if (!k) continue;
+      const f = choqueEntre(r.coche, t, k.nx, k.ny, k.pen);
+      if (f > 0) golpearTrafico(p, t, r.coche, k, f, 'restos');
+    }
+  }
+  // El estruendo de un choque entre otros, para el sonido (como mucho uno cada 0,15 s).
+  if (fuerte > 6 && p.t - p.estruendoT > 0.15) {
+    p.estruendoT = p.t;
+    emitir(p, 'estruendo', { x: fx, y: fy, fuerza: fuerte, dist: dist(fx, fy, j.x, j.y) });
+  }
+}
+
+// Mechas, la grúa y los restos que ya quedan lejos.
+function pasoAccidentes(p, dt) {
+  const tr = p.trafico, j = p.jugador;
+  for (const lista of [tr.ronda, tr.barrio]) {
+    for (const t of lista) {
+      if (!(t.arde > 0)) continue;
+      t.arde -= dt;
+      if (t.arde <= 0) explotar(p, t);
+    }
+  }
+  p.gruaT -= dt;
+  if (p.gruaT <= 0) {
+    p.gruaT = 1;
+    grua(tr, j.x, j.y, p.mapa);
+    for (let i = p.restos.length - 1; i >= 0; i--) {
+      const c = p.restos[i].coche;
+      if (p.t - p.restos[i].t > 8 && dist(c.x, c.y, j.x, j.y) > TUMBAR.lejos) p.restos.splice(i, 1);
+    }
+  }
+}
+
+// Un coche en llamas explota: empuja lo que hay cerca, daña tu coche si estás al lado (De verdad), deja fuera de combate
+// a las patrullas de al lado y prende a los coches tocados que haya cerca (explosiones en cadena, con su mecha).
+function explotar(p, t) {
+  const j = p.jugador, x = t.x, y = t.y;
+  t.arde = 0;
+  t.quemado = true;
+  t.danio = 1;
+  soltar(t);
+  t.emergencia = false;
+  p.stats.explosiones++;
+  const empujar = (c, d) => {
+    const dv = empuje(d, c.masa);
+    if (dv < 0.05) return;
+    const nx = d > 0.1 ? (c.x - x) / d : 0, ny = d > 0.1 ? (c.y - y) / d : 1;
+    c.vx += nx * dv;
+    c.vy += ny * dv;
+  };
+  const dj = dist(x, y, j.x, j.y);
+  if (dj < EXPLOSION.radio) {
+    empujar(j, dj);
+    j.sacudida = Math.max(j.sacudida, 0.6 * alcance(dj, EXPLOSION.radio));
+  }
+  if (dj < EXPLOSION.radioJugador) daniar(p, EXPLOSION.jugador * alcance(dj, EXPLOSION.radioJugador), 'explosion');
+  for (const u of p.policia) {
+    const d = dist(x, y, u.coche.x, u.coche.y);
+    if (d < EXPLOSION.radio) empujar(u.coche, d);
+    if (d < EXPLOSION.patrulla) daniarPatrulla(u, 1, 'explosion');
+  }
+  for (const r of p.restos) {
+    const d = dist(x, y, r.coche.x, r.coche.y);
+    if (d < EXPLOSION.radio) empujar(r.coche, d);
+  }
+  for (const o of cercaDe(p.trafico, x, y, EXPLOSION.radio)) {
+    if (o === t) continue;
+    const d = dist(x, y, o.x, o.y);
+    if (d >= EXPLOSION.radio) continue;
+    if (empuje(d, o.masa) > 1.5 && soltar(o)) p.stats.sueltos++;
+    if (o.suelto) {
+      empujar(o, d);
+      o.w = (o.w || 0) + ((o.id % 2) * 2 - 1) * 1.5 * alcance(d, EXPLOSION.radio);
+    }
+    if (d < EXPLOSION.cadena) daniarTrafico(p, o, EXPLOSION.cadenaDanio * alcance(d, EXPLOSION.cadena), 0);
+  }
+  emitir(p, 'explosion', { x, y, id: t.id, fuerza: t.tipo === 'camion' ? 1.4 : 1, dist: dj, por: t.porUltimo || null });
+  if (p.t - p.explosionT > 8) decir(p, 'explosion', { unidad: cercana(p), lugar: p.mapa.nombreLugar(x, y) });
+  p.explosionT = p.t;
+}
+
+// Las patrullas que han caído en este paso: fuera de combate. Sus restos se quedan; te pagan, te dan medio nitro (el
+// informe 13 cita el nitro lleno de Burnout y Hot Pursuit; aquí caen más a menudo, hasta 1-2 por minuto en el banco con
+// un piloto que choca mucho) y a los 15 s llega otra, así que la persecución no se acaba sola.
+function caerPatrullas(p) {
+  for (let i = p.policia.length - 1; i >= 0; i--) {
+    const u = p.policia[i];
+    if (!u.caida) continue;
+    p.policia.splice(i, 1);
+    const c = u.coche;
+    u.sirena = c.sirena = false;
+    u.emb = u.pit = null;
+    u.ve = false;
+    c.motor = false;
+    c.trompo = Math.max(c.trompo, 1.2);
+    if (Math.abs(c.w) < 1) c.w = (u.numero % 2 ? 1 : -1) * 2;
+    p.restos.push({ id: u.id, tipo: u.tipo, nombre: u.nombre, coche: c, t: p.t, causa: u.caida });
+    const gana = premio(p.botin, Math.round(TUMBAR.premio * p.botin.mult));
+    p.jugador.nitro = Math.min(1, p.jugador.nitro + 0.5);
+    p.stats.tumbadas++;
+    if (u.rol !== 'control') p.programa.push({ t: p.t + TUMBAR.relevo, tipo: 'relevo', modelo: u.tipo, rol: u.rol });
+    emitir(p, 'fueraDeCombate', { unidad: u.id, nombre: u.nombre, causa: u.caida, gana, x: c.x, y: c.y });
+    decir(p, 'fueraCombate', { unidad: u.nombre }, true);
+  }
 }
 
 // ------------------------------------------------------------------ el paso
@@ -3292,6 +3736,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
   p.pasos++;
   const j = p.jugador, mapa = p.mapa, tr = p.trafico;
   grabar(p, entrada);
+  entrada = cuantizar(entrada);
 
   // 1. Tu coche.
   if (entrada.motorToque) {
@@ -3339,11 +3784,15 @@ function pasoPartida(p, entrada = {}, dt = DT) {
   // 2. Tráfico y policía.
   const cuerpos = [j];
   for (const u of p.policia) { u.coche.sirena = u.sirena; cuerpos.push(u.coche); }
+  for (const r of p.restos) cuerpos.push(r.coche);
   pasoTrafico(tr, dt, cuerpos, mapa, p.azar.trafico);
+  // Las patrullas fuera de combate se deslizan hasta pararse (el trompo lo hace coche.js) y estorban a todos.
+  for (const r of p.restos) pasoCoche(r.coche, { gas: 0, freno: 0.7, dir: 0 }, dt);
   const ctx = { jugador: j, mapa, ojo: p.ojo, zonaJugador: p.zona, azar: p.azar.policia, pinchos: p.pinchos, otros: [], orden: 0 };
   p.policia.forEach((u, i) => {
     ctx.otros = cercaDe(tr, u.coche.x, u.coche.y, 60);
     for (const o of p.policia) if (o !== u) ctx.otros.push(o.coche);
+    for (const r of p.restos) ctx.otros.push(r.coche);
     ctx.orden = i;
     ctx.ataqueOcupado = p.policia.some((o) => o !== u && (o.emb || o.pit));
     ctx.respiro = p.respiro;
@@ -3367,14 +3816,17 @@ function pasoPartida(p, entrada = {}, dt = DT) {
   const golpeMuro = choquesMundo(p, j, dt);
   if (golpeMuro > 3) { emitir(p, 'golpe', { fuerza: golpeMuro, con: 'muro' }); p.stats.choques++; }
   if (golpeMuro > DANIO.umbral) daniar(p, danioGolpe(golpeMuro, Infinity, j.masa), 'muro');
-  for (const u of p.policia) choquesMundo(p, u.coche, dt);
+  for (const u of p.policia) {
+    const g = choquesMundo(p, u.coche, dt);
+    if (g > TUMBAR.umbral) daniarPatrulla(u, danioPatrulla(g, Infinity, u.coche.masa), 'muro');
+  }
   const cercanos = cercaDe(tr, j.x, j.y, 16);
   for (const t of cercanos) {
     const k = contacto(j, t);
     if (!k) continue;
     const f = choqueEntre(j, t, k.nx, k.ny, k.pen);
-    golpeado(t, f);
-    if (f > DANIO.umbral) daniar(p, danioGolpe(f, t.masa, j.masa), 'trafico');
+    golpearTrafico(p, t, j, k, f, 'jugador');
+    if (f > DANIO.umbral) daniar(p, danioGolpe(f, t.masa, j.masa), t.quemado ? 'restos' : 'trafico');
     const seg = p.casi.get(t.id);
     if (seg) seg.tocado = true;
     if (f > 1.5) {
@@ -3428,15 +3880,42 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     }
     for (const t of cercaDe(tr, u.coche.x, u.coche.y, 16)) {
       const k2 = contacto(u.coche, t);
-      if (k2) golpeado(t, choqueEntre(u.coche, t, k2.nx, k2.ny, k2.pen));
+      if (!k2) continue;
+      const f = choqueEntre(u.coche, t, k2.nx, k2.ny, k2.pen);
+      golpearTrafico(p, t, u.coche, k2, f, 'policia');
+      if (f > TUMBAR.umbral) daniarPatrulla(u, danioPatrulla(f, t.masa, u.coche.masa), t.suelto ? 'accidente' : 'trafico');
+    }
+    for (const r of p.restos) {
+      const k3 = contacto(u.coche, r.coche);
+      if (!k3) continue;
+      const f = choqueEntre(u.coche, r.coche, k3.nx, k3.ny, k3.pen);
+      if (f > TUMBAR.umbral) daniarPatrulla(u, danioPatrulla(f, r.coche.masa, u.coche.masa), 'restos');
     }
   }
   for (let a = 0; a < p.policia.length; a++) {
     for (let b = a + 1; b < p.policia.length; b++) {
-      const k = contacto(p.policia[a].coche, p.policia[b].coche);
-      if (k) choqueEntre(p.policia[a].coche, p.policia[b].coche, k.nx, k.ny, k.pen);
+      const ua = p.policia[a], ub = p.policia[b];
+      const k = contacto(ua.coche, ub.coche);
+      if (!k) continue;
+      const f = choqueEntre(ua.coche, ub.coche, k.nx, k.ny, k.pen);
+      if (f > TUMBAR.umbral) {
+        daniarPatrulla(ua, danioPatrulla(f, ub.coche.masa, ua.coche.masa), 'patrulla');
+        daniarPatrulla(ub, danioPatrulla(f, ua.coche.masa, ub.coche.masa), 'patrulla');
+      }
     }
   }
+  for (const r of p.restos) {
+    const k = contacto(j, r.coche);
+    if (!k) continue;
+    const f = choqueEntre(j, r.coche, k.nx, k.ny, k.pen);
+    if (f > 1.5) emitir(p, 'golpe', { fuerza: f, con: 'restos' });
+    if (f > DANIO.umbral) daniar(p, danioGolpe(f, r.coche.masa, j.masa), 'restos');
+  }
+  // v7: los coches sueltos chocan con el decorado y entre sí (choques en cadena); las mechas encendidas explotan;
+  // las patrullas que han caído pasan a restos.
+  choquesAccidente(p, dt);
+  pasoAccidentes(p, dt);
+  caerPatrullas(p);
 
   // 4. Dónde estás.
   const zona = mapa.zonaEn(j.x, j.y);
@@ -3462,6 +3941,28 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     pasoBotin(p.botin, dt, p.ojo.estado, p.nivel);
     pasoRadio(p, dt);
   }
+}
+
+// La cinta guarda las entradas redondeadas (centésimas; el crucero, décimas), y la partida se simula con esas mismas:
+// así la semilla y la cinta repiten la partida exacta. Antes se simulaba con las exactas y la repetición se desviaba
+// (informe 14: es la base de «Te reto», la fuga del día y los fantasmas).
+function cuantizar(en = {}) {
+  return {
+    dir: Math.round((en.dir || 0) * 100) / 100, gas: Math.round((en.gas || 0) * 100) / 100, freno: Math.round((en.freno || 0) * 100) / 100,
+    mano: !!en.mano, nitro: !!en.nitro, nitroToque: !!en.nitroToque, motorToque: !!en.motorToque, arrancar: !!en.arrancar,
+    trazada: !!en.trazada, frenadaAuto: !!en.frenadaAuto, crucero: Math.round((en.crucero || 0) * 10) / 10,
+  };
+}
+
+// La entrada de un paso a partir de una línea de la cinta (la inversa de grabar).
+function entradaDeCinta(k) {
+  const [dir, gas, freno, bits, crucero] = k.split(',');
+  const b = (i) => bits[i] === '1';
+  return {
+    dir: Number(dir) / 100, gas: Number(gas) / 100, freno: Number(freno) / 100,
+    mano: b(0), nitro: b(1), nitroToque: b(2), motorToque: b(3), arrancar: b(4), trazada: b(5), frenadaAuto: b(6),
+    crucero: Number(crucero || 0) / 10,
+  };
 }
 
 function grabar(p, en) {
@@ -3690,11 +4191,19 @@ function enRasante(p) {
 }
 
 // ------------------------------------------------------------------ alerta: niveles, refuerzos, controles y pinchos
+// Número libre para una unidad nueva: nunca se repite el de una que ya salió (sus restos pueden seguir en la calle).
+function siguienteNumero(p, tipo, desde = 1) {
+  let n = desde;
+  while (p.usados.has(`${tipo}${n}`)) n++;
+  return n;
+}
+
 function aparecer(p, tipo, numero, rol) {
   const j = p.jugador;
   const cam = { camiones: camiones(p.trafico) };
   const a = puntoAparicion(p.mapa, j, p.azar.policia, p.zona, cam, rol);
-  const u = crearUnidad(tipo, numero, a.x, a.y, a.h, a.v, rol);
+  const u = crearUnidad(tipo, siguienteNumero(p, tipo, numero), a.x, a.y, a.h, a.v, rol);
+  p.usados.add(u.id);
   ponerMarcha(u.coche);
   p.policia.push(u);
   emitir(p, 'unidad', { id: u.id, nombre: u.nombre, modelo: tipo });
@@ -3725,14 +4234,18 @@ function escalar(p, dt) {
     if (pr.tipo === 'lince2') {
       const u = aparecer(p, 'lince', 2, 'cortar');
       decir(p, 'refuerzo', { unidad: u.nombre, lugar: p.mapa.nombreLugar(u.coche.x, u.coche.y) });
+    } else if (pr.tipo === 'relevo') {
+      // Llega otra patrulla en lugar de la que quedó fuera de combate.
+      const u = aparecer(p, pr.modelo, 1, pr.rol);
+      decir(p, 'refuerzo', { unidad: u.nombre, lugar: p.mapa.nombreLugar(u.coche.x, u.coche.y) });
     } else if (pr.tipo === 'controles') {
       // Clave 5: una patrulla cruzada al final de cada salida de la Ronda.
-      let n = 3;
       for (const r of RAMPAS) {
         if (r.tipo !== 'salida') continue;
         const [bx, by] = r.barrio;
         const x = bx - Math.sign(bx) * 4;
-        const u = crearUnidad('lince', n++, x, by, 0, 0, 'control');
+        const u = crearUnidad('lince', siguienteNumero(p, 'lince', 3), x, by, 0, 0, 'control');
+        p.usados.add(u.id);
         p.policia.push(u);
         emitir(p, 'unidad', { id: u.id, nombre: u.nombre, modelo: 'lince', control: true });
       }
@@ -3746,7 +4259,8 @@ function pasoPinchos(p, dt) {
   if (p.pinchosT !== null && p.nivel >= 3) {
     p.pinchosT -= dt;
     if (p.pinchosT <= 0) {
-      if (p.zona === 'ronda') {
+      // Los pinchos los pone el Toro: si ha quedado fuera de combate, esperan a su relevo.
+      if (p.zona === 'ronda' && p.policia.some((u) => u.tipo === 'toro')) {
         const pj = rondaProyectar(j.x, j.y);
         const s = normS(pj.s + Math.max(250, Math.abs(j.vf) * 7));
         const libre = p.azar.pinchos.entero(0, 2);
@@ -3847,6 +4361,7 @@ function terminar(p, final) {
     quemado: p.ojo.vistoCerca > LIMITE_FANTASMA || final === 'DETENIDO' || final === 'SINIESTRO',
     modo: p.modo,
     danio: j.danio,
+    causa: final === 'SINIESTRO' ? p.ultimaCausa : null, // qué dio el último golpe (informe 13: medirlo en la beta)
     lugar: p.mapa.nombreLugar(j.x, j.y),
     stats: { ...p.stats, duracion: p.t, vistoCerca: p.ojo.vistoCerca, vistoTotal: p.ojo.vistoTotal },
   };
@@ -3885,11 +4400,11 @@ function resumen(p) {
     lugar: p.mapa.nombreLugar(j.x, j.y),
   };
 }
-return { DT, ESCENARIOS, DANIO, danioGolpe, MODOS, NIVEL2, NIVEL3, mapaPara, crearPartida, sacarEventos, pasoPartida, TRAFICO_T, premioTrafico, alcanceDeteccion, resumen };
+return { DT, ESCENARIOS, DANIO, danioGolpe, MODOS, NIVEL2, NIVEL3, mapaPara, crearPartida, sacarEventos, pasoPartida, cuantizar, entradaDeCinta, TRAFICO_T, premioTrafico, alcanceDeteccion, resumen };
 })();
 
 // ---- src/logica/registro.js
-__m[11] = (() => {
+__m[12] = (() => {
 
 // Registro mínimo por partida (fase 0): escenario, duración, final, capturas, casi-choques, cámara y control,
 // segundos hasta la siguiente partida y los fps que dio el móvil. La presentación lo guarda en el móvil y deja copiarlo.
@@ -3917,6 +4432,9 @@ function registroDe(p, extra = {}) {
     trafico: p.stats.traficoMax ?? 1, // nivel de tráfico al que llegó (1-4)
     modo: p.modo ?? 'verdad',         // verdad o practica (25/09, v6)
     danio: Math.round((p.stats.danioMax ?? 0) * 100), // daño máximo del coche, en %
+    tumbadas: p.stats.tumbadas ?? 0,       // patrullas fuera de combate (v7)
+    explosiones: p.stats.explosiones ?? 0,
+    causa: f && f.causa ? f.causa : '',    // qué dio el golpe del siniestro (informe 13)
   };
 }
 
@@ -3927,7 +4445,7 @@ function anotarSiguiente(lista, ahoraMs) {
   return lista;
 }
 
-const COLUMNAS = ['fecha', 'escenario', 'semilla', 'duracion', 'final', 'capturas', 'casiChoques', 'huecos', 'nivelMax', 'cobro', 'camara', 'control', 'revancha', 'siguienteEn', 'fps', 'fpsPeor', 'trafico', 'modo', 'danio'];
+const COLUMNAS = ['fecha', 'escenario', 'semilla', 'duracion', 'final', 'capturas', 'casiChoques', 'huecos', 'nivelMax', 'cobro', 'camara', 'control', 'revancha', 'siguienteEn', 'fps', 'fpsPeor', 'trafico', 'modo', 'danio', 'tumbadas', 'explosiones', 'causa'];
 
 // Texto para copiar y pegar en un mensaje o una hoja de cálculo (separado por punto y coma).
 function aTexto(lista) {
@@ -3939,7 +4457,7 @@ return { registroDe, anotarSiguiente, aTexto };
 })();
 
 // ---- src/presentacion/geometria.js
-__m[12] = (() => {
+__m[13] = (() => {
 
 // Piezas de geometría hechas a mano: cajas fundidas con color por vértice y texturas pintadas en un lienzo.
 // Mundo → three.js: (x, y) del mapa pasa a (x, altura, -y). Los coches miran hacia -Z; rotation.y = -rumbo.
@@ -4075,10 +4593,10 @@ return { fundirCajas, lienzo, texturaDe, texturaMancha, tira, pared, unir };
 })();
 
 // ---- src/presentacion/escena.js
-__m[13] = (() => {
+__m[14] = (() => {
 const { LARGO_RONDA, rondaPunto, alturaRonda, alturaEn, CALLES_NS, CALLES_EO, TUNEL, PARKING, CALLEJONES, GLORIETA, RAMPAS, RAMPA_R, RAMPA_MEDIO, BARRIO, CARRILES } = __m[2]; // src/logica/mapa.js
 const { crearAzar } = __m[0]; // src/logica/azar.js
-const { fundirCajas, lienzo, texturaDe, texturaMancha, tira, pared } = __m[12]; // src/presentacion/geometria.js
+const { fundirCajas, lienzo, texturaDe, texturaMancha, tira, pared } = __m[13]; // src/presentacion/geometria.js
 // La ciudad de noche en 3D, con pocas llamadas de dibujo: casi todo va fundido en una geometría o en instancias.
 // Mundo → three.js: (x, y) pasa a (x, altura, -y); los coches miran a -Z y rotation.y = -rumbo.
 
@@ -4562,47 +5080,62 @@ function crearTraficoVisual(escena, trafico) {
     const col = new THREE.Color();
     lista.forEach((v, i) => cuerpo.setColorAt(i, col.set(v.color)));
     escena.add(cuerpo, luces);
-    tipos[t] = { lista, cuerpo, luces };
+    tipos[t] = { lista, cuerpo, luces, quemados: lista.map(() => false) };
   }
+  const QUEMADO = new THREE.Color('#16120F'), col = new THREE.Color();
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), p = new THREE.Vector3(), uno = new THREE.Vector3(1, 1, 1), eje = new THREE.Vector3(0, 1, 0);
   const cero = new THREE.Matrix4().makeScale(0, 0, 0);
-  // Intermitentes: dos pilotos ámbar por vehículo (delante y detrás, del lado al que va a cambiar), solo al parpadear.
-  const intermitentes = new THREE.InstancedMesh(new THREE.BoxGeometry(0.24, 0.14, 0.16), new THREE.MeshBasicMaterial({ color: '#FFB020' }), todos.length * 2);
+  // Intermitentes: cuatro pilotos ámbar por vehículo, solo al parpadear. Cambiando de carril, los dos de ese lado;
+  // parado tras un choque, los cuatro (luces de emergencia, v7).
+  const intermitentes = new THREE.InstancedMesh(new THREE.BoxGeometry(0.24, 0.14, 0.16), new THREE.MeshBasicMaterial({ color: '#FFB020' }), todos.length * 4);
   intermitentes.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   intermitentes.frustumCulled = false;
   escena.add(intermitentes);
   return {
     actualizar(alpha) {
       for (const t of Object.values(tipos)) {
+        let colores = false;
         t.lista.forEach((v, i) => {
+          // Quemado tras una explosión: carrocería negra y sin faros (la grúa lo devuelve como nuevo).
+          if (!!v.quemado !== t.quemados[i]) {
+            t.quemados[i] = !!v.quemado;
+            t.cuerpo.setColorAt(i, v.quemado ? QUEMADO : col.set(v.color));
+            colores = true;
+          }
           if (v.oculto) { t.cuerpo.setMatrixAt(i, cero); t.luces.setMatrixAt(i, cero); return; }
           const x = v._px !== undefined ? v._px + (v.x - v._px) * alpha : v.x;
           const y = v._py !== undefined ? v._py + (v.y - v._py) * alpha : v.y;
           q.setFromAxisAngle(eje, -v.h);
           m4.compose(p.set(x, alturaEn(x, y), -y), q, uno);
           t.cuerpo.setMatrixAt(i, m4);
-          t.luces.setMatrixAt(i, m4);
+          t.luces.setMatrixAt(i, v.quemado ? cero : m4);
         });
         t.cuerpo.instanceMatrix.needsUpdate = true;
         t.luces.instanceMatrix.needsUpdate = true;
+        if (colores && t.cuerpo.instanceColor) t.cuerpo.instanceColor.needsUpdate = true;
       }
       const encendido = Math.floor(performance.now() / 330) % 2 === 0;
       todos.forEach((v, i) => {
-        if (!encendido || !v.intermitente || v.oculto) {
-          intermitentes.setMatrixAt(2 * i, cero);
-          intermitentes.setMatrixAt(2 * i + 1, cero);
+        const lados = v.emergencia ? [-1, 1] : v.intermitente ? [v.intermitente] : [];
+        if (!encendido || !lados.length || v.oculto) {
+          for (let k = 0; k < 4; k++) intermitentes.setMatrixAt(4 * i + k, cero);
           return;
         }
         const x = v._px !== undefined ? v._px + (v.x - v._px) * alpha : v.x;
         const y = v._py !== undefined ? v._py + (v.y - v._py) * alpha : v.y;
         const fx = Math.sin(v.h), fy = Math.cos(v.h), rx = Math.cos(v.h), ry = -Math.sin(v.h);
-        const lat = (v.ancho / 2) * v.intermitente, alto = v.tipo === 'camion' ? 1.05 : 0.72;
+        const alto = v.tipo === 'camion' ? 1.05 : 0.72;
         q.setFromAxisAngle(eje, -v.h);
-        [v.largo / 2 - 0.15, -v.largo / 2 + 0.15].forEach((lon, k) => {
-          const px = x + fx * lon + rx * lat, py = y + fy * lon + ry * lat;
-          m4.compose(p.set(px, alturaEn(px, py) + alto, -py), q, uno);
-          intermitentes.setMatrixAt(2 * i + k, m4);
-        });
+        let k = 0;
+        for (const lado of lados) {
+          const lat = (v.ancho / 2) * lado;
+          for (const lon of [v.largo / 2 - 0.15, -v.largo / 2 + 0.15]) {
+            const px = x + fx * lon + rx * lat, py = y + fy * lon + ry * lat;
+            m4.compose(p.set(px, alturaEn(px, py) + alto, -py), q, uno);
+            intermitentes.setMatrixAt(4 * i + k++, m4);
+          }
+        }
+        while (k < 4) intermitentes.setMatrixAt(4 * i + k++, cero);
       });
       intermitentes.instanceMatrix.needsUpdate = true;
     },
@@ -4740,8 +5273,172 @@ function crearPinchosVisual(escena) {
 return { COLOR_NOCHE, modeloCoche, crearEscena, crearTraficoVisual, crearCocheVisual, colocarCoche, crearFantasma, crearPinchosVisual };
 })();
 
+// ---- src/presentacion/efectos.js
+__m[15] = (() => {
+const { texturaMancha } = __m[13]; // src/presentacion/geometria.js
+const { alturaEn } = __m[2]; // src/logica/mapa.js
+// Fuego, humo y explosiones (v7; Alberto, 25/09: «que si te chocas reaccionen y se choquen, o incluso que haya una explosión»).
+// Partículas baratas para un móvil modesto: dos InstancedMesh de cuadrados que miran a la cámara, el fuego sumando luz y el
+// humo tapando. Hay un tope de partículas, así que son dos llamadas de dibujo en total, pase lo que pase en la calle.
+// Una sola luz puntual, siempre en la escena y apagada, da el destello de las explosiones (encenderla y apagarla no cambia
+// los sombreadores: añadir una luz a mitad de partida obligaría a recompilarlos y daría un tirón).
+// Mundo → three.js como en escena.js: (x, y) pasa a (x, altura, -y).
+
+
+
+const THREE = globalThis.THREE;
+const MAX_FUEGO = 160, MAX_HUMO = 120;
+const NIEBLA = [0.043, 0.067, 0.133]; // el color de la niebla de la noche: el humo se deshace en ella
+
+const mezcla = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+const azar = (a, b) => a + Math.random() * (b - a);
+
+function crearEfectos(escena) {
+  const tex = texturaMancha('#FFFFFF');
+  const matFuego = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false });
+  const matHumo = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0.55 });
+  const fuego = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), matFuego, MAX_FUEGO);
+  const humo = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), matHumo, MAX_HUMO);
+  const col = new THREE.Color();
+  for (const [m, n] of [[fuego, MAX_FUEGO], [humo, MAX_HUMO]]) {
+    m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    m.frustumCulled = false;
+    for (let i = 0; i < n; i++) m.setColorAt(i, col.setRGB(0, 0, 0));
+    m.count = 0;
+    escena.add(m);
+  }
+  humo.renderOrder = 1;
+  fuego.renderOrder = 2;
+  const luz = new THREE.PointLight('#FF8A3A', 0, 55, 2);
+  escena.add(luz);
+  let luzT = 0, luzPico = 0;
+
+  const pf = [], ph = [];
+  const acum = new Map(); // por fuente: cada coche que echa humo o arde lleva su propio ritmo
+  const m4 = new THREE.Matrix4(), pos = new THREE.Vector3(), esc = new THREE.Vector3();
+
+  // p: { x, y, z (three), vx, vy, vz, vida, dur, s0, s1, c0, c1, sube (aceleración hacia arriba), roce }
+  function meter(lista, max, p) {
+    if (lista.length >= max) lista.shift();
+    lista.push(p);
+  }
+
+  function cuantas(llave, ritmo, dt) {
+    const a = (acum.get(llave) || 0) + ritmo * dt;
+    const n = Math.floor(a);
+    acum.set(llave, a - n);
+    return n;
+  }
+
+  return {
+    // Explosión en (x, y) del mundo; fuerza 0,5-1,5 (un camión, más).
+    explosion(x, y, fuerza = 1) {
+      const f = Math.max(0.5, Math.min(1.5, fuerza));
+      const h = alturaEn(x, y), z = -y;
+      // Fogonazo: un destello grande y cortísimo.
+      meter(pf, MAX_FUEGO, { x, y: h + 1.4, z, vx: 0, vy: 0, vz: 0, vida: 0, dur: 0.16, s0: 10 * f, s1: 16 * f, c0: [1, 0.97, 0.85], c1: [1, 0.55, 0.15], sube: 0, roce: 0 });
+      // Bola de fuego: se abre y sube.
+      for (let i = 0; i < 18; i++) {
+        const a = azar(0, Math.PI * 2), v = azar(3, 9) * f;
+        meter(pf, MAX_FUEGO, {
+          x, y: h + azar(0.6, 1.6), z, vx: Math.cos(a) * v, vy: azar(2, 6) * f, vz: Math.sin(a) * v,
+          vida: 0, dur: azar(0.55, 1.1), s0: azar(1.6, 2.6) * f, s1: azar(3.5, 6) * f,
+          c0: [1, 0.85, 0.35], c1: [0.55, 0.08, 0.02], sube: 2.5, roce: 2.2,
+        });
+      }
+      // Humo negro que sube despacio (sale un poco después).
+      for (let i = 0; i < 12; i++) {
+        const a = azar(0, Math.PI * 2), v = azar(0.8, 3);
+        meter(ph, MAX_HUMO, {
+          x: x + Math.cos(a) * 1.2, y: h + azar(1, 2.5), z: z + Math.sin(a) * 1.2, vx: Math.cos(a) * v, vy: azar(1.5, 3.5), vz: Math.sin(a) * v,
+          vida: -azar(0.05, 0.35), dur: azar(2.5, 4.5), s0: azar(2.5, 3.5), s1: azar(7, 11),
+          c0: [0.1, 0.09, 0.09], c1: NIEBLA, sube: 0.4, roce: 0.8,
+        });
+      }
+      luz.position.set(x, h + 3, z);
+      luzPico = 5 * f;
+      luzT = 0;
+    },
+    // Coche en llamas: llamas bajas y humo oscuro. intensidad 0-1; llave: de quién es (un id).
+    fuego(llave, x, y, intensidad, dt) {
+      const h = alturaEn(x, y);
+      for (let n = cuantas('f' + llave, 26 * intensidad, dt); n > 0; n--) {
+        meter(pf, MAX_FUEGO, {
+          x: x + azar(-0.9, 0.9), y: h + azar(0.5, 1.1), z: -y + azar(-0.9, 0.9), vx: azar(-0.4, 0.4), vy: azar(1.5, 3), vz: azar(-0.4, 0.4),
+          vida: 0, dur: azar(0.35, 0.7), s0: azar(0.9, 1.5), s1: azar(0.2, 0.5), c0: [1, 0.72, 0.25], c1: [0.6, 0.1, 0.02], sube: 1.5, roce: 0.5,
+        });
+      }
+      this.humo(llave, x, y, intensidad * 0.8, dt, 1.6, true);
+    },
+    // Humo de un coche tocado: densidad 0-1, a «alto» m del suelo; negro si arde, gris si solo está tocado.
+    humo(llave, x, y, densidad, dt, alto = 0.9, negro = false) {
+      const h = alturaEn(x, y);
+      for (let n = cuantas('h' + llave, 9 * densidad, dt); n > 0; n--) {
+        meter(ph, MAX_HUMO, {
+          x: x + azar(-0.3, 0.3), y: h + alto, z: -y + azar(-0.3, 0.3), vx: azar(-0.3, 0.3), vy: azar(1.2, 2.2), vz: azar(-0.3, 0.3),
+          vida: 0, dur: azar(1.4, 2.4), s0: azar(0.7, 1.1), s1: azar(3, 4.5), c0: negro ? [0.12, 0.11, 0.11] : [0.32, 0.32, 0.34], c1: NIEBLA, sube: 0.3, roce: 0.6,
+        });
+      }
+    },
+    actualizar(dt, camara) {
+      for (const [lista, malla] of [[pf, fuego], [ph, humo]]) {
+        for (let i = lista.length - 1; i >= 0; i--) {
+          lista[i].vida += dt;
+          if (lista[i].vida >= lista[i].dur) lista.splice(i, 1);
+        }
+        let n = 0;
+        for (const p of lista) {
+          if (p.vida < 0) continue; // aún no ha salido
+          const k = p.vida / p.dur;
+          const roce = Math.exp(-p.roce * dt);
+          p.vx *= roce;
+          p.vz *= roce;
+          p.vy = p.vy * roce + p.sube * dt;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.z += p.vz * dt;
+          const s = p.s0 + (p.s1 - p.s0) * k;
+          m4.compose(pos.set(p.x, p.y, p.z), camara.quaternion, esc.set(s, s, 1));
+          malla.setMatrixAt(n, m4);
+          // El fuego se apaga oscureciéndose (sumar negro no se ve); el humo se deshace en la niebla.
+          const c = malla === fuego ? mezcla(p.c0, p.c1, k).map((v) => v * (1 - k * k)) : mezcla(p.c0, p.c1, k * k);
+          malla.setColorAt(n, col.setRGB(c[0], c[1], c[2]));
+          n++;
+        }
+        malla.count = n;
+        malla.instanceMatrix.needsUpdate = true;
+        if (malla.instanceColor) malla.instanceColor.needsUpdate = true;
+      }
+      if (luzPico > 0) {
+        luzT += dt;
+        luz.intensity = luzPico * Math.exp(-luzT * 5);
+        if (luz.intensity < 0.02) luzPico = luz.intensity = 0;
+      }
+    },
+    // Al empezar otra partida: nada de lo anterior sigue ardiendo.
+    vaciar() {
+      pf.length = 0;
+      ph.length = 0;
+      acum.clear();
+      fuego.count = humo.count = 0;
+      luzPico = luz.intensity = 0;
+    },
+    destruir() {
+      for (const m of [fuego, humo]) {
+        escena.remove(m);
+        m.geometry.dispose();
+        m.material.dispose();
+      }
+      escena.remove(luz);
+      tex.dispose();
+    },
+  };
+}
+return { crearEfectos };
+})();
+
 // ---- src/presentacion/camaras.js
-__m[14] = (() => {
+__m[16] = (() => {
 
 // Tres cámaras: persecución (por defecto), capó y cabina. Horizonte estable: la cámara nunca se inclina de lado.
 // Sensación de velocidad: muelle que se queda atrás al acelerar, campo de visión que se abre y mirar atrás 150°.
@@ -4951,7 +5648,7 @@ return { MODOS, NOMBRE_MODO, crearCamaras };
 })();
 
 // ---- src/logica/pie.js
-__m[15] = (() => {
+__m[17] = (() => {
 const { clamp } = __m[1]; // src/logica/mates.js
 // El pie: qué gas y qué freno llegan al coche según el acelerador elegido (Ajustes › Acelerador).
 // Sin pantalla: la presentación le pasa lo que tocas (o inclinas) y él decide. Así se puede probar y medir (tests/pie.test.mjs,
@@ -5056,8 +5753,8 @@ return { ACELERADORES, PIE, crearPie, frenoProgresivo, gasDelPedal, pieInclinado
 })();
 
 // ---- src/presentacion/entrada.js
-__m[16] = (() => {
-const { crearPie, pisar, gasDelPedal, ACELERADORES } = __m[15]; // src/logica/pie.js
+__m[18] = (() => {
+const { crearPie, pisar, gasDelPedal, ACELERADORES } = __m[17]; // src/logica/pie.js
 // Controles: inclinación (con el vector de gravedad), botones táctiles y teclado.
 // La inclinación mide cuánto giras el móvil respecto a como lo sujetabas al calibrar: no necesita giroscopio
 // y funciona igual en horizontal que en vertical. Si el navegador no da los sensores, se juega con botones.
@@ -5397,9 +6094,9 @@ return { crearEntrada, VIBRACION, vibrar };
 })();
 
 // ---- src/presentacion/hud.js
-__m[17] = (() => {
+__m[19] = (() => {
 const { LARGO_RONDA, rondaPunto, CALLES_NS, CALLES_EO, PARKING, CALLEJONES, RAMPAS, RAMPA_R, CARRILES } = __m[2]; // src/logica/mapa.js
-const { restante, radioBusqueda } = __m[6]; // src/logica/ojo.js
+const { restante, radioBusqueda } = __m[7]; // src/logica/ojo.js
 // Lo que se lee en pantalla: el Ojo, la alerta, el botín, el velocímetro, el retrovisor de luces, el minimapa,
 // los textos grandes y los subtítulos de la radio (con voz sintética si el móvil la tiene).
 
@@ -5708,7 +6405,7 @@ return { crearHud };
 })();
 
 // ---- src/presentacion/menu.js
-__m[18] = (() => {
+__m[20] = (() => {
 
 // Pantallas: «¿Dónde te pillan?», ajustes, calibración, pausa, cuenta atrás y la pantalla final.
 
@@ -5782,7 +6479,7 @@ function crearMenu(raiz, api) {
           <span class="nota-modo">${a.modo === 'practica' ? 'Sin daño y sin récord: para ensayar.' : 'Los golpes dañan el coche. Al 100 %, siniestro.'}</span>
         </div>
         ${rec ? `<p class="record">Tu mejor botín: <b>${fmt(rec)}</b> chapas</p>` : ''}
-        <p class="pie">Beta v6 · 25/09 · prototipo de la fase 0 · todo el sonido y la ciudad se generan en tu móvil</p>
+        <p class="pie">Beta v7 · 25/09 · prototipo de la fase 0 · todo el sonido y la ciudad se generan en tu móvil</p>
       </div>`, 'portada-on');
     capa.querySelectorAll('.esc').forEach((b) => b.addEventListener('click', () => api.alJugar(b.dataset.esc)));
     capa.querySelectorAll('[data-control]').forEach((b) => b.addEventListener('click', () => {
@@ -5811,6 +6508,8 @@ function crearMenu(raiz, api) {
           <li><b>Frenar</b>: FRENO suelta el acelerador. Un toque frena suave; mantenlo y frenas en seco.</li>
           <li><b>Crucero</b>: toca el velocímetro y el coche mantiene esa velocidad (ideal para la Fuga a 120). Frenar o el nitro lo quitan.</li>
           <li><b>De verdad o práctica</b>: en De verdad los golpes fuertes dañan el coche (menos potencia y agarre; al 100 %, siniestro). En Práctica no hay daño ni récord.</li>
+          <li><b>Choques</b>: un golpe fuerte saca a un coche de su carril y puede llevarse a otros por delante. Uno destrozado arde y explota a los pocos segundos: aléjate.</li>
+          <li><b>Fuera de combate</b>: la patrulla que choca fuerte contra un muro, el tráfico, otra patrulla o una explosión queda fuera (+150 y medio nitro). Embestirla tú no sirve. Otra llega a los 15 s.</li>
           <li><b>Salida lanzada</b>: parado, freno y acelerador a la vez; suelta el freno con la aguja en verde.</li>
           <li><b>Si te quedas parado</b> con la policía encima, te detienen.</li>
           <li><b>En sentido contrario</b> no puntúas y la policía acaba cancelando (Clave 9).</li>
@@ -5935,6 +6634,7 @@ function crearMenu(raiz, api) {
         <p class="cobro"><span>Botín ${fmt(d.botin)} ${factor}</span><b>${fmt(d.cobro)}</b><span>chapas</span></p>
         <p class="coche">Tu coche: <b>${d.quemado ? 'quemado' : 'limpio'}</b>${d.quemado ? ' (te vieron de cerca)' : ''}</p>
         <p class="datos">${Math.round(d.t)} s · ${s.casiChoques || 0} rebases · ${s.huecos || 0} huecos · nivel ${s.nivelMax || 1} · ${Math.round(s.velMaxKmh || 0)} km/h${d.modo === 'practica' ? '' : ` · daño ${Math.round((d.danio || 0) * 100)} %`}</p>
+        ${s.tumbadas || s.explosiones ? `<p class="datos">${s.tumbadas ? `${s.tumbadas} ${s.tumbadas === 1 ? 'patrulla' : 'patrullas'} fuera de combate` : ''}${s.tumbadas && s.explosiones ? ' · ' : ''}${s.explosiones ? `${s.explosiones} ${s.explosiones === 1 ? 'explosión' : 'explosiones'}` : ''}</p>` : ''}
         ${d.modo === 'practica' ? '<p class="datos">Práctica: no cuenta para tu récord.</p>' : ''}
         <div class="acciones">
           <button class="pri grande" data-revancha>REVANCHA</button>
@@ -5957,7 +6657,7 @@ return { crearMenu };
 })();
 
 // ---- src/presentacion/audio.js
-__m[19] = (() => {
+__m[21] = (() => {
 
 // FUGAZ · sonido y música sintetizados con Web Audio.
 // Cero ficheros de audio y cero librerías: todo sale de osciladores y de un
@@ -6431,6 +7131,32 @@ function crearAudio() {
     tono({ f: 70, f2: 45, t, ataque: 0.003, caida: 0.2, pico: 0.6 * fuerza, destino: n.volEfectos });
   }
 
+  // v7. Cuanto más lejos, más flojo y más apagado (el aire se come los agudos). d: metros hasta ti.
+  const lejania = (d) => lim(1 - num(d, 0) / 260, 0.12, 1);
+
+  function explosion(t, d, fuerza) {
+    const k = lejania(d) * lim(fuerza, 0.5, 1.5, 1);
+    const brillo = 300 + 2200 * lejania(d);
+    tono({ f: 58, f2: 26, t, ataque: 0.004, caida: 1.3, pico: 0.9 * k, destino: n.volEfectos });
+    rafaga({ t, ataque: 0.004, dur: 1.5, pico: 2.2 * k, tipo: 'lowpass', f: brillo, f2: 90, q: 0.7, destino: n.volEfectos });
+    // Crepitar del fuego después del golpe.
+    rafaga({ t: t + 0.08, ataque: 0.05, sosten: 0.3, dur: 0.9, pico: 0.12 * k, tipo: 'highpass', f: 2600, f2: 1600, q: 0.6, destino: n.volEfectos });
+  }
+
+  // Un coche que se prende: soplido que sube.
+  function fuego(t, d) {
+    rafaga({ t, ataque: 0.15, dur: 0.6, pico: 0.3 * lejania(d) * RUIDO_BANDA, tipo: 'bandpass', f: 250, f2: 1300, q: 0.9, destino: n.volEfectos });
+  }
+
+  // Patrulla fuera de combate: chapa, cristales y dos notas que suben (se celebra, como un hueco).
+  function fueraDeCombate(t, d) {
+    const k = lejania(d);
+    golpe(t, 0.9 * k);
+    rafaga({ t: t + 0.03, ataque: 0.002, dur: 0.35, pico: 0.18 * k, tipo: 'highpass', f: 4200, f2: 2500, q: 0.5, destino: n.volEfectos });
+    tono({ tipo: 'square', f: 190, f2: 70, t, ataque: 0.002, caida: 0.25, pico: 0.08 * k, fl: ['lowpass', 900, 1], destino: n.volEfectos });
+    [76, 83].forEach((m, i) => tono({ f: hz(m), t: t + 0.25 + i * 0.09, ataque: 0.004, caida: 0.3, pico: 0.08, destino: n.volEfectos }));
+  }
+
   function pinchazo(t) {
     rafaga({ t, ataque: 0.001, dur: 0.06, pico: 0.8, tipo: 'lowpass', f: 2500, q: 0.5, destino: n.volEfectos });
     tono({ f: 90, f2: 40, t, ataque: 0.002, caida: 0.12, pico: 0.5, destino: n.volEfectos });
@@ -6523,6 +7249,9 @@ function crearAudio() {
     hueco: (t) => enHueco(t),
     golpe: (t, d) => golpe(t, lim(d.fuerza, 0, 1, 0.6)),
     pinchazo: (t) => pinchazo(t),
+    explosion: (t, d) => explosion(t, d.dist, num(d.fuerza, 1)),
+    fuego: (t, d) => fuego(t, d.dist),
+    fueraDeCombate: (t, d) => fueraDeCombate(t, d.dist),
     arranque: (t) => arranque(t),
     apagar: (t) => apagar(t),
     nitroGolpe: (t) => nitroGolpe(t),
@@ -7071,24 +7800,28 @@ return { crearAudio };
 })();
 
 // ---- src/main.js
-__m[20] = (() => {
-const { DT, crearPartida, pasoPartida, sacarEventos, mapaPara } = __m[10]; // src/logica/partida.js
+__m[22] = (() => {
+const { DT, crearPartida, pasoPartida, sacarEventos, mapaPara } = __m[11]; // src/logica/partida.js
 const { rondaPunto, alturaRonda, alturaEn, normS } = __m[2]; // src/logica/mapa.js
-const { crearTrafico, pasoTrafico } = __m[5]; // src/logica/trafico.js
+const { crearTrafico, pasoTrafico } = __m[6]; // src/logica/trafico.js
 const { crearAzar } = __m[0]; // src/logica/azar.js
-const { restante } = __m[6]; // src/logica/ojo.js
-const { registroDe, anotarSiguiente, aTexto } = __m[11]; // src/logica/registro.js
-const { COLOR_NOCHE, crearEscena, crearTraficoVisual, crearCocheVisual, colocarCoche, crearFantasma, crearPinchosVisual } = __m[13]; // src/presentacion/escena.js
-const { texturaMancha } = __m[12]; // src/presentacion/geometria.js
-const { crearCamaras, NOMBRE_MODO } = __m[14]; // src/presentacion/camaras.js
-const { crearEntrada, vibrar, VIBRACION } = __m[16]; // src/presentacion/entrada.js
-const { crearHud } = __m[17]; // src/presentacion/hud.js
-const { crearMenu } = __m[18]; // src/presentacion/menu.js
-const { crearAudio } = __m[19]; // src/presentacion/audio.js
+const { restante } = __m[7]; // src/logica/ojo.js
+const { registroDe, anotarSiguiente, aTexto } = __m[12]; // src/logica/registro.js
+const { COLOR_NOCHE, crearEscena, crearTraficoVisual, crearCocheVisual, colocarCoche, crearFantasma, crearPinchosVisual } = __m[14]; // src/presentacion/escena.js
+const { texturaMancha } = __m[13]; // src/presentacion/geometria.js
+const { crearEfectos } = __m[15]; // src/presentacion/efectos.js
+const { DANIO_TRAFICO } = __m[5]; // src/logica/choques.js
+const { crearCamaras, NOMBRE_MODO } = __m[16]; // src/presentacion/camaras.js
+const { crearEntrada, vibrar, VIBRACION } = __m[18]; // src/presentacion/entrada.js
+const { crearHud } = __m[19]; // src/presentacion/hud.js
+const { crearMenu } = __m[20]; // src/presentacion/menu.js
+const { crearAudio } = __m[21]; // src/presentacion/audio.js
 // FUGAZ · prototipo de la fase 0. Arranque y bucle del juego.
 // Une la lógica de la partida (src/logica: sin pantalla, a pasos fijos de 1/60 s) con la presentación
 // (src/presentacion: escena 3D, cámaras, controles, HUD, menú y sonido). El dibujo interpola entre los dos
 // últimos pasos, así que la física da lo mismo en un móvil a 30 fps que en uno a 120.
+
+
 
 
 
@@ -7244,10 +7977,12 @@ function arrancar() {
     mundo = {
       rampas, mapa, esc, jugador, policia: new Map(), trafico: null, traficoDe: null,
       fantasma: crearFantasma(esc.escena), pinchos: crearPinchosVisual(esc.escena),
+      efectos: crearEfectos(esc.escena), // v7: fuego, humo y explosiones
     };
     if (viejo) {
       if (viejo.trafico) viejo.trafico.destruir();
       viejo.pinchos.destruir();
+      viejo.efectos.destruir();
       liberar(viejo.esc.escena);
     }
     return mundo;
@@ -7268,6 +8003,7 @@ function arrancar() {
     m.trafico = crearTraficoVisual(m.esc.escena, p.trafico);
     m.traficoDe = p;
     m.pinchos.destruir();
+    m.efectos.vaciar();
     m.fantasma.visible = false;
     m.jugador.grupo.visible = true;
   }
@@ -7287,6 +8023,7 @@ function arrancar() {
     m.trafico = crearTraficoVisual(m.esc.escena, fondo.tr);
     m.traficoDe = 'fondo';
     m.pinchos.destruir();
+    m.efectos.vaciar();
     m.fantasma.visible = false;
     m.jugador.grupo.visible = false;
   }
@@ -7712,6 +8449,39 @@ function arrancar() {
         camaras.sacudir(0.6);
         vibra('zumbido');
         break;
+      // v7: choques en cadena, explosiones y patrullas fuera de combate.
+      case 'fuego':
+        audio.evento('fuego', { dist: distJugador(p, ev.x, ev.y) });
+        break;
+      case 'explosion': {
+        const d = ev.dist ?? distJugador(p, ev.x, ev.y);
+        mundo.efectos.explosion(ev.x, ev.y, ev.fuerza);
+        audio.evento('explosion', { dist: d, fuerza: ev.fuerza });
+        const cerca = clamp(1 - d / 70, 0, 1);
+        if (cerca > 0) {
+          camaras.sacudir(0.3 + 0.7 * cerca);
+          efecto.golpe = Math.max(efecto.golpe, cerca);
+          vibra(cerca > 0.5 ? 'zumbido' : 'tic');
+        }
+        if (d < 25) hud.aviso('¡EXPLOSIÓN! Aléjate de los coches en llamas', 'peligro', 1.8, t);
+        pista('explosion', 'Un coche destrozado arde y explota a los pocos segundos. Aléjate: la explosión daña tu coche y deja fuera de combate a las patrullas que tenga al lado.', 7);
+        break;
+      }
+      case 'fueraDeCombate':
+        audio.evento('fueraDeCombate', { dist: distJugador(p, ev.x, ev.y) });
+        hud.grande('¡FUERA DE COMBATE!', 'bien', 1.4, t);
+        hud.premio(`${ev.nombre} +${ev.gana}`, 'hueco');
+        hud.aviso('+50 % de nitro', 'bien', 1.4, t);
+        juego.lento = Math.max(juego.lento, 0.6); // cámara lenta (informe 13)
+        vibra('dobleTic');
+        pista('fuera', 'Patrulla fuera de combate: cae si choca fuerte contra un muro, el tráfico, otra patrulla o una explosión. Embestirla con tu coche no sirve. Otra llega a los 15 s.', 7);
+        break;
+      case 'accidente':
+        if (distJugador(p, ev.x, ev.y) < 120) hud.aviso('CHOQUE EN CADENA', 'peligro', 1.4, t);
+        break;
+      case 'estruendo':
+        audio.evento('golpe', { fuerza: clamp((ev.fuerza / 14) * (1 - ev.dist / 160), 0, 0.8) });
+        break;
       case 'final':
         terminarPartida(p, ev);
         break;
@@ -7720,11 +8490,16 @@ function arrancar() {
     }
   }
 
+  function distJugador(p, x, y) {
+    return Math.hypot(x - p.jugador.x, y - p.jugador.y);
+  }
+
   // ---------------------------------------------------------------- simulación
   function guardarPrevias(p) {
     const g = (c) => { c._px = c.x; c._py = c.y; c._ph = c.h; };
     g(p.jugador);
     for (const u of p.policia) g(u.coche);
+    for (const r of p.restos) g(r.coche);
     for (const v of p.trafico.ronda) g(v);
     for (const v of p.trafico.exterior) g(v);
     for (const v of p.trafico.barrio) g(v);
@@ -7899,6 +8674,28 @@ function arrancar() {
     lctx.globalAlpha = 1;
   }
 
+  // Humo y fuego (v7): de los coches tocados, los que arden, los restos de las patrullas y el tuyo si está muy dañado.
+  // Solo lo que está a menos de 160 m: más lejos no se ve y gastaría partículas.
+  function emitirHumo(dt, p, pose) {
+    if (juego.estado === 'pausa' || juego.estado === 'cuenta') return;
+    const ef = mundo.efectos, j = p.jugador;
+    const cerca = (c) => Math.abs(c.x - j.x) < 160 && Math.abs(c.y - j.y) < 160;
+    for (const lista of [p.trafico.ronda, p.trafico.barrio]) {
+      for (const v of lista) {
+        if (!(v.danio >= DANIO_TRAFICO.humo) || !cerca(v)) continue;
+        if (v.arde > 0) ef.fuego(v.id, v.x, v.y, 1, dt);
+        else ef.humo(v.id, v.x, v.y, v.quemado ? 0.6 : 0.35 + 0.5 * (v.danio - DANIO_TRAFICO.humo), dt, v.tipo === 'camion' ? 2.6 : 1.1, v.quemado);
+      }
+    }
+    for (const r of p.restos) if (cerca(r.coche)) ef.humo(r.id, r.coche.x, r.coche.y, 0.45, dt, 1.2);
+    // El tuyo, por el capó: humo desde el 50 % de daño y llamas pequeñas desde el 80 %.
+    if (j.danio >= 0.5 && juego.estado === 'juego') {
+      const hx = pose.x + Math.sin(pose.h) * 1.5, hy = pose.y + Math.cos(pose.h) * 1.5;
+      if (j.danio >= 0.8) ef.fuego('tu', hx, hy, 0.25, dt);
+      else ef.humo('tu', hx, hy, 0.3 + (j.danio - 0.5), dt, 1.1);
+    }
+  }
+
   function dibujar(dt, p) {
     const m = mundo, t = tReal, j = p.jugador;
     const alpha = juego.estado === 'juego' ? clamp(juego.acum / DT, 0, 1) : 1;
@@ -7914,7 +8711,22 @@ function arrancar() {
       colocarCoche(v, u.coche, alpha, t, u.sirena || u.rol === 'control');
       if (u.sirena && u.distJugador < 40) cerca = true;
     }
+    // Patrullas fuera de combate: el mismo coche, con el puente de luces apagado y echando humo.
+    for (const r of p.restos) {
+      const v = m.policia.get(r.id);
+      if (v) colocarCoche(v, r.coche, alpha, t, false);
+    }
+    if (m.policia.size > p.policia.length + p.restos.length) {
+      const vivos = new Set([...p.policia.map((u) => u.id), ...p.restos.map((r) => r.id)]);
+      for (const [id, v] of m.policia) {
+        if (vivos.has(id)) continue;
+        m.esc.escena.remove(v.grupo);
+        liberar(v.grupo);
+        m.policia.delete(id);
+      }
+    }
     m.trafico.actualizar(alpha);
+    emitirHumo(dt, p, pose);
     m.pinchos.actualizar(p.pinchos);
     // El fantasma: tu coche donde la policía cree que estás.
     const o = p.ojo;
@@ -7934,6 +8746,7 @@ function arrancar() {
     if (!juego.esperaGolpe && juego.estado !== 'pausa' && juego.estado !== 'cuenta' && juego.estado !== 'resultado') hud.actualizar(p, pose, t);
     audio.actualizar(estadoAudio(p, dt));
     efectos(dt, p, cerca);
+    m.efectos.actualizar(juego.estado === 'pausa' || juego.estado === 'cuenta' ? 0 : dt, camaras.camara);
     renderer.render(m.esc.escena, camaras.camara); // una sola vez por fotograma
     contar();
   }
