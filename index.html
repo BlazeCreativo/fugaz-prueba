@@ -32,10 +32,10 @@
   --sr: env(safe-area-inset-right, 0px);
   --sb: env(safe-area-inset-bottom, 0px);
   --sl: env(safe-area-inset-left, 0px);
-  --b: 68px;           /* botón de mando */
-  --retro: min(30vw, 210px);
+  --b: 56px;           /* botón de mando (25/09: 68 tapaba la pantalla) */
+  --retro: min(24vw, 168px);
 }
-@media (max-height: 380px) { :root { --b: 60px; } }
+@media (max-height: 380px) { :root { --b: 50px; } }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--fondo); color: var(--texto); overflow: hidden; }
 body { font-family: var(--ui); -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
@@ -69,11 +69,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 .h-ojo {
   --c: var(--rojo);
   position: absolute; top: calc(var(--st) + 12px + var(--retro) * 0.15); left: 50%; transform: translateX(-50%);
-  width: 104px; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  width: 90px; display: flex; flex-direction: column; align-items: center; gap: 1px;
 }
 .h-ojo[data-estado="ambar"] { --c: var(--ambar); }
 .h-ojo[data-estado="cerrado"] { --c: var(--verde); }
-.h-ojo svg { width: 58px; height: 58px; overflow: visible; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c) 55%, transparent)); }
+.h-ojo svg { width: 44px; height: 44px; overflow: visible; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c) 55%, transparent)); }
 .h-ojo .anillo-fondo { fill: rgba(5, 8, 14, 0.55); stroke: rgba(255, 255, 255, 0.14); stroke-width: 6; }
 .h-ojo .anillo { fill: none; stroke: var(--c); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 0; transform: rotate(-90deg); transform-origin: 50% 50%; }
 .h-ojo .parpado { fill: rgba(255, 255, 255, 0.1); fill: color-mix(in srgb, var(--c) 22%, transparent); stroke: var(--c); stroke-width: 3.5; }
@@ -84,14 +84,14 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 .h-ojo[data-estado="cerrado"] .cerrado { display: inline; }
 .h-ojo.parpadea svg { animation: parpadeo 0.3s steps(2) infinite; }
 @keyframes parpadeo { 50% { opacity: 0.35; } }
-.ojo-txt { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: 0.08em; color: var(--c); white-space: nowrap; }
+.ojo-txt { font-family: var(--display); font-weight: 800; font-size: 14px; letter-spacing: 0.08em; color: var(--c); white-space: nowrap; }
 .nivel { display: flex; gap: 4px; }
-.nivel i { width: 14px; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.22); }
+.nivel i { width: 11px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.22); }
 .nivel i.on { background: var(--rojo); box-shadow: 0 0 6px var(--rojo); }
 
 .h-botin { position: absolute; top: calc(var(--st) + 8px); left: calc(var(--sl) + 14px); display: flex; flex-direction: column; }
-.h-botin .chapas { font-family: var(--display); font-weight: 800; font-size: 38px; line-height: 1; color: var(--ambar); font-variant-numeric: tabular-nums; }
-.h-botin .ud { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tenue); }
+.h-botin .chapas { font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1; color: var(--ambar); font-variant-numeric: tabular-nums; }
+.h-botin .ud { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tenue); }
 .h-botin .mult { font-family: var(--mono); font-size: 12px; color: var(--cian); min-height: 15px; }
 .premios { position: relative; height: 0; }
 .premio {
@@ -104,20 +104,20 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 
 /* Horizontal (lo normal): arriba el botín, el retrovisor con el Ojo y el minimapa; abajo el velocímetro. */
 .h-mapa {
-  position: absolute; top: calc(var(--st) + 10px); right: calc(var(--sr) + 66px);
-  width: min(22vw, 124px); height: min(22vw, 124px); border-radius: 50%;
+  position: absolute; top: calc(var(--st) + 8px); right: calc(var(--sr) + 58px);
+  width: min(17vw, 96px); height: min(17vw, 96px); border-radius: 50%; opacity: 0.88;
   box-shadow: 0 0 0 1.5px rgba(160, 180, 220, 0.28), 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 .h-velo {
   position: absolute; bottom: calc(var(--sb) + 10px); left: 50%; transform: translateX(-50%);
-  width: 170px; display: grid; grid-template-columns: 1fr auto; align-items: end; column-gap: 8px;
+  width: 140px; display: grid; grid-template-columns: 1fr auto; align-items: end; column-gap: 8px;
 }
 .h-velo .rpm { grid-column: 1 / 3; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.14); overflow: hidden; margin-bottom: 3px; }
 .h-velo .rpm i { display: block; height: 100%; background: linear-gradient(90deg, var(--cian), var(--ambar) 75%, var(--rojo)); transform-origin: 0 50%; transform: scaleX(0); }
-.h-velo .kmh { font-family: var(--display); font-weight: 800; font-size: 50px; line-height: 0.9; text-align: right; font-variant-numeric: tabular-nums; }
+.h-velo .kmh { font-family: var(--display); font-weight: 800; font-size: 40px; line-height: 0.9; text-align: right; font-variant-numeric: tabular-nums; }
 .h-velo .uds { grid-column: 1; grid-row: 3; text-align: right; font-size: 10px; letter-spacing: 0.16em; color: var(--tenue); }
-.h-velo .marcha { grid-column: 2; grid-row: 2; font-family: var(--mono); font-weight: 700; font-size: 18px; color: var(--ambar); border: 1.5px solid rgba(255, 176, 32, 0.6); border-radius: 6px; padding: 1px 7px 0; margin-bottom: 4px; }
+.h-velo .marcha { grid-column: 2; grid-row: 2; font-family: var(--mono); font-weight: 700; font-size: 15px; color: var(--ambar); border: 1.5px solid rgba(255, 176, 32, 0.6); border-radius: 6px; padding: 1px 7px 0; margin-bottom: 4px; }
 .h-velo .barras { grid-column: 1 / 3; display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
 .h-velo .barras > div { height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
 .h-velo .barras i { display: block; height: 100%; transform-origin: 0 50%; transform: scaleX(0); }
@@ -143,38 +143,38 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 .h-aviso {
   position: absolute; top: calc(var(--st) + 112px + var(--retro) * 0.15); left: 50%; transform: translateX(-50%);
   width: max-content; max-width: min(50vw, 420px); padding: 6px 14px; border-radius: 999px; text-align: center;
-  font-family: var(--display); font-weight: 600; font-size: 18px; letter-spacing: 0.04em;
-  background: rgba(9, 13, 24, 0.78); border: 1px solid var(--borde);
+  font-family: var(--display); font-weight: 600; font-size: 16px; letter-spacing: 0.04em;
+  background: rgba(9, 13, 24, 0.7); border: 1px solid var(--borde);
 }
 .h-aviso.peligro { color: #fff; background: rgba(160, 18, 42, 0.86); border-color: var(--rojo); }
 .h-aviso.bien { color: var(--verde); border-color: rgba(61, 220, 132, 0.5); }
 
 .h-grande {
   position: absolute; top: 34%; left: 0; right: 0; text-align: center; opacity: 0;
-  font-family: var(--display); font-weight: 800; font-size: clamp(44px, 11vw, 96px); letter-spacing: 0.04em; line-height: 1;
+  font-family: var(--display); font-weight: 800; font-size: clamp(38px, 9vw, 80px); letter-spacing: 0.04em; line-height: 1;
   text-shadow: 0 0 24px rgba(0, 0, 0, 0.6), 0 2px 0 rgba(0, 0, 0, 0.6);
 }
 .h-grande.on { opacity: 1; }
 .h-grande.entra { animation: golpe 0.34s cubic-bezier(0.2, 1.6, 0.4, 1); }
 .h-grande.rojo { color: var(--rojo); }
 .h-grande.ambar { color: var(--ambar); }
-.h-grande.libre { color: var(--verde); font-size: clamp(56px, 15vw, 132px); }
+.h-grande.libre { color: var(--verde); font-size: clamp(50px, 13vw, 116px); }
 .h-grande.hueco { color: var(--cian); }
 .h-grande.bien { color: var(--verde); }
 @keyframes golpe { 0% { transform: scale(1.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
 .h-radio {
-  position: absolute; bottom: calc(var(--sb) + 96px); left: 50%; transform: translateX(-50%);
-  width: max-content; max-width: min(50vw, 400px); padding: 7px 12px; border-radius: 10px; background: rgba(6, 9, 16, 0.82);
-  border-left: 3px solid var(--azul); font-size: 14px; line-height: 1.3;
+  position: absolute; bottom: calc(var(--sb) + 84px); left: 50%; transform: translateX(-50%);
+  width: max-content; max-width: min(44vw, 340px); padding: 6px 11px; border-radius: 10px; background: rgba(6, 9, 16, 0.72);
+  border-left: 3px solid var(--azul); font-size: 13px; line-height: 1.3;
 }
 .h-radio[data-quien="central"] { border-left-color: var(--cian); }
 .h-radio .quien { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--azul); }
 .h-radio[data-quien="central"] .quien { color: var(--cian); }
 .h-pista {
   position: absolute; top: calc(var(--st) + 104px); left: calc(var(--sl) + 14px);
-  width: min(32vw, 280px); padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.35;
-  background: rgba(40, 28, 4, 0.9); border: 1px solid rgba(255, 176, 32, 0.6); color: #FFE7B8; text-shadow: none;
+  width: min(28vw, 240px); padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.35;
+  background: rgba(40, 28, 4, 0.78); border: 1px solid rgba(255, 176, 32, 0.6); color: #FFE7B8; text-shadow: none;
   animation: aparece-izq 0.35s ease-out;
 }
 @keyframes aparece-izq { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
@@ -185,53 +185,60 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 .ctl {
   position: absolute; pointer-events: auto; touch-action: none; width: var(--b); height: var(--b); border-radius: 50%;
   display: flex; align-items: center; justify-content: center; padding: 0;
-  font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: 0.06em; color: rgba(255, 255, 255, 0.92);
-  background: rgba(12, 17, 30, 0.42); border: 1.5px solid rgba(255, 255, 255, 0.26);
-  transition: transform 0.06s, background 0.06s;
+  font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: 0.06em; color: rgba(255, 255, 255, 0.86);
+  background: rgba(12, 17, 30, 0.28); border: 1.5px solid rgba(255, 255, 255, 0.22);
+  transition: transform 0.06s, background 0.06s, opacity 0.45s;
 }
+/* En reposo (2,5 s sin tocar la pantalla) los mandos se apagan casi del todo; cualquier toque los enciende. */
+.controles[data-reposo="1"] .ctl:not(.on):not(.motor):not(.reversa) { opacity: 0.32; }
+.controles[data-reposo="1"] .ctl.pausa:not(.on), .controles[data-reposo="1"] .ctl.cam:not(.on), .controles[data-reposo="1"] .ctl.mirar:not(.on) { opacity: 0.18; }
 .ctl.on { background: rgba(255, 255, 255, 0.28); transform: scale(0.94); }
+/* Zona de toque invisible más grande que el dibujo (dibujo 56 px, toque 76 px): se acierta sin tapar la carretera. */
+.ctl::before { content: ''; position: absolute; inset: -10px; border-radius: inherit; }
+.ctl.pausa::before, .ctl.cam::before, .ctl.mirar::before { inset: -3px; }
+.ctl.motor::before, .ctl.reversa::before { inset: -4px; }
 .ctl.freno { border-color: rgba(255, 51, 85, 0.7); }
 .ctl.nitro { border-color: rgba(127, 227, 255, 0.8); color: var(--cian); }
 .ctl.gas { border-color: rgba(61, 220, 132, 0.7); }
-.ctl.mano { font-size: 13px; }
-.ctl.izq, .ctl.der { font-size: 26px; width: calc(var(--b) * 1.12); height: calc(var(--b) * 1.12); }
+.ctl.mano { font-size: 12px; }
+.ctl.izq, .ctl.der { font-size: 22px; width: calc(var(--b) * 1.15); height: calc(var(--b) * 1.15); }
 /* Columna de la derecha, arriba: pausa, cámara y mirar atrás (este se mantiene pulsado). */
-.ctl.pausa, .ctl.cam, .ctl.mirar { width: 44px; height: 44px; right: calc(var(--sr) + 12px); }
-.ctl.pausa { top: calc(var(--st) + 10px); font-size: 16px; }
-.ctl.cam { top: calc(var(--st) + 60px); font-size: 18px; }
-.ctl.mirar { top: calc(var(--st) + 110px); font-size: 21px; }
+.ctl.pausa, .ctl.cam, .ctl.mirar { width: 38px; height: 38px; right: calc(var(--sr) + 10px); }
+.ctl.pausa { top: calc(var(--st) + 8px); font-size: 14px; }
+.ctl.cam { top: calc(var(--st) + 52px); font-size: 16px; }
+.ctl.mirar { top: calc(var(--st) + 96px); font-size: 18px; }
 /* Motor y marcha atrás: solo con el coche parado, encima del pulgar izquierdo. */
-.ctl.motor, .ctl.reversa { width: 86px; height: 42px; border-radius: 21px; font-size: 14px; bottom: calc(var(--sb) + 28px + var(--b) * 1.2); }
+.ctl.motor, .ctl.reversa { width: 78px; height: 38px; border-radius: 19px; font-size: 13px; bottom: calc(var(--sb) + 28px + var(--b) * 1.2); }
 .ctl.motor { left: calc(var(--sl) + 14px); }
-.ctl.reversa { left: calc(var(--sl) + 110px); }
+.ctl.reversa { left: calc(var(--sl) + 100px); }
 .controles:not([data-parado="1"]) .motor, .controles:not([data-parado="1"]) .reversa { display: none; }
 .controles[data-motor="0"] .motor { background: rgba(255, 176, 32, 0.3); border-color: var(--ambar); color: var(--ambar); animation: parpadeo 1s steps(2) infinite; }
 .controles[data-motor="0"] .reversa { display: none; }
 
 /* Botones: izquierda y derecha con el pulgar izquierdo; freno, mano, nitro (y gas) con el derecho. */
 .controles[data-modo="botones"] .izq { left: calc(var(--sl) + 14px); bottom: calc(var(--sb) + 16px); }
-.controles[data-modo="botones"] .der { left: calc(var(--sl) + 26px + var(--b) * 1.12); bottom: calc(var(--sb) + 16px); }
-.controles[data-modo="botones"] .freno { right: calc(var(--sr) + 26px + var(--b)); bottom: calc(var(--sb) + 16px); }
-.controles[data-modo="botones"] .mano { right: calc(var(--sr) + 26px + var(--b)); bottom: calc(var(--sb) + 28px + var(--b)); }
+.controles[data-modo="botones"] .der { left: calc(var(--sl) + 34px + var(--b) * 1.15); bottom: calc(var(--sb) + 16px); }
+.controles[data-modo="botones"] .freno { right: calc(var(--sr) + 34px + var(--b)); bottom: calc(var(--sb) + 16px); }
+.controles[data-modo="botones"] .mano { right: calc(var(--sr) + 34px + var(--b)); bottom: calc(var(--sb) + 36px + var(--b)); }
 .controles[data-modo="botones"] .nitro { right: calc(var(--sr) + 14px); bottom: calc(var(--sb) + 16px); }
 .controles[data-modo="botones"][data-auto="0"] .gas { right: calc(var(--sr) + 14px); bottom: calc(var(--sb) + 16px); }
-.controles[data-modo="botones"][data-auto="0"] .nitro { bottom: calc(var(--sb) + 28px + var(--b)); }
+.controles[data-modo="botones"][data-auto="0"] .nitro { bottom: calc(var(--sb) + 36px + var(--b)); }
 /* Inclinación: pulgar izquierdo, freno y freno de mano; derecho, nitro (y gas). */
 .controles[data-modo="inclinacion"] .izq, .controles[data-modo="inclinacion"] .der { display: none; }
 .controles[data-modo="inclinacion"] .freno { left: calc(var(--sl) + 14px); bottom: calc(var(--sb) + 16px); width: calc(var(--b) * 1.2); height: calc(var(--b) * 1.2); }
-.controles[data-modo="inclinacion"] .mano { left: calc(var(--sl) + 30px + var(--b) * 1.2); bottom: calc(var(--sb) + 16px); }
+.controles[data-modo="inclinacion"] .mano { left: calc(var(--sl) + 36px + var(--b) * 1.2); bottom: calc(var(--sb) + 16px); }
 .controles[data-modo="inclinacion"] .nitro { right: calc(var(--sr) + 14px); bottom: calc(var(--sb) + 16px); width: calc(var(--b) * 1.2); height: calc(var(--b) * 1.2); }
 .controles[data-modo="inclinacion"][data-auto="0"] .gas { right: calc(var(--sr) + 14px); bottom: calc(var(--sb) + 16px); width: calc(var(--b) * 1.2); height: calc(var(--b) * 1.2); }
-.controles[data-modo="inclinacion"][data-auto="0"] .nitro { right: calc(var(--sr) + 30px + var(--b) * 1.2); width: var(--b); height: var(--b); }
+.controles[data-modo="inclinacion"][data-auto="0"] .nitro { right: calc(var(--sr) + 36px + var(--b) * 1.2); width: var(--b); height: var(--b); }
 .controles[data-auto="1"] .gas { display: none; }
 
 /* En vertical la pantalla es estrecha: el velocímetro sube por encima de los mandos y el minimapa va a la izquierda. */
 @media (orientation: portrait) {
-  :root { --b: 62px; --retro: min(40vw, 190px); }
-  .h-botin .chapas { font-size: 30px; }
-  .h-mapa { top: calc(var(--st) + 104px); right: auto; left: calc(var(--sl) + 12px); width: min(28vw, 108px); height: min(28vw, 108px); }
-  .h-velo { bottom: calc(var(--sb) + 30px + var(--b) * 2.3); width: 150px; }
-  .h-velo .kmh { font-size: 42px; }
+  :root { --b: 54px; --retro: min(36vw, 170px); }
+  .h-botin .chapas { font-size: 26px; }
+  .h-mapa { top: calc(var(--st) + 92px); right: auto; left: calc(var(--sl) + 12px); width: min(24vw, 92px); height: min(24vw, 92px); }
+  .h-velo { bottom: calc(var(--sb) + 30px + var(--b) * 2.3); width: 130px; }
+  .h-velo .kmh { font-size: 36px; }
   .h-aviso { top: calc(34% + 92px); max-width: calc(100vw - 32px); }
   .h-detencion { top: calc(34% + 136px); width: min(70vw, 280px); }
   .h-radio { bottom: calc(var(--sb) + 116px + var(--b) * 2.3); max-width: calc(100vw - 32px); }
@@ -596,6 +603,11 @@ function tramoNombre(s) {
 }
 function esCurva(s) {
   return tramoDe(normS(s)).tipo === 'arco';
+}
+
+// Curvatura (1/m) de la Ronda en s, a la distancia d del eje: en el sentido de la marcha las curvas giran a la derecha (+).
+function curvaturaRonda(s, d = 0) {
+  return tramoDe(normS(s)).tipo === 'arco' ? 1 / Math.max(R + d, 20) : 0;
 }
 
 // Punto de la Ronda a la distancia s y el desplazamiento lateral d, con su tangente (sentido horario) y normal (hacia fuera).
@@ -1323,7 +1335,7 @@ function ruta(grafo, ox, oy, dx, dy, op = {}) {
   for (let i = 1; i < puntos.length; i++) largo += dist(puntos[i - 1][0], puntos[i - 1][1], puntos[i][0], puntos[i][1]);
   return { puntos, largo };
 }
-return { LARGO_RONDA, CARRILES, CARRILES_EXT, D_MEDIANA, D_GUARDA, ANCHO_CARRIL, TRAMOS_RONDA, normS, difS, tramoNombre, esCurva, rondaPunto, rondaProyectar, CIMA, alturaRonda, alturaEn, BARRIO, CALLES_NS, CALLES_EO, TUNEL, PARKING, CALLEJONES, GLORIETA, RAMPA_R, RAMPA_MEDIO, RAMPAS, crearMapa, aristaCercana, nodosCerca, ruta };
+return { LARGO_RONDA, CARRILES, CARRILES_EXT, D_MEDIANA, D_GUARDA, ANCHO_CARRIL, TRAMOS_RONDA, normS, difS, tramoNombre, esCurva, curvaturaRonda, rondaPunto, rondaProyectar, CIMA, alturaRonda, alturaEn, BARRIO, CALLES_NS, CALLES_EO, TUNEL, PARKING, CALLEJONES, GLORIETA, RAMPA_R, RAMPA_MEDIO, RAMPAS, crearMapa, aristaCercana, nodosCerca, ruta };
 })();
 
 // ---- src/logica/coche.js
@@ -1352,8 +1364,23 @@ for (const [id, m] of Object.entries(BASE)) {
   };
 }
 
-const ASISTENCIA = { direccion: true, derrape: 2 }; // derrape: 2 automática, 1 media, 0 manual
+// derrape: 2 automática, 1 media, 0 manual · agarre: agarre extra del coche del jugador (dirección asistida, 25/09)
+const ASISTENCIA = { direccion: true, derrape: 2, agarre: 1.5 };
 const BETA_MAX = [Infinity, 0.8, 0.58];
+
+// Agarre lateral útil (m/s²). c.agil es la dirección asistida del jugador: 1,5 veces el agarre a partir de 40 m/s
+// y hasta 1,9 veces a poca velocidad, para las esquinas del barrio. La policía no la tiene: agil = 1.
+function agilDe(c, v) {
+  const extra = c.agil || 1;
+  return extra > 1 ? extra + 0.4 * clamp((40 - v) / 25, 0, 1) : 1;
+}
+function agarreDe(c, v) {
+  return c.m.agarre * agilDe(c, v) * (c.pinchado ? 0.72 : 1) * (1 - 0.15 * c.danio);
+}
+// Ángulo de volante máximo: con ayuda, el giro a tope gasta justo el agarre a cualquier velocidad.
+function giroMaxDe(c, v, asist = ASISTENCIA) {
+  return Math.min(c.m.giroMax, Math.atan((c.m.ejes * agarreDe(c, v) * (asist.direccion ? 1.1 : 1.6)) / Math.max(v * v, 1)));
+}
 
 // Círculos que forman el coche para chocar: a lo largo de su eje, con radio = medio ancho.
 function circulosDe(largo, ancho) {
@@ -1492,9 +1519,8 @@ function pasoCoche(c, e, dt, asist = ASISTENCIA) {
   if (c.lanzada > 0) nvf = 0;
 
   // ---- dirección: con ayuda, el giro máximo gasta justo el agarre a cualquier velocidad
-  const agarre = m.agarre * (c.pinchado ? 0.72 : 1) * (1 - 0.15 * c.danio);
-  const exceso = asist.direccion ? 1.1 : 1.6;
-  const giroMax = Math.min(m.giroMax, Math.atan((m.ejes * agarre * exceso) / Math.max(vAbs * vAbs, 1)));
+  const agarre = agarreDe(c, vAbs);
+  const giroMax = giroMaxDe(c, vAbs, asist);
   const delta = dir * giroMax;
   c.volante = dir;
   const wObj = (vf * Math.tan(delta)) / m.ejes;
@@ -1613,11 +1639,89 @@ function choqueEntre(a, b, nx, ny, pen) {
 
 const velocidadKmh = (c) => Math.abs(c.vf) * 3.6;
 const velocidadMax = (c) => c.m.vMax;
-return { MODELOS, ASISTENCIA, circulosDe, crearCoche, pasoCoche, choqueFijo, choqueEntre, velocidadKmh, velocidadMax, lerp };
+return { MODELOS, ASISTENCIA, agilDe, agarreDe, giroMaxDe, circulosDe, crearCoche, pasoCoche, choqueFijo, choqueEntre, velocidadKmh, velocidadMax, lerp };
+})();
+
+// ---- src/logica/asistencia.js
+__m[4] = (() => {
+const { clamp, angDif, rumbo } = __m[1]; // src/logica/mates.js
+const { rondaProyectar, rondaPunto, curvaturaRonda } = __m[2]; // src/logica/mapa.js
+const { agarreDe, giroMaxDe } = __m[3]; // src/logica/coche.js
+// Ayudas a la conducción del coche del jugador (25/09/2026). Alberto, al probarlo: «el coche gira, pero le cuesta mucho».
+// Solo con mandos de persona, que lo marcan en la entrada (trazada, frenadaAuto): el piloto de las pruebas y la policía no las usan.
+//  - Trazada: en la Ronda el coche pone la curva de la carretera; tus ◀ ▶ solo cambian de carril.
+//  - Acelerador automático con cabeza: levanta el pie y frena lo justo antes de las curvas de la Ronda, en los dos sentidos
+//    (la Clave 9 sigue valiendo), y en el barrio, si mantienes el giro, hasta la velocidad a la que cabe la esquina.
+
+
+
+
+const MARGEN = 0.9;                              // parte del agarre que se permite gastar el acelerador automático
+const MIRAR = [0, 8, 18, 30, 45, 65, 90, 120];   // metros por delante que mira en la Ronda
+const ESQUINA = 11;                              // radio (m) de una esquina del barrio con el volante a tope
+const ALINEAR = 0.6;                             // s: sin tocar el volante, el morro vuelve a la dirección de la Ronda
+
+function crearAyuda() {
+  return { giroT: 0, suelto: 0, trazada: 0, vT: null };
+}
+
+// Cambia e (lo que va a la física) antes del paso del coche. zona: la del paso anterior.
+function asistir(ayuda, j, zona, entrada, e, dt) {
+  ayuda.trazada = 0;
+  ayuda.vT = null;
+  if (j.trompo > 0) { ayuda.giroT = 0; return; }
+  const v = Math.abs(j.vf);
+  const humano = !!entrada.trazada;
+  const auto = !!entrada.frenadaAuto && e.gas > 0.5 && e.freno < 0.1 && !j.marchaAtras;
+  if (zona === 'ronda') {
+    ayuda.giroT = 0;
+    if (!humano && !auto) return;
+    const pr = rondaProyectar(j.x, j.y);
+    const t = rondaPunto(pr.s, pr.d);
+    const cos = Math.sin(j.h) * t.tx + Math.cos(j.h) * t.ty; // 1: a favor; −1: a contramano
+    const sentido = cos >= 0 ? 1 : -1;
+    const alineado = clamp((Math.abs(cos) - 0.6) / 0.3, 0, 1); // cruzado en la calzada: sin ayuda
+    ayuda.suelto = Math.abs(e.dir) < 0.1 ? ayuda.suelto + dt : 0;
+    if (humano && !j.derrape && alineado > 0 && v > 2) {
+      // Giro que pide la carretera (curvatura media de ±6 m) y, con el volante suelto, lo que falta para ir recto por ella.
+      const k = (curvaturaRonda(pr.s - 6 * sentido, pr.d) + curvaturaRonda(pr.s, pr.d) + curvaturaRonda(pr.s + 6 * sentido, pr.d)) / 3;
+      // Se corrige hacia dónde va el coche, no hacia dónde apunta: en curva desliza un poco hacia fuera.
+      const err = angDif(rumbo(t.tx * sentido, t.ty * sentido), j.vf > 2 ? rumbo(j.vx, j.vy) : j.h);
+      const corregir = Math.min(1, ayuda.suelto / 0.25) * clamp((0.35 - Math.abs(err)) / 0.15, 0, 1); // un ángulo grande es a propósito
+      const w = sentido * v * k + (corregir * err) / ALINEAR;
+      ayuda.trazada = (alineado * Math.atan((j.m.ejes * w) / v)) / giroMaxDe(j, v);
+      e.dir = clamp(e.dir + ayuda.trazada, -1, 1);
+    }
+    if (auto && alineado > 0.5) {
+      const ag = agarreDe(j, 40) * MARGEN, dec = j.m.frenada * 0.7;
+      let vT = Infinity;
+      for (const D of MIRAR) {
+        const k = curvaturaRonda(pr.s + sentido * D, pr.d);
+        if (k > 0) vT = Math.min(vT, Math.sqrt(ag / k + 2 * dec * Math.max(0, D - 6)));
+      }
+      topeVelocidad(ayuda, j, e, vT);
+    }
+    return;
+  }
+  // Barrio y rampas: mantener el giro es querer doblar la esquina.
+  ayuda.giroT = auto && !j.derrape && Math.abs(e.dir) > 0.55 ? ayuda.giroT + dt : 0;
+  if (ayuda.giroT > 0.18) topeVelocidad(ayuda, j, e, Math.sqrt((agarreDe(j, 15) * MARGEN * ESQUINA) / (e.dir * e.dir)));
+}
+
+// Por encima de vT: fuera gas y freno según lo que sobra. El gas no baja de 0,3, para que al volver a pisar no salte el tirón.
+function topeVelocidad(ayuda, j, e, vT) {
+  if (!Number.isFinite(vT)) return;
+  ayuda.vT = vT;
+  if (j.vf > vT + 0.6) {
+    e.gas = 0.3;
+    e.freno = Math.max(e.freno, clamp((j.vf - vT) * 0.25, 0.15, 0.8));
+  } else if (j.vf > vT - 1) e.gas = Math.min(e.gas, 0.35);
+}
+return { crearAyuda, asistir };
 })();
 
 // ---- src/logica/trafico.js
-__m[4] = (() => {
+__m[5] = (() => {
 const { clamp, angNorm, angDif, rumbo } = __m[1]; // src/logica/mates.js
 const { LARGO_RONDA, CARRILES, CARRILES_EXT, D_MEDIANA, D_GUARDA, rondaPunto, rondaProyectar, normS, difS, esCurva } = __m[2]; // src/logica/mapa.js
 // Tráfico: la Ronda (calzada interior, sentido horario), la calzada exterior (solo decorado) y el barrio.
@@ -1631,6 +1735,25 @@ const TIPOS_TRAFICO = {
   furgo: { largo: 5.4, ancho: 2.0, masa: 2300, v: [23, 28] },
   camion: { largo: 12, ancho: 2.5, masa: 14000, v: [21, 24] },  // 76-86 km/h
 };
+// Dificultad creciente (idea de Alberto, 25/09/2026): cuanto más huyes, más tráfico y más nervioso en la Ronda.
+// El nivel 1 es el de siempre. Los vehículos de más esperan en una reserva y entran lejos de ti, donde no los ves aparecer.
+// pausa: segundos que espera un coche tras cambiar de carril antes de volver a hacerlo.
+const NIVELES_TRAFICO = [
+  null,
+  { extra: 0, pausa: 5 },                          // 1: 40 vehículos
+  { extra: 14, pausa: 3.5 },                       // 2: 54
+  { extra: 14, pausa: 2.5, camionCentro: true },   // 3: 68 y camiones también por el carril central
+  { extra: 12, pausa: 1.8, camionCentro: true },   // 4: 80 y cambian de carril a menudo
+];
+const LEJOS_ENTRAR = 320; // m: la niebla empieza a 70 m y tapa del todo a 330-430 m
+const AVISO = 1.0;        // s de intermitente antes de cambiar de carril (informe 10: 0,8-1,2 s)
+
+// Pone el intermitente (−1 izquierda, hacia la mediana; +1 derecha) y deja el cambio pendiente.
+function avisar(c, carril, atras) {
+  c.aviso = { carril, t: AVISO, atras };
+  c.intermitente = carril < c.carril ? -1 : 1;
+}
+
 // Colores de la calle: bastantes rojos oscuros, para que un compacto rojo se pierda entre ellos.
 const COLORES = ['#C9CED6', '#1E2230', '#8B1E24', '#2F4A7A', '#D8D2C4', '#4A4F57', '#9E2A2B', '#B8872E', '#E8E8EA', '#15171C', '#5A6B7D'];
 
@@ -1650,7 +1773,7 @@ function nuevo(id, tipo, azar, zona) {
 // opciones: { ronda, exterior, barrio, evitarS: [s0, s1] de la Ronda sin tráfico al empezar, evitar: [{ x, y, r }] }
 function crearTrafico(azar, mapa, opciones = {}) {
   const nRonda = opciones.ronda ?? 40, nExt = opciones.exterior ?? 26, nBarrio = opciones.barrio ?? 14;
-  const tr = { ronda: [], exterior: [], barrio: [], t: 0 };
+  const tr = { ronda: [], exterior: [], barrio: [], reserva: [], t: 0, nivel: 1, pausa: NIVELES_TRAFICO[1].pausa };
   let id = 0;
 
   // Ronda: 26 coches, 8 camiones y 6 furgonetas, repartidos con huecos mínimos por carril.
@@ -1715,7 +1838,54 @@ function crearTrafico(azar, mapa, opciones = {}) {
       break;
     }
   }
+
+  // Reserva de la dificultad creciente: se crea la última y con su propio azar, así no cambia nada de lo anterior.
+  const az = opciones.azarReserva;
+  if (az && nRonda > 0) {
+    const n = NIVELES_TRAFICO.reduce((t, nv) => t + (nv ? nv.extra : 0), 0);
+    for (let i = 0; i < n; i++) {
+      const c = nuevo(id++, i % 5 === 0 ? 'camion' : i % 5 === 1 ? 'furgo' : 'coche', az, 'ronda');
+      c.oculto = true;
+      tr.reserva.push(c);
+    }
+  }
   return tr;
+}
+
+// Sube el tráfico de la Ronda al nivel dado: saca de la reserva los vehículos de ese nivel y los pone en huecos libres
+// a más de 320 m de cada cuerpo de «lejosDe» (tú). Devuelve cuántos han entrado.
+function subirTrafico(tr, nivel, lejosDe, azar) {
+  const cfg = NIVELES_TRAFICO[nivel];
+  if (!cfg || nivel <= tr.nivel) return 0;
+  tr.nivel = nivel;
+  tr.pausa = cfg.pausa;
+  const sLejos = lejosDe.map((b) => rondaProyectar(b.x, b.y).s);
+  const ocupados = [[], [], []];
+  for (const c of tr.ronda) ocupados[c.carril].push({ s: c.s, largo: c.largo });
+  let n = 0;
+  for (let k = 0; k < cfg.extra && tr.reserva.length; k++) {
+    const c = tr.reserva[tr.reserva.length - 1];
+    for (let intento = 0; intento < 80; intento++) {
+      const carril = c.tipo === 'camion' ? (cfg.camionCentro && azar.probabilidad(0.4) ? 1 : 2) : c.tipo === 'furgo' ? azar.entero(1, 2) : azar.entero(0, 2);
+      const s = azar.rango(0, LARGO_RONDA);
+      if (sLejos.some((sj) => Math.abs(difS(s, sj)) < LEJOS_ENTRAR)) continue;
+      if (ocupados[carril].some((o) => Math.abs(difS(o.s, s)) < (o.largo + c.largo) / 2 + 22)) continue;
+      ocupados[carril].push({ s, largo: c.largo });
+      tr.reserva.pop();
+      c.oculto = false;
+      c.s = s;
+      c.carril = carril;
+      c.d = CARRILES[carril];
+      c.v = c.vDes;
+      c.cambioT = azar.rango(1, 4);
+      c.apartado = 0;
+      colocarRonda(c, c.d, 1);
+      tr.ronda.push(c);
+      n++;
+      break;
+    }
+  }
+  return n;
 }
 
 function colocarRonda(c, dAntes, dt) {
@@ -1825,17 +1995,27 @@ function pasoRonda(tr, dt, cuerpos) {
     }
     // Sirena detrás: se aparta a la derecha; si ya va por el carril lento, se pega al guardarraíl y afloja.
     c.apartado = 0;
-    if (sirenaDetras && c.aturdido <= 0) {
-      if (c.carril < 2 && Math.abs(c.d - CARRILES[c.carril]) < 0.4 && libre(c, CARRILES[c.carril + 1], 12, 18)) c.carril++;
+    if (c.aviso) {
+      // Con el intermitente puesto: cambia cuando acaba el aviso y solo si el hueco sigue libre.
+      c.aviso.t -= dt;
+      if (c.aviso.t <= 0) {
+        if (c.aturdido <= 0 && libre(c, CARRILES[c.aviso.carril], c.aviso.atras, 24)) c.carril = c.aviso.carril;
+        else c.intermitente = 0;
+        c.aviso = null;
+      }
+    } else if (sirenaDetras && c.aturdido <= 0) {
+      // Apartarse para la sirena es inmediato; el intermitente se pone igual.
+      if (c.carril < 2 && Math.abs(c.d - CARRILES[c.carril]) < 0.4 && libre(c, CARRILES[c.carril + 1], 12, 18)) { c.carril++; c.intermitente = 1; }
       else if (c.carril === 2) { c.apartado = -1.6; vObj = Math.min(vObj, c.vDes * 0.8); }
     } else if (c.tipo !== 'camion' && c.aturdido <= 0 && c.cambioT <= 0 && lider && gap < 35 && lider.v < c.vDes - 2) {
       // Adelantar por la izquierda (carril más rápido) o, si no se puede, por la derecha.
       const cerca = Math.abs(c.d - CARRILES[c.carril]) < 0.4;
       const aluego = 14 + Math.max(0, 30 - c.v) * 0.5;
-      if (cerca && c.carril > 0 && libre(c, CARRILES[c.carril - 1], aluego, 24)) { c.carril--; c.cambioT = 5; }
-      else if (cerca && c.carril < 2 && c.tipo === 'coche' && libre(c, CARRILES[c.carril + 1], aluego, 24)) { c.carril++; c.cambioT = 5; }
+      if (cerca && c.carril > 0 && libre(c, CARRILES[c.carril - 1], aluego, 24)) { avisar(c, c.carril - 1, aluego); c.cambioT = tr.pausa; }
+      else if (cerca && c.carril < 2 && c.tipo === 'coche' && libre(c, CARRILES[c.carril + 1], aluego, 24)) { avisar(c, c.carril + 1, aluego); c.cambioT = tr.pausa; }
       else c.cambioT = 1;
     }
+    if (!c.aviso && c.intermitente && Math.abs(c.d - CARRILES[c.carril]) < 0.3) c.intermitente = 0; // ya está en su carril
     const frenada = gap < 5 + c.v * 0.5 ? 9 : 4.5;
     if (vObj > c.v) c.v += Math.min(vObj - c.v, 2.2 * dt);
     else c.v -= Math.min(c.v - vObj, frenada * dt);
@@ -1933,6 +2113,8 @@ function golpeado(c, fuerza) {
     let k = 0, md = Infinity;
     CARRILES.forEach((d, i) => { if (Math.abs(d - c.d) < md) { md = Math.abs(d - c.d); k = i; } });
     c.carril = k;
+    c.aviso = null;
+    c.intermitente = 0;
   } else if (c.zona === 'barrio') {
     const fx = c.fx ?? Math.sin(c.h), fy = c.fy ?? Math.cos(c.h);
     c.v = Math.max(0, c.vx * fx + c.vy * fy);
@@ -1956,11 +2138,11 @@ function camiones(tr) {
   for (const c of tr.ronda) if (c.tipo === 'camion') out.push({ x: c.x, y: c.y, h: c.h, ml: c.largo / 2, ma: c.ancho / 2 });
   return out;
 }
-return { TIPOS_TRAFICO, crearTrafico, pasoTrafico, golpeado, cercaDe, camiones };
+return { TIPOS_TRAFICO, NIVELES_TRAFICO, crearTrafico, subirTrafico, pasoTrafico, golpeado, cercaDe, camiones };
 })();
 
 // ---- src/logica/ojo.js
-__m[5] = (() => {
+__m[6] = (() => {
 const { clamp } = __m[1]; // src/logica/mates.js
 // El Ojo: rojo = te ven; ámbar = te buscan donde te vieron por última vez; cerrado = libre.
 
@@ -2035,11 +2217,11 @@ return { GRACIA, BUSQUEDA, LIMITE_FANTASMA, crearOjo, pasoOjo, restante, radioBu
 })();
 
 // ---- src/logica/policia.js
-__m[6] = (() => {
+__m[7] = (() => {
 const { clamp, angDif, rumbo, dist, proyectarSegmento } = __m[1]; // src/logica/mates.js
-const { crearCoche, pasoCoche } = __m[3]; // src/logica/coche.js
+const { crearCoche, pasoCoche, agilDe } = __m[3]; // src/logica/coche.js
 const { rondaProyectar, rondaPunto, CARRILES, normS, difS, RAMPAS } = __m[2]; // src/logica/mapa.js
-const { radioBusqueda } = __m[5]; // src/logica/ojo.js
+const { radioBusqueda } = __m[6]; // src/logica/ojo.js
 // La policía de la Metro. Lince: persigue. Lobo: rápido en recta, torpe en curva; hace la maniobra PIT con aviso.
 // Toro: pesado, corta el paso y pone pinchos. Conductas: perseguir, cortar, buscar desde la última posición y cancelar.
 
@@ -2113,7 +2295,8 @@ function pilotar(c, ruta, op = {}) {
   if (op.desvio) { tx += obj.dy * op.desvio; ty -= obj.dx * op.desvio; }
   const a = angDif(rumbo(tx - c.x, ty - c.y), c.h);
   const Ld = Math.max(4, Math.hypot(tx - c.x, ty - c.y));
-  const agarre = m.agarre * (c.pinchado ? 0.72 : 1);
+  // Con el agarre de ese coche: el del jugador (pruebas con piloto automático) lleva la dirección asistida.
+  const agarre = m.agarre * agilDe(c, v) * (c.pinchado ? 0.72 : 1);
   const giroMax = Math.min(m.giroMax, Math.atan((m.ejes * agarre * 1.1) / Math.max(v * v, 1)));
   let dir;
   if (Math.abs(a) > 2 && v > 8) dir = 0; // media vuelta: primero frenar recto, luego girar
@@ -2464,7 +2647,7 @@ return { NOMBRES, crearUnidad, prepararRuta, puntoRuta, pilotar, rutaRonda, paso
 })();
 
 // ---- src/logica/botin.js
-__m[7] = (() => {
+__m[8] = (() => {
 
 // Botín en juego: crece con el tiempo, el nivel de alerta y el estilo; se cobra al escapar.
 // El estilo premia la pericia (casi-choques, huecos, derrapes), nunca las infracciones.
@@ -2486,22 +2669,23 @@ function pasoBotin(b, dt, ojo, nivel) {
   }
 }
 
-function casiChoque(b, fuerza) {
+// extra: el premio del nivel de tráfico (más tráfico, más vale cada rebase).
+function casiChoque(b, fuerza, extra = 1) {
   b.cadena++;
   b.tCadena = 0;
   b.mult = Math.min(2.5, 1 + 0.08 * b.cadena);
-  const g = Math.round((10 + 10 * fuerza) * b.mult);
+  const g = Math.round((10 + 10 * fuerza) * b.mult * extra);
   b.enJuego += g;
   b.estilo += g;
   b.casiChoques++;
   return g;
 }
 
-function hueco(b) {
+function hueco(b, extra = 1) {
   b.cadena += 2;
   b.tCadena = 0;
   b.mult = Math.min(2.5, 1 + 0.08 * b.cadena);
-  const g = Math.round(60 * b.mult);
+  const g = Math.round(60 * b.mult * extra);
   b.enJuego += g;
   b.estilo += g;
   b.huecos++;
@@ -2535,7 +2719,7 @@ return { FINALES, crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrap
 })();
 
 // ---- src/logica/radio.js
-__m[8] = (() => {
+__m[9] = (() => {
 
 // La radio de la Metro narra la persecución. Claves ficticias:
 // 7 persecución · 3 pinchos · 5 control · 9 cancelar · 0 detenido.
@@ -2575,6 +2759,19 @@ const LINEAS = {
     ['{unidad}', 'Voy por la Ronda. Nada de momento.'],
     ['{unidad}', 'Aquí no está. ¿Ha salido o sigue en la Ronda?'],
     ['CENTRAL', 'Atentos a cualquier compacto {color}.'],
+  ],
+  // Dificultad creciente del tráfico (25/09).
+  trafico2: [
+    ['CENTRAL', 'Atención: la Ronda se está cargando. Cuidado con los civiles.'],
+    ['CENTRAL', 'Aumenta el tráfico en la Ronda. Que nadie se la juegue.'],
+  ],
+  trafico3: [
+    ['CENTRAL', 'Hora punta en la Ronda. Hay camiones también por el carril central.'],
+    ['{unidad}', 'Esto está hasta arriba. Lo sigo como puedo.'],
+  ],
+  trafico4: [
+    ['CENTRAL', 'La Ronda está colapsada. Si se mete entre los coches, no arriesguéis.'],
+    ['{unidad}', '¡Se mete entre los camiones! Está loco.'],
   ],
   relevo: [
     ['{unidad}', 'Me lo tapa un camión. Cógelo tú, eres principal.'],
@@ -2669,6 +2866,7 @@ const PRIORIDAD = {
   pinchosCaida: 7, pitHecho: 7, inicio: 9, perdido: 6, visto: 5, relevo: 5, rasante: 5,
   salidaPerfecta: 4, choque: 4, tunel: 4, parking: 4, callejon: 4, salidaRonda: 4, fuga120: 5,
   hueco: 3, refuerzo: 3, busqueda: 2, busquedaRonda: 2, pinchosFallo: 4, pitFallo: 4,
+  trafico2: 5, trafico3: 5, trafico4: 6,
 };
 
 function rellenar(texto, datos) {
@@ -2696,18 +2894,20 @@ return { LINEAS, PRIORIDAD, lineaRadio, cuantasLineas };
 })();
 
 // ---- src/logica/partida.js
-__m[9] = (() => {
+__m[10] = (() => {
 const { crearAzar, subSemilla, semillaNueva } = __m[0]; // src/logica/azar.js
 const { clamp, dist, rumbo, circuloCaja, circuloMuro, circuloCirculo } = __m[1]; // src/logica/mates.js
 const { crearMapa, rondaPunto, rondaProyectar, CARRILES, normS, difS, RAMPAS } = __m[2]; // src/logica/mapa.js
 const { crearCoche, pasoCoche, choqueFijo, choqueEntre, circulosDe, ASISTENCIA } = __m[3]; // src/logica/coche.js
-const { crearTrafico, pasoTrafico, golpeado, cercaDe, camiones } = __m[4]; // src/logica/trafico.js
-const { crearUnidad, pasoUnidad, puntoAparicion } = __m[6]; // src/logica/policia.js
-const { crearOjo, pasoOjo, finalDeEscape, LIMITE_FANTASMA } = __m[5]; // src/logica/ojo.js
-const { crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, FINALES } = __m[7]; // src/logica/botin.js
-const { lineaRadio, PRIORIDAD } = __m[8]; // src/logica/radio.js
+const { crearAyuda, asistir } = __m[4]; // src/logica/asistencia.js
+const { crearTrafico, pasoTrafico, golpeado, cercaDe, camiones, subirTrafico } = __m[5]; // src/logica/trafico.js
+const { crearUnidad, pasoUnidad, puntoAparicion } = __m[7]; // src/logica/policia.js
+const { crearOjo, pasoOjo, finalDeEscape, LIMITE_FANTASMA } = __m[6]; // src/logica/ojo.js
+const { crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, FINALES } = __m[8]; // src/logica/botin.js
+const { lineaRadio, PRIORIDAD } = __m[9]; // src/logica/radio.js
 // Una partida: une el mapa, tu coche, el tráfico, la policía, el Ojo, el botín y la radio.
 // Sin pantalla ni 3D: avanza a pasos fijos de 1/60 s y deja eventos para la presentación (sonido, vibración, textos).
+
 
 
 
@@ -2748,6 +2948,7 @@ function crearPartida(op = {}) {
     policia: crearAzar(subSemilla(semilla, 2)),
     radio: crearAzar(subSemilla(semilla, 3)),
     pinchos: crearAzar(subSemilla(semilla, 4)),
+    reserva: crearAzar(subSemilla(semilla, 5)),
   };
   let jugador, lince, s0 = 0;
   if (escenario === 'barrio') {
@@ -2762,15 +2963,18 @@ function crearPartida(op = {}) {
     ponerMarcha(jugador);
     ponerMarcha(lince.coche);
   }
+  const asistencia = op.asistencia || ASISTENCIA;
+  jugador.agil = asistencia.agarre ?? 1; // dirección asistida: solo tu coche
   const sinTrafico = op.trafico === false;
   const trafico = crearTrafico(azar.trafico, mapa, sinTrafico ? { ronda: 0, exterior: 0, barrio: 0 } : {
     evitarS: escenario === 'barrio' ? [0, 0] : [normS(s0 - 90), normS(s0 + 45)],
     evitar: [{ x: jugador.x, y: jugador.y, r: 45 }, { x: lince.coche.x, y: lince.coche.y, r: 30 }],
+    azarReserva: azar.reserva,
   });
   const p = {
     escenario, semilla, mapa, azar,
     t: 0, pasos: 0,
-    jugador, asistencia: op.asistencia || ASISTENCIA,
+    jugador, asistencia, ayuda: crearAyuda(),
     color: op.color || 'rojo', cocheNombre: 'compacto',
     trafico, policia: [lince],
     ojo: crearOjo(jugador.x, jugador.y, jugador.h),
@@ -2781,12 +2985,13 @@ function crearPartida(op = {}) {
     pinchos: [], pinchosT: null,
     radio: { cola: [], espera: 0.6, actual: null, busquedaT: 3 },
     casi: new Map(), ultimoCasi: null, rebufoGap: Infinity, rebufoOn: false, fuga120T: 0, contraAvisos: 0,
+    traficoNivel: 1,
     final: null,
     eventos: [],
     cinta: [], ultimaEntrada: '',
     stats: {
       nivelMax: 1, casiChoques: 0, huecos: 0, derrapeSeg: 0, velMaxKmh: 0, choques: 0, vecesVisto: 1,
-      pinchazos: 0, pits: 0, contraSeg: 0, escondidoSeg: 0,
+      pinchazos: 0, pits: 0, contraSeg: 0, escondidoSeg: 0, traficoMax: 1,
     },
   };
   decir(p, 'inicio', { unidad: lince.nombre });
@@ -2922,6 +3127,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     dir: clamp(entrada.dir || 0, -1, 1), gas: clamp(entrada.gas || 0, 0, 1), freno: clamp(entrada.freno || 0, 0, 1),
     mano: !!entrada.mano, nitro: !!entrada.nitro, nitroToque: !!entrada.nitroToque,
   };
+  asistir(p.ayuda, j, p.zona, entrada, e, dt);
   for (const ev of pasoCoche(j, e, dt, p.asistencia)) {
     emitir(p, ev.tipo, ev);
     if (ev.tipo === 'salidaPerfecta') decir(p, 'salidaPerfecta');
@@ -2934,6 +3140,9 @@ function pasoPartida(p, entrada = {}, dt = DT) {
       }
     }
   }
+
+  // Cuanto más dura la huida, más tráfico en la Ronda (idea de Alberto, 25/09).
+  if (p.traficoNivel < 4 && p.t >= TRAFICO_T[p.traficoNivel + 1]) subirNivelTrafico(p);
 
   // 2. Tráfico y policía.
   const cuerpos = [j];
@@ -3029,11 +3238,25 @@ function pasoPartida(p, entrada = {}, dt = DT) {
 
 function grabar(p, en) {
   // La cinta: la semilla más las entradas bastan para repetir la partida (repeticiones, clips, Sombras).
-  const k = `${Math.round((en.dir || 0) * 100)},${Math.round((en.gas || 0) * 100)},${Math.round((en.freno || 0) * 100)},${en.mano ? 1 : 0}${en.nitro ? 1 : 0}${en.nitroToque ? 1 : 0}${en.motorToque ? 1 : 0}${en.arrancar ? 1 : 0}`;
+  const k = `${Math.round((en.dir || 0) * 100)},${Math.round((en.gas || 0) * 100)},${Math.round((en.freno || 0) * 100)},${en.mano ? 1 : 0}${en.nitro ? 1 : 0}${en.nitroToque ? 1 : 0}${en.motorToque ? 1 : 0}${en.arrancar ? 1 : 0}${en.trazada ? 1 : 0}${en.frenadaAuto ? 1 : 0}`;
   if (k !== p.ultimaEntrada && p.cinta.length < 60000) {
     p.cinta.push([p.pasos, k]);
     p.ultimaEntrada = k;
   }
+}
+
+// Segundos de huida para subir el tráfico a los niveles 2, 3 y 4. Lejos de los Lobos (35 s) y del Toro (80 s), que llegan
+// con el Ojo en rojo: dos sustos a la vez no se leen (informe 10, 25/09).
+const TRAFICO_T = [0, 0, 25, 60, 110];
+const premioTrafico = (nivel) => 1 + 0.25 * (nivel - 1); // cada rebase vale más cuanto más tráfico
+
+function subirNivelTrafico(p) {
+  const nivel = p.traficoNivel + 1;
+  const nuevos = subirTrafico(p.trafico, nivel, [p.jugador], p.azar.reserva);
+  p.traficoNivel = nivel;
+  p.stats.traficoMax = nivel;
+  emitir(p, 'trafico', { nivel, nuevos, premio: premioTrafico(nivel) });
+  decir(p, 'trafico' + nivel);
 }
 
 function cambioZona(p, de, a) {
@@ -3131,14 +3354,14 @@ function terminarCasi(p, seg, vJ) {
   if (seg.tocado || seg.min >= 1.1 || seg.vRel < 5 || vJ < 15 || p.contra) return;
   const fuerza = clamp(1 - seg.min / 1.1, 0, 1);
   const lado = seg.lat > 0 ? 'izquierda' : 'derecha'; // lado del coche rebasado, visto desde ti
-  const gana = casiChoque(p.botin, fuerza);
+  const gana = casiChoque(p.botin, fuerza, premioTrafico(p.traficoNivel));
   p.jugador.nitro = Math.min(1, p.jugador.nitro + 0.05);
   p.stats.casiChoques++;
   emitir(p, 'casiChoque', { lado, fuerza, gana, cadena: p.botin.cadena, mult: p.botin.mult });
   // HUECO: dos casi-choques por lados opuestos en 0,4 s, con menos de medio metro en cada uno.
   const u = p.ultimoCasi;
   if (u && p.t - u.t < 0.4 && u.lado !== lado && u.min < 0.55 && seg.min < 0.55) {
-    const g = hueco(p.botin);
+    const g = hueco(p.botin, premioTrafico(p.traficoNivel));
     p.jugador.nitro = Math.min(1, p.jugador.nitro + 0.12);
     p.stats.huecos++;
     emitir(p, 'hueco', { gana: g });
@@ -3427,11 +3650,11 @@ function resumen(p) {
     lugar: p.mapa.nombreLugar(j.x, j.y),
   };
 }
-return { DT, ESCENARIOS, NIVEL2, NIVEL3, mapaPara, crearPartida, sacarEventos, pasoPartida, alcanceDeteccion, resumen };
+return { DT, ESCENARIOS, NIVEL2, NIVEL3, mapaPara, crearPartida, sacarEventos, pasoPartida, TRAFICO_T, premioTrafico, alcanceDeteccion, resumen };
 })();
 
 // ---- src/logica/registro.js
-__m[10] = (() => {
+__m[11] = (() => {
 
 // Registro mínimo por partida (fase 0): escenario, duración, final, capturas, casi-choques, cámara y control,
 // segundos hasta la siguiente partida y los fps que dio el móvil. La presentación lo guarda en el móvil y deja copiarlo.
@@ -3456,6 +3679,7 @@ function registroDe(p, extra = {}) {
     siguienteEn: null,
     fps: extra.fps ?? null,         // fotogramas por segundo de media en la partida
     fpsPeor: extra.fpsPeor ?? null, // el peor segundo (sin contar el arranque)
+    trafico: p.stats.traficoMax ?? 1, // nivel de tráfico al que llegó (1-4)
   };
 }
 
@@ -3466,7 +3690,7 @@ function anotarSiguiente(lista, ahoraMs) {
   return lista;
 }
 
-const COLUMNAS = ['fecha', 'escenario', 'semilla', 'duracion', 'final', 'capturas', 'casiChoques', 'huecos', 'nivelMax', 'cobro', 'camara', 'control', 'revancha', 'siguienteEn', 'fps', 'fpsPeor'];
+const COLUMNAS = ['fecha', 'escenario', 'semilla', 'duracion', 'final', 'capturas', 'casiChoques', 'huecos', 'nivelMax', 'cobro', 'camara', 'control', 'revancha', 'siguienteEn', 'fps', 'fpsPeor', 'trafico'];
 
 // Texto para copiar y pegar en un mensaje o una hoja de cálculo (separado por punto y coma).
 function aTexto(lista) {
@@ -3478,7 +3702,7 @@ return { registroDe, anotarSiguiente, aTexto };
 })();
 
 // ---- src/presentacion/geometria.js
-__m[11] = (() => {
+__m[12] = (() => {
 
 // Piezas de geometría hechas a mano: cajas fundidas con color por vértice y texturas pintadas en un lienzo.
 // Mundo → three.js: (x, y) del mapa pasa a (x, altura, -y). Los coches miran hacia -Z; rotation.y = -rumbo.
@@ -3614,10 +3838,10 @@ return { fundirCajas, lienzo, texturaDe, texturaMancha, tira, pared, unir };
 })();
 
 // ---- src/presentacion/escena.js
-__m[12] = (() => {
+__m[13] = (() => {
 const { LARGO_RONDA, rondaPunto, alturaRonda, alturaEn, CALLES_NS, CALLES_EO, TUNEL, PARKING, CALLEJONES, GLORIETA, RAMPAS, RAMPA_R, RAMPA_MEDIO, BARRIO, CARRILES } = __m[2]; // src/logica/mapa.js
 const { crearAzar } = __m[0]; // src/logica/azar.js
-const { fundirCajas, lienzo, texturaDe, texturaMancha, tira, pared } = __m[11]; // src/presentacion/geometria.js
+const { fundirCajas, lienzo, texturaDe, texturaMancha, tira, pared } = __m[12]; // src/presentacion/geometria.js
 // La ciudad de noche en 3D, con pocas llamadas de dibujo: casi todo va fundido en una geometría o en instancias.
 // Mundo → three.js: (x, y) pasa a (x, altura, -y); los coches miran a -Z y rotation.y = -rumbo.
 
@@ -4088,7 +4312,7 @@ function crearEscena(mapa, opciones = {}) {
 // Tráfico en instancias: una malla por tipo para la carrocería y otra para los faros.
 function crearTraficoVisual(escena, trafico) {
   const tipos = {};
-  const todos = [...trafico.ronda, ...trafico.exterior, ...trafico.barrio];
+  const todos = [...trafico.ronda, ...trafico.exterior, ...trafico.barrio, ...(trafico.reserva || [])]; // la reserva, escondida
   for (const t of ['coche', 'furgo', 'camion']) {
     const lista = todos.filter((v) => v.tipo === t);
     if (!lista.length) continue;
@@ -4104,10 +4328,17 @@ function crearTraficoVisual(escena, trafico) {
     tipos[t] = { lista, cuerpo, luces };
   }
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), p = new THREE.Vector3(), uno = new THREE.Vector3(1, 1, 1), eje = new THREE.Vector3(0, 1, 0);
+  const cero = new THREE.Matrix4().makeScale(0, 0, 0);
+  // Intermitentes: dos pilotos ámbar por vehículo (delante y detrás, del lado al que va a cambiar), solo al parpadear.
+  const intermitentes = new THREE.InstancedMesh(new THREE.BoxGeometry(0.24, 0.14, 0.16), new THREE.MeshBasicMaterial({ color: '#FFB020' }), todos.length * 2);
+  intermitentes.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  intermitentes.frustumCulled = false;
+  escena.add(intermitentes);
   return {
     actualizar(alpha) {
       for (const t of Object.values(tipos)) {
         t.lista.forEach((v, i) => {
+          if (v.oculto) { t.cuerpo.setMatrixAt(i, cero); t.luces.setMatrixAt(i, cero); return; }
           const x = v._px !== undefined ? v._px + (v.x - v._px) * alpha : v.x;
           const y = v._py !== undefined ? v._py + (v.y - v._py) * alpha : v.y;
           q.setFromAxisAngle(eje, -v.h);
@@ -4118,8 +4349,30 @@ function crearTraficoVisual(escena, trafico) {
         t.cuerpo.instanceMatrix.needsUpdate = true;
         t.luces.instanceMatrix.needsUpdate = true;
       }
+      const encendido = Math.floor(performance.now() / 330) % 2 === 0;
+      todos.forEach((v, i) => {
+        if (!encendido || !v.intermitente || v.oculto) {
+          intermitentes.setMatrixAt(2 * i, cero);
+          intermitentes.setMatrixAt(2 * i + 1, cero);
+          return;
+        }
+        const x = v._px !== undefined ? v._px + (v.x - v._px) * alpha : v.x;
+        const y = v._py !== undefined ? v._py + (v.y - v._py) * alpha : v.y;
+        const fx = Math.sin(v.h), fy = Math.cos(v.h), rx = Math.cos(v.h), ry = -Math.sin(v.h);
+        const lat = (v.ancho / 2) * v.intermitente, alto = v.tipo === 'camion' ? 1.05 : 0.72;
+        q.setFromAxisAngle(eje, -v.h);
+        [v.largo / 2 - 0.15, -v.largo / 2 + 0.15].forEach((lon, k) => {
+          const px = x + fx * lon + rx * lat, py = y + fy * lon + ry * lat;
+          m4.compose(p.set(px, alturaEn(px, py) + alto, -py), q, uno);
+          intermitentes.setMatrixAt(2 * i + k, m4);
+        });
+      });
+      intermitentes.instanceMatrix.needsUpdate = true;
     },
     destruir() {
+      escena.remove(intermitentes);
+      intermitentes.geometry.dispose();
+      intermitentes.material.dispose();
       for (const t of Object.values(tipos)) {
         escena.remove(t.cuerpo, t.luces);
         t.cuerpo.geometry.dispose();
@@ -4251,7 +4504,7 @@ return { COLOR_NOCHE, modeloCoche, crearEscena, crearTraficoVisual, crearCocheVi
 })();
 
 // ---- src/presentacion/camaras.js
-__m[13] = (() => {
+__m[14] = (() => {
 
 // Tres cámaras: persecución (por defecto), capó y cabina. Horizonte estable: la cámara nunca se inclina de lado.
 // Sensación de velocidad: muelle que se queda atrás al acelerar, campo de visión que se abre y mirar atrás 150°.
@@ -4461,13 +4714,13 @@ return { MODOS, NOMBRE_MODO, crearCamaras };
 })();
 
 // ---- src/presentacion/entrada.js
-__m[14] = (() => {
+__m[15] = (() => {
 
 // Controles: inclinación (con el vector de gravedad), botones táctiles y teclado.
 // La inclinación mide cuánto giras el móvil respecto a como lo sujetabas al calibrar: no necesita giroscopio
 // y funciona igual en horizontal que en vertical. Si el navegador no da los sensores, se juega con botones.
 
-const SENS = [34, 28, 23, 18, 14]; // grados para girar a tope, de la sensibilidad 1 a la 5
+const SENS = [30, 25, 20, 16, 12]; // grados para girar a tope, de la sensibilidad 1 a la 5 (25/09: antes 34-14)
 const ZONA_MUERTA = 2.5;           // grados
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -4476,11 +4729,13 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
   const e = {
     modo: ajustes.control === 'inclinacion' ? 'inclinacion' : 'botones',
     auto: ajustes.acelAuto !== false,
+    ayuda: ['completa', 'frenada', 'ninguna'].includes(ajustes.ayudaVolante) ? ajustes.ayudaVolante : 'completa',
     sens: clamp(ajustes.sensibilidad ?? 3, 1, 5),
     dir: 0, dirBotones: 0, angulo: 0, anguloFiltrado: 0,
     ref: null, grav: null, gravT: 0, plano: false,
     toques: { nitroToque: false, motorToque: false, arrancar: false, camaraToque: false, pausaToque: false },
     motorApagado: false,
+    tocadoT: 0, reposo: false, // reposo: 2,5 s sin tocar la pantalla → los mandos se apagan (CSS data-reposo)
   };
   const pulsado = new Map(); // control → nº de dedos o teclas
   const on = (k) => (pulsado.get(k) || 0) > 0;
@@ -4546,6 +4801,8 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
   capa.addEventListener('pointercancel', fin);
   capa.addEventListener('lostpointercapture', fin);
   capa.addEventListener('contextmenu', (ev) => ev.preventDefault());
+  // Cualquier toque en la pantalla (también fuera de los botones) enciende los mandos.
+  window.addEventListener('pointerdown', () => { e.tocadoT = performance.now(); }, { passive: true });
 
   // ---------------------------------------------------------------- teclado
   const TECLAS = {
@@ -4638,6 +4895,11 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
   // ---------------------------------------------------------------- lectura por fotograma
   function leer(dt, estadoCoche = {}) {
     e.motorApagado = estadoCoche.motor === false;
+    let algo = false;
+    for (const n of pulsado.values()) if (n > 0) { algo = true; break; }
+    if (algo) e.tocadoT = performance.now();
+    const reposo = performance.now() - e.tocadoT > 2500;
+    if (reposo !== e.reposo) { e.reposo = reposo; capa.dataset.reposo = reposo ? '1' : '0'; }
     let dir, angVolante;
     const objBotones = (on('der') ? 1 : 0) - (on('izq') ? 1 : 0);
     if (e.modo === 'inclinacion' && !teclado && e.grav) {
@@ -4647,22 +4909,26 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
       const max = SENS[e.sens - 1];
       const m = Math.abs(e.anguloFiltrado);
       const x = clamp((m - ZONA_MUERTA) / (max - ZONA_MUERTA), 0, 1);
-      // Curva suave cerca del centro y fuerte en los extremos.
-      dir = Math.sign(e.anguloFiltrado) * Math.pow(x, 1.5);
+      // Curva suave cerca del centro y fuerte en los extremos (25/09: exponente 1,3, antes 1,5: responde antes).
+      dir = Math.sign(e.anguloFiltrado) * Math.pow(x, 1.3);
       angVolante = (e.anguloFiltrado * Math.PI) / 180;
       if (objBotones) dir = objBotones;
     } else {
-      e.dirBotones += clamp(objBotones - e.dirBotones, -dt / 0.12, dt / 0.12);
+      e.dirBotones += clamp(objBotones - e.dirBotones, -dt / 0.08, dt / 0.08); // a tope en 0,08 s
       if (!objBotones && Math.abs(e.dirBotones) < 0.02) e.dirBotones = 0;
       dir = e.dirBotones;
       angVolante = dir * 1.05;
     }
     const frenando = on('freno');
     let gas = on('gas') ? 1 : 0;
-    if (e.auto && !teclado && !on('reversa')) gas = 1;
+    const gasAuto = e.auto && !teclado && !on('reversa');
+    if (gasAuto) gas = 1;
     if (on('reversa')) gas = 0;
     return {
       dir,
+      // Ayudas de la física para mandos de persona (src/logica/asistencia.js), según Ajustes › Ayuda al volante.
+      trazada: e.ayuda === 'completa',
+      frenadaAuto: gasAuto && e.ayuda !== 'ninguna',
       gas: e.motorApagado ? 0 : gas,
       freno: frenando || on('reversa') ? 1 : 0,
       mano: on('mano'),
@@ -4707,6 +4973,7 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
       if (e.modo === 'inclinacion') escuchar();
     },
     ponerAuto(a) { e.auto = !!a; aplicarModo(); },
+    ponerAyuda(a) { e.ayuda = ['completa', 'frenada', 'ninguna'].includes(a) ? a : 'completa'; },
     ponerSensibilidad(n) { e.sens = clamp(Math.round(n), 1, 5); },
     // Durante la partida, el motor y la marcha atrás solo se ofrecen parado.
     marcarParado(parado, motor) {
@@ -4740,9 +5007,9 @@ return { crearEntrada, VIBRACION, vibrar };
 })();
 
 // ---- src/presentacion/hud.js
-__m[15] = (() => {
+__m[16] = (() => {
 const { LARGO_RONDA, rondaPunto, CALLES_NS, CALLES_EO, PARKING, CALLEJONES, RAMPAS, RAMPA_R, CARRILES } = __m[2]; // src/logica/mapa.js
-const { restante, radioBusqueda } = __m[5]; // src/logica/ojo.js
+const { restante, radioBusqueda } = __m[6]; // src/logica/ojo.js
 // Lo que se lee en pantalla: el Ojo, la alerta, el botín, el velocímetro, el retrovisor de luces, el minimapa,
 // los textos grandes y los subtítulos de la radio (con voz sintética si el móvil la tiene).
 
@@ -5038,7 +5305,7 @@ return { crearHud };
 })();
 
 // ---- src/presentacion/menu.js
-__m[16] = (() => {
+__m[17] = (() => {
 
 // Pantallas: «¿Dónde te pillan?», ajustes, calibración, pausa, cuenta atrás y la pantalla final.
 
@@ -5147,6 +5414,8 @@ function crearMenu(raiz, api) {
           <div class="seg">${opcion('control', 'inclinacion', 'Inclinar')}${opcion('control', 'botones', 'Botones')}</div>
           <div class="seg">${[1, 2, 3, 4, 5].map((n) => opcion('sensibilidad', n, `Sensib. ${n}`)).join('')}</div>
           <div class="seg">${opcion('acelAuto', true, 'Acelerador automático')}${opcion('acelAuto', false, 'Acelerar yo')}</div>
+          <div class="seg">${opcion('ayudaVolante', 'completa', 'Ayuda completa')}${opcion('ayudaVolante', 'frenada', 'Solo frenada')}${opcion('ayudaVolante', 'ninguna', 'Sin ayuda')}</div>
+          <p class="nota">Ayuda completa: en la Ronda el coche sigue la curva y frena antes de ella; tú solo cambias de carril. Solo frenada: giras tú y el acelerador automático levanta el pie antes de las curvas y al doblar esquinas.</p>
           <button class="sec" data-calibrar>Calibrar la inclinación</button>
         </div>
         <div class="grupo"><h3>Cámara</h3>
@@ -5268,7 +5537,7 @@ return { crearMenu };
 })();
 
 // ---- src/presentacion/audio.js
-__m[17] = (() => {
+__m[18] = (() => {
 
 // FUGAZ · sonido y música sintetizados con Web Audio.
 // Cero ficheros de audio y cero librerías: todo sale de osciladores y de un
@@ -6382,20 +6651,20 @@ return { crearAudio };
 })();
 
 // ---- src/main.js
-__m[18] = (() => {
-const { DT, crearPartida, pasoPartida, sacarEventos, mapaPara } = __m[9]; // src/logica/partida.js
+__m[19] = (() => {
+const { DT, crearPartida, pasoPartida, sacarEventos, mapaPara } = __m[10]; // src/logica/partida.js
 const { rondaPunto, alturaRonda, alturaEn, normS } = __m[2]; // src/logica/mapa.js
-const { crearTrafico, pasoTrafico } = __m[4]; // src/logica/trafico.js
+const { crearTrafico, pasoTrafico } = __m[5]; // src/logica/trafico.js
 const { crearAzar } = __m[0]; // src/logica/azar.js
-const { restante } = __m[5]; // src/logica/ojo.js
-const { registroDe, anotarSiguiente, aTexto } = __m[10]; // src/logica/registro.js
-const { COLOR_NOCHE, crearEscena, crearTraficoVisual, crearCocheVisual, colocarCoche, crearFantasma, crearPinchosVisual } = __m[12]; // src/presentacion/escena.js
-const { texturaMancha } = __m[11]; // src/presentacion/geometria.js
-const { crearCamaras, NOMBRE_MODO } = __m[13]; // src/presentacion/camaras.js
-const { crearEntrada, vibrar, VIBRACION } = __m[14]; // src/presentacion/entrada.js
-const { crearHud } = __m[15]; // src/presentacion/hud.js
-const { crearMenu } = __m[16]; // src/presentacion/menu.js
-const { crearAudio } = __m[17]; // src/presentacion/audio.js
+const { restante } = __m[6]; // src/logica/ojo.js
+const { registroDe, anotarSiguiente, aTexto } = __m[11]; // src/logica/registro.js
+const { COLOR_NOCHE, crearEscena, crearTraficoVisual, crearCocheVisual, colocarCoche, crearFantasma, crearPinchosVisual } = __m[13]; // src/presentacion/escena.js
+const { texturaMancha } = __m[12]; // src/presentacion/geometria.js
+const { crearCamaras, NOMBRE_MODO } = __m[14]; // src/presentacion/camaras.js
+const { crearEntrada, vibrar, VIBRACION } = __m[15]; // src/presentacion/entrada.js
+const { crearHud } = __m[16]; // src/presentacion/hud.js
+const { crearMenu } = __m[17]; // src/presentacion/menu.js
+const { crearAudio } = __m[18]; // src/presentacion/audio.js
 // FUGAZ · prototipo de la fase 0. Arranque y bucle del juego.
 // Une la lógica de la partida (src/logica: sin pantalla, a pasos fijos de 1/60 s) con la presentación
 // (src/presentacion: escena 3D, cámaras, controles, HUD, menú y sonido). El dibujo interpola entre los dos
@@ -6436,8 +6705,9 @@ function guardarLS(clave, valor) {
 const TACTIL = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window;
 let menosMovimiento = false;
 try { menosMovimiento = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (_) { /* sin preferencia */ }
+const TRAFICO_AVISO = ['', '', 'LA RONDA SE CARGA', 'HORA PUNTA', 'RONDA COLAPSADA'];
 const AJUSTES_BASE = {
-  control: TACTIL ? 'inclinacion' : 'botones', sensibilidad: 3, acelAuto: true, camara: 'persecucion',
+  control: TACTIL ? 'inclinacion' : 'botones', sensibilidad: 3, acelAuto: true, ayudaVolante: 'completa', camara: 'persecucion',
   efectos: menosMovimiento ? 'suaves' : 'normales', musica: 0.8, efectosVol: 1, motor: 0.9, voz: true, vibracion: true,
 };
 function cargarAjustes() {
@@ -6679,7 +6949,7 @@ function arrancar() {
     registro.push(registroDe(p, {
       fecha: fechaCorta(new Date()),
       camara: juego.camaraUsada || ajustes.camara,
-      control: entrada.teclado ? 'teclado' : `${entrada.modo}${ajustes.acelAuto ? '+auto' : ''}`,
+      control: `${entrada.teclado ? 'teclado' : `${entrada.modo}${ajustes.acelAuto ? '+auto' : ''}`}+${ajustes.ayudaVolante || 'completa'}`,
       revancha: juego.revancha,
       finMs: Date.now(),
       fps: medida.t > 0 ? Math.round(medida.n / medida.t) : null,
@@ -6902,6 +7172,11 @@ function arrancar() {
         hud.premio(`HUECO +${ev.gana}`, 'hueco');
         juego.lento = 0.5;
         vibra('dobleTic');
+        break;
+      case 'trafico':
+        hud.aviso(`TRÁFICO ${ev.nivel} · ${TRAFICO_AVISO[ev.nivel] || ''} · rebases ×${String(ev.premio).replace('.', ',')}`, 'peligro', 2.6, t);
+        vibra('dobleTic');
+        pista('trafico', 'Cuanto más dura la huida, más se llena la Ronda: cada rebase vale más, pero cuesta más encontrar hueco. Los intermitentes avisan de quién va a cambiar de carril.', 6.5);
         break;
       case 'rebufo':
         if (ev.on) {
@@ -7298,6 +7573,7 @@ function arrancar() {
           break;
         case 'sensibilidad': entrada.ponerSensibilidad(v); break;
         case 'acelAuto': entrada.ponerAuto(v); break;
+        case 'ayudaVolante': entrada.ponerAyuda(v); break;
         case 'camara': camaras.ponerModo(v); break;
         case 'musica': case 'efectosVol': case 'motor': aplicarVolumen(); break;
         default: break;
