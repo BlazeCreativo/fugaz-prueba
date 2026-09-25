@@ -124,7 +124,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 .h-velo .nitro i { background: linear-gradient(90deg, #2F8CFF, var(--cian)); box-shadow: 0 0 8px var(--cian); }
 .h-velo .danio { opacity: 0; transition: opacity 0.3s; }
 .h-velo .danio.visible { opacity: 1; }
-.h-velo .danio i { background: linear-gradient(90deg, #B3122E, var(--rojo)); }
+.h-velo .danio i { background: linear-gradient(90deg, #F2C14E, #FF9F1C); }
+.h-velo .danio.humo i { background: linear-gradient(90deg, #E07A1F, #FF5A1F); }
+.h-velo .danio.fuego i { background: linear-gradient(90deg, #B3122E, var(--rojo)); animation: parpadea 0.7s steps(2) infinite; }
+@keyframes parpadea { 50% { opacity: 0.45; } }
+.h-velo .crucero { grid-column: 1 / 3; justify-self: center; margin-top: 3px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: var(--cian); border: 1px solid rgba(127, 227, 255, 0.55); border-radius: 4px; padding: 1px 6px; }
+.h-modo { margin-top: 4px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: var(--ambar); border: 1px solid rgba(255, 176, 32, 0.55); border-radius: 4px; padding: 1px 6px; align-self: flex-start; }
 .h-velo .calor { opacity: 0; transition: opacity 0.3s; }
 .h-velo .calor.visible { opacity: 1; }
 .h-velo .calor i { background: linear-gradient(90deg, var(--ambar), var(--rojo)); }
@@ -234,6 +239,19 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 .controles[data-modo="inclinacion"][data-auto="0"] .gas { right: calc(var(--sr) + 14px); bottom: calc(var(--sb) + 16px); width: calc(var(--b) * 1.2); height: calc(var(--b) * 1.2); }
 .controles[data-modo="inclinacion"][data-auto="0"] .nitro { right: calc(var(--sr) + 36px + var(--b) * 1.2); width: var(--b); height: var(--b); }
 .controles[data-auto="1"] .gas { display: none; }
+/* Pedal (v6): alto, y cuanto más arriba el pulgar, más gas; el nivel se ve dentro. */
+.ctl.gas { overflow: hidden; }
+.ctl.gas span { position: relative; }
+.ctl.gas i.nivel { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--pedal, 0) * 100%); background: rgba(61, 220, 132, 0.3); pointer-events: none; }
+.ctl.gas:not(.on) i.nivel { height: 0; }
+.controles[data-acel="pedal"] .gas { height: calc(var(--b) * 1.9); border-radius: 16px; align-items: flex-start; padding-top: 10px; }
+.controles[data-modo="botones"][data-acel="pedal"] .nitro { bottom: calc(var(--sb) + 36px + var(--b) * 1.9); }
+.controles[data-modo="inclinacion"][data-acel="pedal"] .gas { height: calc(var(--b) * 1.9); }
+/* Crucero: zona invisible encima del velocímetro. */
+.ctl.crucero { left: 50%; margin-left: -75px; bottom: calc(var(--sb) + 4px); width: 150px; height: 74px; border: 0; background: transparent; border-radius: 14px; }
+.ctl.crucero::before { inset: -2px; }
+.ctl.crucero.on { background: rgba(127, 227, 255, 0.08); transform: none; }
+.controles[data-reposo="1"] .ctl.crucero { opacity: 1; }
 
 /* En vertical la pantalla es estrecha: el velocímetro sube por encima de los mandos y el minimapa va a la izquierda. */
 @media (orientation: portrait) {
@@ -241,6 +259,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
   .h-botin .chapas { font-size: 26px; }
   .h-mapa { top: calc(var(--st) + 92px); right: auto; left: calc(var(--sl) + 12px); width: min(24vw, 92px); height: min(24vw, 92px); }
   .h-velo { bottom: calc(var(--sb) + 30px + var(--b) * 2.3); width: 130px; }
+  .ctl.crucero { bottom: calc(var(--sb) + 24px + var(--b) * 2.3); margin-left: -70px; width: 140px; }
   .h-velo .kmh { font-size: 36px; }
   .h-aviso { top: calc(34% + 92px); max-width: calc(100vw - 32px); }
   .h-detencion { top: calc(34% + 136px); width: min(70vw, 280px); }
@@ -289,6 +308,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 .esc:active, .esc:hover { border-color: var(--rojo); background: rgba(40, 14, 24, 0.9); }
 .esc::after { content: 'JUGAR ▸'; margin-top: auto; font-family: var(--display); font-weight: 800; font-size: 14px; letter-spacing: 0.1em; color: var(--rojo); }
 .portada .fila { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.portada .nota-modo { font-size: 12px; color: var(--tenue); max-width: 230px; }
 .record { margin: 0; color: var(--ambar); font-size: 14px; }
 .pie { margin: 0; color: var(--tenue); font-size: 12px; opacity: 0.75; }
 @media (max-width: 640px) { .escenarios { grid-template-columns: 1fr; } .esc { min-height: 0; } }
@@ -1671,6 +1691,20 @@ function crearAyuda() {
 
 // Cambia e (lo que va a la física) antes del paso del coche. zona: la del paso anterior.
 function asistir(ayuda, j, zona, entrada, e, dt) {
+  asistirZona(ayuda, j, zona, entrada, e, dt);
+  crucero(entrada, j, e);
+}
+
+// Crucero (tocar el velocímetro, src/logica/pie.js): mantiene la velocidad fijada. Va después de la frenada de las curvas,
+// que puede bajarla aún más; si ya se está frenando, no toca nada.
+function crucero(entrada, j, e) {
+  if (!(entrada.crucero > 0) || e.freno >= 0.05) return;
+  const err = entrada.crucero - j.vf;
+  e.gas = Math.min(e.gas, clamp(0.45 + err * 0.35, 0, 1));
+  if (err < -1.5) e.freno = Math.max(e.freno, clamp(-err * 0.12, 0.05, 0.5));
+}
+
+function asistirZona(ayuda, j, zona, entrada, e, dt) {
   ayuda.trazada = 0;
   ayuda.vT = null;
   if (j.trompo > 0) { ayuda.giroT = 0; return; }
@@ -1721,7 +1755,7 @@ function topeVelocidad(ayuda, j, e, vT) {
     e.freno = Math.max(e.freno, clamp((j.vf - vT) * 0.25, 0.15, 0.8));
   } else if (j.vf > vT - 1) e.gas = Math.min(e.gas, 0.35);
 }
-return { crearAyuda, asistir };
+return { crearAyuda, asistir, crucero };
 })();
 
 // ---- src/logica/trafico.js
@@ -2239,7 +2273,7 @@ const NOMBRES = { lince: 'LINCE', lobo: 'LOBO', toro: 'TORO' };
 // Se pone a tu altura (acercar), avisa (aviso) y cierra contra tu costado (ataque). Si frenas o aceleras a tiempo, falla.
 // frena: parte de tu velocidad que pierdes; danio: lo que se abolla tu coche (menos potencia y agarre); enfriar: s por unidad.
 // Informe 11 (25/09): aviso de 1,2-1,5 s; el Lince solo empuja; el Lobo y el Toro frenan más, abollan y te dejan 0,6 s sin agarre.
-const EMBESTIDA = { acercar: 4, aviso: 1.2, ataque: 1.3, danioMax: 0.4, enfriar: 8, enfriarFallo: 5, primera: 12 };
+const EMBESTIDA = { acercar: 4, aviso: 1.2, ataque: 1.3, enfriar: 8, enfriarFallo: 5, primera: 12 };
 // PIT comprometida: desde el aviso, la unidad cambia de velocidad a 3 m/s² como mucho. Si frenas de golpe se pasa de largo;
 // si te escapas acelerando, se queda atrás. Antes copiaba cada frenazo y no había forma de esquivarla.
 const PIT_ADAPTA = 3;
@@ -2540,6 +2574,14 @@ function pasoUnidad(u, ctx, dt) {
       u.rutaT = 0;
     } else {
       u.modo = 'ruta';
+      const pu0 = terreno(zonaU) === 'ronda' && terreno(ctx.zonaJugador) === 'ronda' ? rondaProyectar(c.x, c.y) : null;
+      if (ojo === 'rojo' && pu0 && difS(pu0.s, rondaProyectar(j.x, j.y).s) > 0) {
+        // Va por delante de ti en la Ronda: te espera por el carril lento, en el sentido de la marcha, y cuando pasas te sigue.
+        // Antes daba media vuelta para ir a por ti y se te ponía de frente: con el daño de la v6, un choque frontal a
+        // 200 km/h de velocidad sumada (64 % de un golpe).
+        u.ruta = rutaRonda(pu0.s, pu0.d, CARRILES[2], 130);
+        e = pilotar(c, u.ruta, { ...op, vObj: Math.max(8, vJ * 0.5) });
+      } else {
       // Destino: el jugador (si alguien lo ve), un punto de corte (rol cortar) o un punto de búsqueda.
       let destino;
       if (ojo === 'rojo') {
@@ -2559,6 +2601,7 @@ function pasoUnidad(u, ctx, dt) {
       }
       const vMax = ojo === 'rojo' ? undefined : c.m.vMax * 0.72;
       e = pilotar(c, u.ruta, ojo === 'rojo' ? { ...op, vFinal: vJ, margenFinal: 12 } : { ...op, vMax });
+      }
     }
 
     // Esquivar: si hay algo lento delante, se abre a un lado libre.
@@ -2738,7 +2781,7 @@ __m[8] = (() => {
 // El estilo premia la pericia (casi-choques, huecos, derrapes), nunca las infracciones.
 
 const TASA = [5, 9, 14]; // chapas por segundo con el Ojo en rojo, según el nivel
-const FINALES = { FANTASMA: 2, LIMPIO: 1, CLAVE9: 0.5, DETENIDO: 0.25 };
+const FINALES = { FANTASMA: 2, LIMPIO: 1, CLAVE9: 0.5, DETENIDO: 0.25, SINIESTRO: 0.25 };
 
 function crearBotin() {
   return { enJuego: 0, cadena: 0, mult: 1, tCadena: 0, casiChoques: 0, huecos: 0, derrape: 0, estilo: 0 };
@@ -2958,6 +3001,13 @@ const LINEAS = {
   detenido: [
     ['{unidad}', 'Clave 0. Detenido en {lugar}.'],
   ],
+  humo: [
+    ['{unidad}', 'Central, el sospechoso va echando humo. Está tocado.'],
+    ['{unidad}', 'Lleva el coche tocado, no aguantará mucho.'],
+  ],
+  siniestro: [
+    ['{unidad}', 'Clave 0. El coche del sospechoso ha quedado destrozado en {lugar}. Lo tenemos.'],
+  ],
 };
 
 const PRIORIDAD = {
@@ -2967,6 +3017,7 @@ const PRIORIDAD = {
   salidaPerfecta: 4, choque: 4, tunel: 4, parking: 4, callejon: 4, salidaRonda: 4, fuga120: 5,
   hueco: 3, refuerzo: 3, busqueda: 2, busquedaRonda: 2, pinchosFallo: 4, pitFallo: 4,
   trafico2: 5, trafico3: 5, trafico4: 6, embisteAviso: 6, embestida: 7, embisteFallo: 4,
+  humo: 5, siniestro: 10,
 };
 
 function rellenar(texto, datos) {
@@ -3024,6 +3075,18 @@ const ESCENARIOS = {
   barrio: { id: 'barrio', nombre: 'En el barrio', rampas: true },
   mixta: { id: 'mixta', nombre: 'Fuga mixta', rampas: true },
 };
+// Daño por choque (modo De verdad; Alberto, 25/09: «si hay un choque en el modo de verdad, que te dañes y te condicione»).
+// Rozar no daña (por debajo de 4 m/s de golpe). Contra un muro: 10 % a 36 km/h de frente, 35 % a 90 km/h.
+// Contra otro vehículo, según su masa: un camión duele casi el doble que un coche. Al 100 %, SINIESTRO.
+// Ningún golpe suelto pasa del 50 %: hacen falta al menos dos para el siniestro (un frontal no te saca de la huida de golpe).
+const DANIO = { umbral: 4, porMs: 0.013, golpeMax: 0.5, muro: 1.3, humo: 0.5, fuego: 0.8, falloCada: 3, falloDura: 0.25 };
+function danioGolpe(fuerza, masaOtro = Infinity, masaJ = 1250) {
+  const base = Math.max(0, (fuerza - DANIO.umbral) * DANIO.porMs);
+  const k = Number.isFinite(masaOtro) ? clamp((2 * masaOtro) / (masaOtro + masaJ), 0.6, 1.9) : DANIO.muro;
+  return Math.min(DANIO.golpeMax, base * k);
+}
+const MODOS = ['verdad', 'practica'];
+
 const NIVEL2 = 35;   // segundos con el Ojo en rojo para subir a nivel 2
 const NIVEL3 = 80;
 const ALCANCE = { ronda: 150, barrio: 115 };
@@ -3038,7 +3101,7 @@ function ponerMarcha(c) {
   while (c.marcha < 6 && c.vf > c.m.marchas[c.marcha]) c.marcha++;
 }
 
-// op: { escenario, semilla, trafico (false = sin tráfico, para las pruebas), asistencia, color }
+// op: { escenario, semilla, modo ('verdad' | 'practica'), trafico (false = sin tráfico, para las pruebas), asistencia, color }
 function crearPartida(op = {}) {
   const escenario = ESCENARIOS[op.escenario] ? op.escenario : 'mixta';
   const semilla = op.semilla ?? semillaNueva();
@@ -3073,6 +3136,8 @@ function crearPartida(op = {}) {
   });
   const p = {
     escenario, semilla, mapa, azar,
+    modo: op.modo === 'practica' ? 'practica' : 'verdad', // práctica: los golpes no dañan y no cuenta para el récord
+    crucero: 0,
     t: 0, pasos: 0,
     jugador, asistencia, ayuda: crearAyuda(),
     color: op.color || 'rojo', cocheNombre: 'compacto',
@@ -3092,6 +3157,7 @@ function crearPartida(op = {}) {
     stats: {
       nivelMax: 1, casiChoques: 0, huecos: 0, derrapeSeg: 0, velMaxKmh: 0, choques: 0, vecesVisto: 1,
       pinchazos: 0, pits: 0, contraSeg: 0, escondidoSeg: 0, traficoMax: 1, embestidas: 0, embestidasEsquivadas: 0,
+      danioMax: 0,
     },
   };
   decir(p, 'inicio', { unidad: lince.nombre });
@@ -3107,6 +3173,18 @@ function sacarEventos(p) {
 
 function emitir(p, tipo, datos = {}) {
   p.eventos.push({ ...datos, tipo, t: p.t });
+}
+
+// Suma daño a tu coche (solo en modo De verdad). A la mitad echa humo; al 80 % el motor falla a ratos; al 100 %, siniestro.
+function daniar(p, cantidad, causa) {
+  const j = p.jugador;
+  if (p.modo === 'practica' || !(cantidad > 0) || p.final) return;
+  const antes = j.danio;
+  j.danio = Math.min(1, j.danio + cantidad);
+  p.stats.danioMax = Math.max(p.stats.danioMax, j.danio);
+  emitir(p, 'danio', { danio: j.danio, antes, causa });
+  if (antes < DANIO.humo && j.danio >= DANIO.humo) decir(p, 'humo', { unidad: cercana(p) });
+  if (j.danio >= 1) terminar(p, 'SINIESTRO');
 }
 
 // ------------------------------------------------------------------ radio
@@ -3227,7 +3305,10 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     dir: clamp(entrada.dir || 0, -1, 1), gas: clamp(entrada.gas || 0, 0, 1), freno: clamp(entrada.freno || 0, 0, 1),
     mano: !!entrada.mano, nitro: !!entrada.nitro, nitroToque: !!entrada.nitroToque,
   };
+  p.crucero = entrada.crucero > 0 ? entrada.crucero : 0;
   asistir(p.ayuda, j, p.zona, entrada, e, dt);
+  // Motor tocado (80 % de daño o más): se ahoga un cuarto de segundo cada 3 s.
+  if (j.danio >= DANIO.fuego && p.t % DANIO.falloCada < DANIO.falloDura) e.gas *= 0.15;
   for (const ev of pasoCoche(j, e, dt, p.asistencia)) {
     emitir(p, ev.tipo, ev);
     if (ev.tipo === 'salidaPerfecta') decir(p, 'salidaPerfecta');
@@ -3247,7 +3328,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     j.pinchadoT -= dt;
     if (j.pinchadoT <= 0) {
       j.pinchado = false;
-      j.danio = Math.min(EMBESTIDA.danioMax, j.danio + 0.08);
+      daniar(p, 0.08, 'rueda');
       emitir(p, 'ruedaEmergencia', { danio: j.danio });
     }
   }
@@ -3285,6 +3366,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
   // 3. Choques.
   const golpeMuro = choquesMundo(p, j, dt);
   if (golpeMuro > 3) { emitir(p, 'golpe', { fuerza: golpeMuro, con: 'muro' }); p.stats.choques++; }
+  if (golpeMuro > DANIO.umbral) daniar(p, danioGolpe(golpeMuro, Infinity, j.masa), 'muro');
   for (const u of p.policia) choquesMundo(p, u.coche, dt);
   const cercanos = cercaDe(tr, j.x, j.y, 16);
   for (const t of cercanos) {
@@ -3292,6 +3374,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     if (!k) continue;
     const f = choqueEntre(j, t, k.nx, k.ny, k.pen);
     golpeado(t, f);
+    if (f > DANIO.umbral) daniar(p, danioGolpe(f, t.masa, j.masa), 'trafico');
     const seg = p.casi.get(t.id);
     if (seg) seg.tocado = true;
     if (f > 1.5) {
@@ -3309,13 +3392,15 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     if (k) {
       const f = choqueEntre(j, u.coche, k.nx, k.ny, k.pen);
       if (f > 1.5) emitir(p, 'golpe', { fuerza: f, con: 'policia' });
-      if (u.emb && u.emb.fase === 'ataque') {
+      const embiste = u.emb && u.emb.fase === 'ataque';
+      if (!embiste && f > DANIO.umbral) daniar(p, danioGolpe(f, u.coche.masa, j.masa), 'policia');
+      if (embiste) {
         // Embestida: pierdes velocidad, el coche se abolla (menos potencia y agarre) y se rompe la cadena de rebases.
         // Después, 6 s de respiro sin otro ataque y +30 % de nitro de rabia (informe 11).
         const fuerza = EMBESTIDA_TIPO[u.tipo] || EMBESTIDA_TIPO.lince;
         j.vx *= 1 - fuerza.frena;
         j.vy *= 1 - fuerza.frena;
-        j.danio = Math.min(EMBESTIDA.danioMax, j.danio + fuerza.danio);
+        daniar(p, fuerza.danio, 'embestida');
         j.sacudida = Math.max(j.sacudida, fuerza.sacudida);
         j.nitro = Math.min(1, j.nitro + 0.3);
         p.respiro = 6;
@@ -3381,7 +3466,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
 
 function grabar(p, en) {
   // La cinta: la semilla más las entradas bastan para repetir la partida (repeticiones, clips, Sombras).
-  const k = `${Math.round((en.dir || 0) * 100)},${Math.round((en.gas || 0) * 100)},${Math.round((en.freno || 0) * 100)},${en.mano ? 1 : 0}${en.nitro ? 1 : 0}${en.nitroToque ? 1 : 0}${en.motorToque ? 1 : 0}${en.arrancar ? 1 : 0}${en.trazada ? 1 : 0}${en.frenadaAuto ? 1 : 0}`;
+  const k = `${Math.round((en.dir || 0) * 100)},${Math.round((en.gas || 0) * 100)},${Math.round((en.freno || 0) * 100)},${en.mano ? 1 : 0}${en.nitro ? 1 : 0}${en.nitroToque ? 1 : 0}${en.motorToque ? 1 : 0}${en.arrancar ? 1 : 0}${en.trazada ? 1 : 0}${en.frenadaAuto ? 1 : 0},${Math.round((en.crucero || 0) * 10)}`;
   if (k !== p.ultimaEntrada && p.cinta.length < 60000) {
     p.cinta.push([p.pasos, k]);
     p.ultimaEntrada = k;
@@ -3759,7 +3844,9 @@ function terminar(p, final) {
     botin,
     t: p.t,
     escondido: !j.motor && Math.abs(j.vf) < 0.5,
-    quemado: p.ojo.vistoCerca > LIMITE_FANTASMA || final === 'DETENIDO',
+    quemado: p.ojo.vistoCerca > LIMITE_FANTASMA || final === 'DETENIDO' || final === 'SINIESTRO',
+    modo: p.modo,
+    danio: j.danio,
     lugar: p.mapa.nombreLugar(j.x, j.y),
     stats: { ...p.stats, duracion: p.t, vistoCerca: p.ojo.vistoCerca, vistoTotal: p.ojo.vistoTotal },
   };
@@ -3768,7 +3855,8 @@ function terminar(p, final) {
   else if (final === 'LIMPIO') decir(p, 'libre', { unidad }, true);
   else if (final === 'CLAVE9') decir(p, 'clave9', {}, true);
   else if (final === 'DETENIDO') decir(p, 'detenido', { unidad }, true);
-  for (const u of p.policia) u.sirena = final === 'DETENIDO';
+  else if (final === 'SINIESTRO') decir(p, 'siniestro', { unidad }, true);
+  for (const u of p.policia) u.sirena = final === 'DETENIDO' || final === 'SINIESTRO';
   emitir(p, 'final', { ...p.final });
 }
 
@@ -3785,6 +3873,9 @@ function resumen(p) {
     cadena: p.botin.cadena,
     nitro: j.nitro,
     calor: j.calor,
+    danio: j.danio,
+    crucero: p.crucero,
+    modo: p.modo,
     motor: j.motor,
     riesgo: p.riesgo,
     detencion: p.detencion,
@@ -3794,7 +3885,7 @@ function resumen(p) {
     lugar: p.mapa.nombreLugar(j.x, j.y),
   };
 }
-return { DT, ESCENARIOS, NIVEL2, NIVEL3, mapaPara, crearPartida, sacarEventos, pasoPartida, TRAFICO_T, premioTrafico, alcanceDeteccion, resumen };
+return { DT, ESCENARIOS, DANIO, danioGolpe, MODOS, NIVEL2, NIVEL3, mapaPara, crearPartida, sacarEventos, pasoPartida, TRAFICO_T, premioTrafico, alcanceDeteccion, resumen };
 })();
 
 // ---- src/logica/registro.js
@@ -3824,6 +3915,8 @@ function registroDe(p, extra = {}) {
     fps: extra.fps ?? null,         // fotogramas por segundo de media en la partida
     fpsPeor: extra.fpsPeor ?? null, // el peor segundo (sin contar el arranque)
     trafico: p.stats.traficoMax ?? 1, // nivel de tráfico al que llegó (1-4)
+    modo: p.modo ?? 'verdad',         // verdad o practica (25/09, v6)
+    danio: Math.round((p.stats.danioMax ?? 0) * 100), // daño máximo del coche, en %
   };
 }
 
@@ -3834,7 +3927,7 @@ function anotarSiguiente(lista, ahoraMs) {
   return lista;
 }
 
-const COLUMNAS = ['fecha', 'escenario', 'semilla', 'duracion', 'final', 'capturas', 'casiChoques', 'huecos', 'nivelMax', 'cobro', 'camara', 'control', 'revancha', 'siguienteEn', 'fps', 'fpsPeor', 'trafico'];
+const COLUMNAS = ['fecha', 'escenario', 'semilla', 'duracion', 'final', 'capturas', 'casiChoques', 'huecos', 'nivelMax', 'cobro', 'camara', 'control', 'revancha', 'siguienteEn', 'fps', 'fpsPeor', 'trafico', 'modo', 'danio'];
 
 // Texto para copiar y pegar en un mensaje o una hoja de cálculo (separado por punto y coma).
 function aTexto(lista) {
@@ -4857,12 +4950,119 @@ function crearCamaras(escena) {
 return { MODOS, NOMBRE_MODO, crearCamaras };
 })();
 
-// ---- src/presentacion/entrada.js
+// ---- src/logica/pie.js
 __m[15] = (() => {
+const { clamp } = __m[1]; // src/logica/mates.js
+// El pie: qué gas y qué freno llegan al coche según el acelerador elegido (Ajustes › Acelerador).
+// Sin pantalla: la presentación le pasa lo que tocas (o inclinas) y él decide. Así se puede probar y medir (tests/pie.test.mjs,
+// tools/banco-mandos.mjs).
+//
+// Alberto, 25/09: «poder dejar de acelerar y a la vez frenar, para hacerlo más en seco».
+// Hasta la v5, con el acelerador automático FRENO no soltaba el gas: el Rayo GT frenaba con 2,6 m/s² en vez de 9,2.
+//
+//   auto      el coche acelera solo. FRENO suelta el gas: un toque frena suave, sujeto frena a fondo; al soltarlo, el gas
+//             vuelve en 0,25 s.
+//   pedal     acelera tu pulgar: cuanto más arriba del pedal GAS, más gas. FRENO también suelta el gas.
+//   inclinar  como auto, y además acercar el borde de arriba del móvil hacia ti suelta el gas y, si lo acercas más, frena.
+//   crucero   (con cualquiera) tocar el velocímetro fija la velocidad de ese momento; se quita al frenar, con nitro o con otro toque.
+// Parado, freno + gas sigue siendo la salida lanzada (la aguja): el freno solo corta el gas con el coche en marcha.
 
+
+const ACELERADORES = ['auto', 'pedal', 'inclinar'];
+
+const PIE = {
+  rampa: 0.25,      // s: el gas automático vuelve a fondo tras frenar sin dar el tirón
+  parado: 1.5,      // m/s: por debajo, FRENO + gas es la salida lanzada
+  soltar: 7,        // grados hacia ti (acelerador «inclinar»): sueltas el gas
+  frenarDe: 13,     // grados: empiezas a frenar…
+  frenarA: 24,      // …y a estos frenas a fondo
+  cruceroMin: 8,    // m/s (29 km/h): más despacio no se fija el crucero
+  pedalMin: 0.12,   // gas con el pulgar abajo del todo del pedal (arriba del todo, 1)
+  pedalCurva: 1.4,  // más fino abajo: para ir a 120 km/h basta un 30 % de gas (medido con el Rayo GT)
+  // Freno progresivo (banco de mandos, 25/09): un toque frena al 35 % para ajustar la velocidad; sujeto, a fondo en 0,27 s.
+  // Frenar de golpe desde el primer instante hacía imposible aguantar 120 km/h a toques (21 % del tiempo frente al 94 %)
+  // y solo ganaba 4 m en la frenada en seco (54 m frente a 58).
+  frenoSuave: 0.35,
+  frenoToque: 0.12,
+  frenoSube: 0.15,
+};
+
+function crearPie() {
+  return { gas: 1, crucero: 0, frenoT: 0 };
+}
+
+// FRENO (botón o tecla, 0 o 1) → fuerza de freno según el tiempo que lleva pulsado.
+function frenoProgresivo(pie, pulsado, dt) {
+  if (!(pulsado > 0.5)) { pie.frenoT = 0; return clamp(pulsado || 0, 0, 1); }
+  pie.frenoT += dt;
+  if (pie.frenoT <= PIE.frenoToque) return PIE.frenoSuave;
+  return Math.min(1, PIE.frenoSuave + ((pie.frenoT - PIE.frenoToque) / PIE.frenoSube) * (1 - PIE.frenoSuave));
+}
+
+// Del sitio del pulgar en el pedal (0 abajo, 1 arriba) al gas.
+const gasDelPedal = (pos) => PIE.pedalMin + (1 - PIE.pedalMin) * clamp(pos, 0, 1) ** PIE.pedalCurva;
+
+// Del cabeceo del móvil (grados hacia ti respecto a como lo sujetabas al empezar) a { soltar, freno }.
+function pieInclinado(grados) {
+  if (grados === null || grados === undefined || !Number.isFinite(grados)) return { soltar: false, freno: 0 };
+  const freno = grados > PIE.frenarDe ? clamp((grados - PIE.frenarDe) / (PIE.frenarA - PIE.frenarDe), 0.15, 1) : 0;
+  return { soltar: grados > PIE.soltar, freno };
+}
+
+// m: { acelerador, teclado, freno (0-1), gas (0-1: el pedal o la tecla), inclinacion (grados o null), reversa, nitro,
+//      cruceroToque, ayuda }. v: velocidad del coche hacia delante (m/s). Devuelve { gas, freno, frenadaAuto, crucero }.
+function pisar(pie, m, v, dt) {
+  const acelerador = ACELERADORES.includes(m.acelerador) ? m.acelerador : 'auto';
+  const manual = !!m.teclado || acelerador === 'pedal';
+  let freno = frenoProgresivo(pie, m.freno, dt);
+  if (m.reversa) {
+    pie.crucero = 0;
+    pie.gas = 0;
+    return { gas: 0, freno: 1, frenadaAuto: false, crucero: 0 };
+  }
+
+  // Crucero: un toque lo fija a la velocidad de ahora; otro toque, el freno, el nitro o quedarte casi parado lo quitan.
+  if (m.cruceroToque) pie.crucero = pie.crucero > 0 || v < PIE.cruceroMin ? 0 : v;
+  if (pie.crucero > 0 && (freno > 0.05 || m.nitro || v < PIE.cruceroMin * 0.6)) pie.crucero = 0;
+
+  let gasObj;
+  if (manual) gasObj = clamp(m.gas || 0, 0, 1);
+  else {
+    gasObj = 1;
+    if (acelerador === 'inclinar') {
+      const i = pieInclinado(m.inclinacion);
+      if (i.soltar) gasObj = 0;
+      freno = Math.max(freno, i.freno);
+    }
+  }
+  if (pie.crucero > 0) gasObj = 1; // el crucero sustituye al pie: con el pedal puedes soltarlo
+
+  // Frenar en seco: con el coche en marcha, frenar suelta el gas. Parado, freno + gas es la salida lanzada.
+  if (freno > 0.05 && Math.abs(v) > PIE.parado) gasObj = 0;
+
+  // El gas automático vuelve en 0,25 s (sin tirón); el pedal y las teclas van directos.
+  if (manual) pie.gas = gasObj;
+  else pie.gas = gasObj < pie.gas ? gasObj : Math.min(gasObj, pie.gas + dt / PIE.rampa);
+
+  return {
+    gas: pie.gas,
+    freno,
+    // La frenada antes de las curvas es del acelerador automático: con el pedal o el teclado mandas tú (como hasta ahora).
+    frenadaAuto: (!manual || pie.crucero > 0) && m.ayuda !== 'ninguna',
+    crucero: pie.crucero,
+  };
+}
+return { ACELERADORES, PIE, crearPie, frenoProgresivo, gasDelPedal, pieInclinado, pisar };
+})();
+
+// ---- src/presentacion/entrada.js
+__m[16] = (() => {
+const { crearPie, pisar, gasDelPedal, ACELERADORES } = __m[15]; // src/logica/pie.js
 // Controles: inclinación (con el vector de gravedad), botones táctiles y teclado.
 // La inclinación mide cuánto giras el móvil respecto a como lo sujetabas al calibrar: no necesita giroscopio
 // y funciona igual en horizontal que en vertical. Si el navegador no da los sensores, se juega con botones.
+
+
 
 const SENS = [30, 25, 20, 16, 12]; // grados para girar a tope, de la sensibilidad 1 a la 5 (25/09: antes 34-14)
 const ZONA_MUERTA = 2.5;           // grados
@@ -4872,12 +5072,14 @@ const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
   const e = {
     modo: ajustes.control === 'inclinacion' ? 'inclinacion' : 'botones',
-    auto: ajustes.acelAuto !== false,
+    // Acelerador (v6): auto, pedal o inclinar (src/logica/pie.js). FRENO siempre suelta el gas en marcha.
+    acelerador: ACELERADORES.includes(ajustes.acelerador) ? ajustes.acelerador : 'auto',
+    pie: crearPie(), pedalPos: 0.6, cabeceo: 0,
     ayuda: ['completa', 'frenada', 'ninguna'].includes(ajustes.ayudaVolante) ? ajustes.ayudaVolante : 'completa',
     sens: clamp(ajustes.sensibilidad ?? 3, 1, 5),
     dir: 0, dirBotones: 0, angulo: 0, anguloFiltrado: 0,
     ref: null, grav: null, gravT: 0, plano: false,
-    toques: { nitroToque: false, motorToque: false, arrancar: false, camaraToque: false, pausaToque: false },
+    toques: { nitroToque: false, motorToque: false, arrancar: false, camaraToque: false, pausaToque: false, cruceroToque: false },
     motorApagado: false,
     tocadoT: 0, reposo: false, // reposo: 2,5 s sin tocar la pantalla → los mandos se apagan (CSS data-reposo)
   };
@@ -4909,7 +5111,17 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
     motor: boton('motor', 'MOTOR', 'motor'),
     reversa: boton('reversa', 'ATRÁS', 'reversa'),
     pausa: boton('pausa', 'II', 'pausa'),
+    // Crucero: zona invisible encima del velocímetro (tocarlo fija la velocidad). No añade nada a la pantalla.
+    crucero: boton('crucero', '', 'crucero'),
   };
+  botones.crucero.setAttribute('aria-label', 'Crucero: fija la velocidad');
+  // El pedal GAS: cuanto más arriba el pulgar, más gas (se ve el nivel dentro).
+  botones.gas.innerHTML = '<i class="nivel"></i><span>GAS</span>';
+  function posPedal(ev) {
+    const r = botones.gas.getBoundingClientRect();
+    e.pedalPos = clamp(1 - (ev.clientY - r.top) / Math.max(1, r.height), 0, 1);
+    botones.gas.style.setProperty('--pedal', gasDelPedal(e.pedalPos).toFixed(2));
+  }
   const dedos = new Map(); // pointerId → control
   function pulsar(control) {
     pulsado.set(control, (pulsado.get(control) || 0) + 1);
@@ -4917,6 +5129,7 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
     if (control === 'motor') e.toques.motorToque = true;
     if (control === 'camara') e.toques.camaraToque = true;
     if (control === 'pausa') e.toques.pausaToque = true;
+    if (control === 'crucero') e.toques.cruceroToque = true;
     if ((control === 'gas' || control === 'freno' || control === 'reversa') && e.motorApagado) e.toques.arrancar = true;
     const b = botones[control];
     if (b) b.classList.add('on');
@@ -4933,7 +5146,11 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
     ev.preventDefault();
     try { b.setPointerCapture(ev.pointerId); } catch (_) { /* sin captura: da igual */ }
     dedos.set(ev.pointerId, b.dataset.control);
+    if (b.dataset.control === 'gas') posPedal(ev);
     pulsar(b.dataset.control);
+  });
+  capa.addEventListener('pointermove', (ev) => {
+    if (dedos.get(ev.pointerId) === 'gas') posPedal(ev);
   });
   const fin = (ev) => {
     const c = dedos.get(ev.pointerId);
@@ -4952,7 +5169,7 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
   const TECLAS = {
     ArrowLeft: 'izq', KeyA: 'izq', ArrowRight: 'der', KeyD: 'der', ArrowUp: 'gas', KeyW: 'gas',
     ArrowDown: 'freno', KeyS: 'freno', Space: 'mano', ShiftLeft: 'nitro', ShiftRight: 'nitro', KeyN: 'nitro',
-    KeyB: 'atras', KeyC: 'camara', KeyM: 'motor', KeyP: 'pausa', Escape: 'pausa', KeyR: 'reversa',
+    KeyB: 'atras', KeyC: 'camara', KeyM: 'motor', KeyP: 'pausa', Escape: 'pausa', KeyR: 'reversa', KeyX: 'crucero',
   };
   let teclado = false;
   const abajo = (ev) => {
@@ -5036,6 +5253,18 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
     return (Math.atan2(c.x * v.y - c.y * v.x, c.x * v.x + c.y * v.y) * 180) / Math.PI;
   }
 
+  // Cabeceo (acelerador «inclinar»): grados que has acercado el borde de arriba del móvil hacia ti desde la postura calibrada.
+  // Se mide con el ángulo entre la gravedad y la pantalla: vale igual en iOS y en Android, en cualquier horizontal,
+  // y no se mezcla con el giro de volante (que es sobre la propia pantalla).
+  function cabeceo(dt) {
+    if (!e.grav) return null;
+    if (!e.ref) calibrar();
+    const elev = (g) => (Math.atan2(Math.abs(g.z), Math.hypot(g.x, g.y)) * 180) / Math.PI;
+    const a = elev(e.ref) - elev(e.grav);
+    e.cabeceo += (a - e.cabeceo) * Math.min(1, dt / 0.08);
+    return e.cabeceo;
+  }
+
   // ---------------------------------------------------------------- lectura por fotograma
   function leer(dt, estadoCoche = {}) {
     e.motorApagado = estadoCoche.motor === false;
@@ -5063,18 +5292,27 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
       dir = e.dirBotones;
       angVolante = dir * 1.05;
     }
-    const frenando = on('freno');
-    let gas = on('gas') ? 1 : 0;
-    const gasAuto = e.auto && !teclado && !on('reversa');
-    if (gasAuto) gas = 1;
-    if (on('reversa')) gas = 0;
+    // El pie (src/logica/pie.js): FRENO suelta el gas en marcha; un toque frena suave y sujeto, a fondo.
+    const pie = pisar(e.pie, {
+      acelerador: e.acelerador,
+      teclado,
+      freno: on('freno') ? 1 : 0,
+      gas: teclado ? (on('gas') ? 1 : 0) : e.acelerador === 'pedal' && on('gas') ? gasDelPedal(e.pedalPos) : 0,
+      inclinacion: e.acelerador === 'inclinar' && !teclado ? cabeceo(dt) : null,
+      reversa: on('reversa'),
+      nitro: on('nitro') || e.toques.nitroToque,
+      cruceroToque: e.toques.cruceroToque,
+      ayuda: e.ayuda,
+    }, estadoCoche.v || 0, dt);
+    e.toques.cruceroToque = false;
     return {
       dir,
       // Ayudas de la física para mandos de persona (src/logica/asistencia.js), según Ajustes › Ayuda al volante.
       trazada: e.ayuda === 'completa',
-      frenadaAuto: gasAuto && e.ayuda !== 'ninguna',
-      gas: e.motorApagado ? 0 : gas,
-      freno: frenando || on('reversa') ? 1 : 0,
+      frenadaAuto: pie.frenadaAuto,
+      crucero: pie.crucero,
+      gas: e.motorApagado ? 0 : pie.gas,
+      freno: pie.freno,
       mano: on('mano'),
       nitro: on('nitro'),
       nitroToque: e.toques.nitroToque,
@@ -5098,7 +5336,8 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
 
   function aplicarModo() {
     capa.dataset.modo = e.modo;
-    capa.dataset.auto = e.auto ? '1' : '0';
+    capa.dataset.acel = e.acelerador;
+    capa.dataset.auto = e.acelerador === 'pedal' ? '0' : '1';
   }
   aplicarModo();
 
@@ -5116,7 +5355,13 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
       aplicarModo();
       if (e.modo === 'inclinacion') escuchar();
     },
-    ponerAuto(a) { e.auto = !!a; aplicarModo(); },
+    get acelerador() { return e.acelerador; },
+    ponerAcelerador(a) {
+      e.acelerador = ACELERADORES.includes(a) ? a : 'auto';
+      e.pie = crearPie();
+      aplicarModo();
+      if (e.acelerador === 'inclinar') escuchar();
+    },
     ponerAyuda(a) { e.ayuda = ['completa', 'frenada', 'ninguna'].includes(a) ? a : 'completa'; },
     ponerSensibilidad(n) { e.sens = clamp(Math.round(n), 1, 5); },
     // Durante la partida, el motor y la marcha atrás solo se ofrecen parado.
@@ -5128,6 +5373,7 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
     soltarTodo() {
       for (const k of pulsado.keys()) { pulsado.set(k, 0); if (botones[k]) botones[k].classList.remove('on'); }
       dedos.clear();
+      e.pie = crearPie(); // sin crucero ni freno pendiente al empezar otra huida
     },
     avisar,
   };
@@ -5151,7 +5397,7 @@ return { crearEntrada, VIBRACION, vibrar };
 })();
 
 // ---- src/presentacion/hud.js
-__m[16] = (() => {
+__m[17] = (() => {
 const { LARGO_RONDA, rondaPunto, CALLES_NS, CALLES_EO, PARKING, CALLEJONES, RAMPAS, RAMPA_R, CARRILES } = __m[2]; // src/logica/mapa.js
 const { restante, radioBusqueda } = __m[6]; // src/logica/ojo.js
 // Lo que se lee en pantalla: el Ojo, la alerta, el botín, el velocímetro, el retrovisor de luces, el minimapa,
@@ -5177,9 +5423,9 @@ function crearHud(raiz, ajustes) {
   h.innerHTML = `
     <div class="h-ojo" data-estado="rojo">${OJO_SVG}<div class="ojo-txt">TE VEN</div><div class="nivel"><i></i><i></i><i></i></div></div>
     <div class="h-retro"><canvas width="360" height="54"></canvas></div>
-    <div class="h-botin"><b class="chapas">0</b><span class="ud">chapas</span><span class="mult"></span><div class="premios"></div></div>
+    <div class="h-botin"><b class="chapas">0</b><span class="ud">chapas</span><span class="mult"></span><span class="h-modo" hidden>PRÁCTICA</span><div class="premios"></div></div>
     <canvas class="h-mapa" width="300" height="300"></canvas>
-    <div class="h-velo"><div class="rpm"><i></i></div><b class="kmh">0</b><span class="uds">km/h</span><span class="marcha">1</span>
+    <div class="h-velo"><div class="rpm"><i></i></div><b class="kmh">0</b><span class="uds">km/h</span><span class="marcha">1</span><span class="crucero" hidden></span>
       <div class="barras"><div class="nitro"><i></i></div><div class="danio"><i></i></div><div class="calor"><i></i></div></div></div>
     <div class="h-lanzada" hidden><div class="zona"></div><i class="aguja"></i><span>Suelta el freno en la zona verde</span></div>
     <div class="h-detencion" hidden><span>DETENCIÓN</span><div><i></i></div></div>
@@ -5195,7 +5441,7 @@ function crearHud(raiz, ajustes) {
     kmh: $('.kmh'), marcha: $('.marcha'), rpm: $('.rpm i'), nitro: $('.nitro i'), calor: $('.calor i'), calorCaja: $('.calor'), danio: $('.danio i'), danioCaja: $('.danio'),
     lanzada: $('.h-lanzada'), aguja: $('.h-lanzada .aguja'), detencion: $('.h-detencion'), detBarra: $('.h-detencion i'),
     aviso: $('.h-aviso'), grande: $('.h-grande'), radio: $('.h-radio'), quien: $('.h-radio .quien'), texto: $('.h-radio .texto'),
-    pista: $('.h-pista'), premios: $('.premios'),
+    pista: $('.h-pista'), premios: $('.premios'), crucero: $('.h-velo .crucero'), modo: $('.h-modo'),
   };
   const cache = {};
   const poner = (k, v, fn) => { if (cache[k] !== v) { cache[k] = v; fn(v); } };
@@ -5406,11 +5652,19 @@ function crearHud(raiz, ajustes) {
     poner('marcha', j.marchaAtras ? 'R' : String(j.marcha), (v) => { el.marcha.textContent = v; });
     poner('rpm', Math.round(j.rpm / 100), (v) => { el.rpm.style.transform = `scaleX(${clamp(v / 78, 0, 1)})`; });
     poner('nitro', Math.round(j.nitro * 100), (v) => { el.nitro.style.transform = `scaleX(${v / 100})`; });
-    // Daño: la barra roja sale con el primer golpe (hasta el 40 %: menos potencia y agarre).
+    // Daño: la barra roja sale con el primer golpe y se llena al 100 % (siniestro). Naranja con humo, roja y parpadeando
+    // con el motor tocado.
     poner('danio', Math.round(j.danio * 100), (v) => {
       el.danioCaja.classList.toggle('visible', v > 0);
-      el.danio.style.transform = `scaleX(${clamp(v / 40, 0, 1)})`;
+      el.danioCaja.classList.toggle('humo', v >= 50 && v < 80);
+      el.danioCaja.classList.toggle('fuego', v >= 80);
+      el.danio.style.transform = `scaleX(${clamp(v / 100, 0, 1)})`;
     });
+    poner('crucero', Math.round((p.crucero || 0) * 3.6), (v) => {
+      el.crucero.hidden = !v;
+      el.crucero.textContent = v ? `CRUCERO ${v}` : '';
+    });
+    poner('modo', p.modo, (v) => { el.modo.hidden = v !== 'practica'; });
     const verCalor = !j.motor || Math.abs(j.vf) < 1;
     poner('verCalor', verCalor, (v) => el.calorCaja.classList.toggle('visible', v));
     poner('calor', Math.round(j.calor * 100), (v) => { el.calor.style.transform = `scaleX(${v / 100})`; });
@@ -5454,7 +5708,7 @@ return { crearHud };
 })();
 
 // ---- src/presentacion/menu.js
-__m[17] = (() => {
+__m[18] = (() => {
 
 // Pantallas: «¿Dónde te pillan?», ajustes, calibración, pausa, cuenta atrás y la pantalla final.
 
@@ -5463,6 +5717,7 @@ const FINALES = {
   LIMPIO: { titulo: 'LIMPIO', lema: 'Te perdieron. Botín ×1.', clase: 'limpio' },
   CLAVE9: { titulo: 'CLAVE 9', lema: 'La policía cancela: demasiado riesgo. Botín ×0,5.', clase: 'clave9' },
   DETENIDO: { titulo: 'DETENIDO', lema: 'Te quedas el 25 % del botín.', clase: 'detenido' },
+  SINIESTRO: { titulo: 'SINIESTRO', lema: 'Coche destrozado: te pillan. Te quedas el 25 % del botín.', clase: 'detenido' },
 };
 
 const ESCENARIOS = [
@@ -5519,12 +5774,23 @@ function crearMenu(raiz, api) {
           <button class="sec" data-ir="ajustes">Ajustes</button>
           <button class="sec" data-ir="ayuda">Cómo se juega</button>
         </div>
+        <div class="fila">
+          <div class="seg" role="group" aria-label="Modo">
+            <button data-modo="verdad" class="${a.modo !== 'practica' ? 'sel' : ''}">De verdad</button>
+            <button data-modo="practica" class="${a.modo === 'practica' ? 'sel' : ''}">Práctica</button>
+          </div>
+          <span class="nota-modo">${a.modo === 'practica' ? 'Sin daño y sin récord: para ensayar.' : 'Los golpes dañan el coche. Al 100 %, siniestro.'}</span>
+        </div>
         ${rec ? `<p class="record">Tu mejor botín: <b>${fmt(rec)}</b> chapas</p>` : ''}
-        <p class="pie">Beta v5 · 25/09 · prototipo de la fase 0 · todo el sonido y la ciudad se generan en tu móvil</p>
+        <p class="pie">Beta v6 · 25/09 · prototipo de la fase 0 · todo el sonido y la ciudad se generan en tu móvil</p>
       </div>`, 'portada-on');
     capa.querySelectorAll('.esc').forEach((b) => b.addEventListener('click', () => api.alJugar(b.dataset.esc)));
     capa.querySelectorAll('[data-control]').forEach((b) => b.addEventListener('click', () => {
       api.cambiarAjuste('control', b.dataset.control);
+      portada();
+    }));
+    capa.querySelectorAll('[data-modo]').forEach((b) => b.addEventListener('click', () => {
+      api.cambiarAjuste('modo', b.dataset.modo);
       portada();
     }));
     capa.querySelector('[data-ir="ajustes"]').addEventListener('click', () => ajustes(portada));
@@ -5542,11 +5808,14 @@ function crearMenu(raiz, api) {
           <li><b>Escóndete</b>: párate en un sitio oscuro (parking, callejón, túnel) y apaga el motor. Con el motor caliente te ven de cerca.</li>
           <li><b>Rebasa rozando</b>: cada casi-choque llena el nitro y multiplica el botín. Tocar un coche rompe la cadena.</li>
           <li><b>Rebufo</b>: pegado detrás de un camión vas más rápido; al salir, un empujón.</li>
+          <li><b>Frenar</b>: FRENO suelta el acelerador. Un toque frena suave; mantenlo y frenas en seco.</li>
+          <li><b>Crucero</b>: toca el velocímetro y el coche mantiene esa velocidad (ideal para la Fuga a 120). Frenar o el nitro lo quitan.</li>
+          <li><b>De verdad o práctica</b>: en De verdad los golpes fuertes dañan el coche (menos potencia y agarre; al 100 %, siniestro). En Práctica no hay daño ni récord.</li>
           <li><b>Salida lanzada</b>: parado, freno y acelerador a la vez; suelta el freno con la aguja en verde.</li>
           <li><b>Si te quedas parado</b> con la policía encima, te detienen.</li>
           <li><b>En sentido contrario</b> no puntúas y la policía acaba cancelando (Clave 9).</li>
         </ul>
-        <p class="teclas">Teclado: flechas o WASD · espacio freno de mano · Mayús nitro · C cámara · B mirar atrás · M motor · R marcha atrás · P pausa</p>
+        <p class="teclas">Teclado: flechas o WASD · espacio freno de mano · Mayús nitro · X crucero · C cámara · B mirar atrás · M motor · R marcha atrás · P pausa</p>
         <button class="pri" data-volver>Volver</button>
       </div>`);
     capa.querySelector('[data-volver]').addEventListener('click', volver);
@@ -5562,7 +5831,8 @@ function crearMenu(raiz, api) {
         <div class="grupo"><h3>Control</h3>
           <div class="seg">${opcion('control', 'inclinacion', 'Inclinar')}${opcion('control', 'botones', 'Botones')}</div>
           <div class="seg">${[1, 2, 3, 4, 5].map((n) => opcion('sensibilidad', n, `Sensib. ${n}`)).join('')}</div>
-          <div class="seg">${opcion('acelAuto', true, 'Acelerador automático')}${opcion('acelAuto', false, 'Acelerar yo')}</div>
+          <div class="seg">${opcion('acelerador', 'auto', 'Acelerador automático')}${opcion('acelerador', 'pedal', 'Pedal')}${opcion('acelerador', 'inclinar', 'Inclinar hacia ti (prueba)')}</div>
+          <p class="nota">FRENO siempre suelta el acelerador: un toque frena suave, mantenido frena en seco. Pedal: cuanto más arriba pones el pulgar, más gas. Inclinar hacia ti: acerca el borde de arriba del móvil y sueltas el gas; más, y frenas. Con cualquiera, toca el velocímetro para el crucero.</p>
           <div class="seg">${opcion('ayudaVolante', 'completa', 'Ayuda completa')}${opcion('ayudaVolante', 'frenada', 'Solo frenada')}${opcion('ayudaVolante', 'ninguna', 'Sin ayuda')}</div>
           <p class="nota">Ayuda completa: en la Ronda el coche sigue la curva y frena antes de ella; tú solo cambias de carril. Solo frenada: giras tú y el acelerador automático levanta el pie antes de las curvas y al doblar esquinas.</p>
           <button class="sec" data-calibrar>Calibrar la inclinación</button>
@@ -5656,7 +5926,7 @@ function crearMenu(raiz, api) {
   // Pantalla final: 8 s como máximo, saltable. REVANCHA repite la misma persecución.
   function final(d) {
     const f = FINALES[d.final] || FINALES.LIMPIO;
-    const factor = { FANTASMA: '×2', LIMPIO: '×1', CLAVE9: '×0,5', DETENIDO: '×0,25' }[d.final];
+    const factor = { FANTASMA: '×2', LIMPIO: '×1', CLAVE9: '×0,5', DETENIDO: '×0,25', SINIESTRO: '×0,25' }[d.final];
     const s = d.stats || {};
     mostrar(`
       <div class="final ${f.clase}">
@@ -5664,7 +5934,8 @@ function crearMenu(raiz, api) {
         <p class="lema">${f.lema}</p>
         <p class="cobro"><span>Botín ${fmt(d.botin)} ${factor}</span><b>${fmt(d.cobro)}</b><span>chapas</span></p>
         <p class="coche">Tu coche: <b>${d.quemado ? 'quemado' : 'limpio'}</b>${d.quemado ? ' (te vieron de cerca)' : ''}</p>
-        <p class="datos">${Math.round(d.t)} s · ${s.casiChoques || 0} rebases · ${s.huecos || 0} huecos · nivel ${s.nivelMax || 1} · ${Math.round(s.velMaxKmh || 0)} km/h</p>
+        <p class="datos">${Math.round(d.t)} s · ${s.casiChoques || 0} rebases · ${s.huecos || 0} huecos · nivel ${s.nivelMax || 1} · ${Math.round(s.velMaxKmh || 0)} km/h${d.modo === 'practica' ? '' : ` · daño ${Math.round((d.danio || 0) * 100)} %`}</p>
+        ${d.modo === 'practica' ? '<p class="datos">Práctica: no cuenta para tu récord.</p>' : ''}
         <div class="acciones">
           <button class="pri grande" data-revancha>REVANCHA</button>
           <button class="sec" data-otra>Otra huida</button>
@@ -5686,7 +5957,7 @@ return { crearMenu };
 })();
 
 // ---- src/presentacion/audio.js
-__m[18] = (() => {
+__m[19] = (() => {
 
 // FUGAZ · sonido y música sintetizados con Web Audio.
 // Cero ficheros de audio y cero librerías: todo sale de osciladores y de un
@@ -6800,7 +7071,7 @@ return { crearAudio };
 })();
 
 // ---- src/main.js
-__m[19] = (() => {
+__m[20] = (() => {
 const { DT, crearPartida, pasoPartida, sacarEventos, mapaPara } = __m[10]; // src/logica/partida.js
 const { rondaPunto, alturaRonda, alturaEn, normS } = __m[2]; // src/logica/mapa.js
 const { crearTrafico, pasoTrafico } = __m[5]; // src/logica/trafico.js
@@ -6810,10 +7081,10 @@ const { registroDe, anotarSiguiente, aTexto } = __m[11]; // src/logica/registro.
 const { COLOR_NOCHE, crearEscena, crearTraficoVisual, crearCocheVisual, colocarCoche, crearFantasma, crearPinchosVisual } = __m[13]; // src/presentacion/escena.js
 const { texturaMancha } = __m[12]; // src/presentacion/geometria.js
 const { crearCamaras, NOMBRE_MODO } = __m[14]; // src/presentacion/camaras.js
-const { crearEntrada, vibrar, VIBRACION } = __m[15]; // src/presentacion/entrada.js
-const { crearHud } = __m[16]; // src/presentacion/hud.js
-const { crearMenu } = __m[17]; // src/presentacion/menu.js
-const { crearAudio } = __m[18]; // src/presentacion/audio.js
+const { crearEntrada, vibrar, VIBRACION } = __m[16]; // src/presentacion/entrada.js
+const { crearHud } = __m[17]; // src/presentacion/hud.js
+const { crearMenu } = __m[18]; // src/presentacion/menu.js
+const { crearAudio } = __m[19]; // src/presentacion/audio.js
 // FUGAZ · prototipo de la fase 0. Arranque y bucle del juego.
 // Une la lógica de la partida (src/logica: sin pantalla, a pasos fijos de 1/60 s) con la presentación
 // (src/presentacion: escena 3D, cámaras, controles, HUD, menú y sonido). El dibujo interpola entre los dos
@@ -6856,7 +7127,8 @@ let menosMovimiento = false;
 try { menosMovimiento = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (_) { /* sin preferencia */ }
 const TRAFICO_AVISO = ['', '', 'LA RONDA SE CARGA', 'HORA PUNTA', 'RONDA COLAPSADA'];
 const AJUSTES_BASE = {
-  control: TACTIL ? 'inclinacion' : 'botones', sensibilidad: 3, acelAuto: true, ayudaVolante: 'completa', camara: 'persecucion',
+  control: TACTIL ? 'inclinacion' : 'botones', sensibilidad: 3, acelerador: 'auto', ayudaVolante: 'completa', camara: 'persecucion',
+  modo: 'verdad', // v6: 'verdad' (los golpes dañan) o 'practica'
   efectos: menosMovimiento ? 'suaves' : 'normales', musica: 0.8, efectosVol: 1, motor: 0.9, voz: true, vibracion: true,
 };
 function cargarAjustes() {
@@ -6864,7 +7136,11 @@ function cargarAjustes() {
   const a = { ...AJUSTES_BASE };
   if (guardados && typeof guardados === 'object') {
     for (const k of Object.keys(a)) if (typeof guardados[k] === typeof a[k]) a[k] = guardados[k];
+    // Hasta la v5: «Acelerar yo» era acelAuto = false; ahora es el pedal.
+    if (guardados.acelAuto === false && guardados.acelerador === undefined) a.acelerador = 'pedal';
   }
+  if (!['auto', 'pedal', 'inclinar'].includes(a.acelerador)) a.acelerador = 'auto';
+  if (!['verdad', 'practica'].includes(a.modo)) a.modo = 'verdad';
   return a;
 }
 
@@ -7098,7 +7374,7 @@ function arrancar() {
     registro.push(registroDe(p, {
       fecha: fechaCorta(new Date()),
       camara: juego.camaraUsada || ajustes.camara,
-      control: `${entrada.teclado ? 'teclado' : `${entrada.modo}${ajustes.acelAuto ? '+auto' : ''}`}+${ajustes.ayudaVolante || 'completa'}`,
+      control: `${entrada.teclado ? 'teclado' : `${entrada.modo}+${ajustes.acelerador || 'auto'}`}+${ajustes.ayudaVolante || 'completa'}`,
       revancha: juego.revancha,
       finMs: Date.now(),
       fps: medida.t > 0 ? Math.round(medida.n / medida.t) : null,
@@ -7112,7 +7388,7 @@ function arrancar() {
     const t0 = performance.now();
     registro = anotarSiguiente(registro, Date.now());
     guardarLS(LS.registro, registro);
-    const p = crearPartida({ escenario, semilla });
+    const p = crearPartida({ escenario, semilla, modo: ajustes.modo });
     montarPartida(p);
     Object.assign(juego, {
       estado: 'juego', p, revancha, acum: 0, hitStop: 0, lento: 0, ent: null, golpeMs: 0, esperaGolpe: false,
@@ -7139,8 +7415,8 @@ function arrancar() {
     // La primera vez: qué es el Ojo y cómo se conduce.
     pista('ojo', 'Arriba, el OJO. Rojo: la policía te ve. Rompe su línea de visión (esquinas, camiones, el túnel) para que pase a ámbar.', 6.5);
     if (!TACTIL) pista('mandos-teclado', 'Flechas o WASD para conducir · espacio: freno de mano · Mayús: nitro · C: cámara · B: mirar atrás · M: motor · P: pausa.', 7);
-    else if (entrada.modo === 'inclinacion') pista('mandos-inclinacion', 'Inclina el móvil para girar. Izquierda: FRENO y MANO (derrape). Derecha: NITRO; un toque da el tirón y mantenido, la punta.', 7);
-    else pista('mandos-botones', 'Gira con ◀ ▶. A la derecha, FRENO, MANO (derrape) y NITRO: un toque da el tirón; mantenido, la punta.', 7);
+    else if (entrada.modo === 'inclinacion') pista('mandos-inclinacion', 'Inclina el móvil para girar. Izquierda: FRENO (un toque frena suave; mantenlo para frenar en seco) y MANO (derrape). Derecha: NITRO.', 7);
+    else pista('mandos-botones', 'Gira con ◀ ▶. A la derecha, FRENO (un toque frena suave; mantenlo para frenar en seco), MANO (derrape) y NITRO.', 7);
     juego.listoMs = Math.round(performance.now() - t0);
     fotogramaAnterior = performance.now();
   }
@@ -7222,7 +7498,7 @@ function arrancar() {
     juego.camaraUsada = ajustes.camara;
     anotarPartida(p);
     let nuevo = false;
-    if (d.cobro > record) {
+    if (p.modo !== 'practica' && d.cobro > record) { // la práctica no cuenta para el récord
       record = d.cobro;
       guardarLS(LS.record, record);
       nuevo = true;
@@ -7230,10 +7506,11 @@ function arrancar() {
     entrada.soltarTodo();
     entrada.mostrar(false);
     camaras.ponerModo('persecucion'); // para ver el coche en el plano final
-    if (d.final === 'DETENIDO') {
+    if (d.final === 'DETENIDO' || d.final === 'SINIESTRO') {
       audio.evento('detenido');
-      hud.grande('DETENIDO', 'rojo', 2.2, tReal);
+      hud.grande(d.final, 'rojo', 2.2, tReal);
       vibra('zumbido');
+      if (d.final === 'SINIESTRO') camaras.sacudir(1);
     } else if (d.final === 'CLAVE9') {
       audio.evento('clave9');
       audio.musica.capa('final');
@@ -7309,6 +7586,13 @@ function arrancar() {
         vibra(f > 6 ? 'zumbido' : 'tic');
         break;
       }
+      case 'danio':
+        // Modo De verdad: cada golpe fuerte daña (barra roja del velocímetro).
+        if (ev.antes < 0.5 && ev.danio >= 0.5) hud.aviso('Coche tocado: echa humo · menos potencia y agarre', 'peligro', 2.4, t);
+        else if (ev.antes < 0.8 && ev.danio >= 0.8) { hud.aviso('Motor tocado: falla a ratos · un golpe más y es siniestro', 'peligro', 2.6, t); vibra('zumbido'); }
+        else if (ev.danio - ev.antes >= 0.05) hud.aviso(`Daño ${Math.round(ev.danio * 100)} %`, 'peligro', 1.2, t);
+        pista('danio', 'Modo De verdad: los golpes fuertes dañan el coche (barra roja del velocímetro): menos potencia y agarre. Al 100 %, siniestro. En Práctica no hay daño.', 7);
+        break;
       case 'casiChoque':
         audio.evento('casiChoque', { lado: ev.lado === 'izquierda' ? -1 : 1, fuerza: ev.fuerza });
         hud.premio(`+${ev.gana}`, ev.cadena >= 3 ? 'cadena' : '');
@@ -7343,6 +7627,7 @@ function arrancar() {
           audio.musica.capa('ambar');
           hud.grande('TE BUSCAN', 'ambar', 1.2, t);
           pista('ambar', 'ÁMBAR: te buscan donde te vieron por última vez (el círculo naranja del mapa). Que no te vean hasta que el anillo del Ojo se vacíe.', 7);
+          if (p.zona === 'ronda') pista('crucero', 'Fuga a 120: entre el tráfico y a 115-123 km/h te confundes con los demás. Toca el velocímetro para fijar la velocidad (crucero); frenar lo quita.', 7);
         } else if (ev.estado === 'cerrado') {
           // El cierre del Ojo cae en un tiempo fuerte de la música: se espera hasta 200 ms.
           const ms = audio.activo ? clamp(audio.musica.alinear(), 0, 200) : 0;
@@ -7447,7 +7732,7 @@ function arrancar() {
 
   function simular(dt, p) {
     const j = p.jugador;
-    const ent = entrada.leer(dt, { motor: j.motor });
+    const ent = entrada.leer(dt, { motor: j.motor, v: j.vf });
     juego.ent = ent;
     if (ent.pausaToque) {
       entrada.consumirInterfaz();
@@ -7747,7 +8032,13 @@ function arrancar() {
           } else entrada.ponerModo('botones');
           break;
         case 'sensibilidad': entrada.ponerSensibilidad(v); break;
-        case 'acelAuto': entrada.ponerAuto(v); break;
+        case 'acelerador':
+          entrada.ponerAcelerador(v);
+          if (v === 'inclinar') {
+            probandoInclinacion = null; // pide el permiso dentro de este toque (iPhone)
+            probarInclinacion().then((ok) => { if (!ok) menu.toast('No llegan datos de inclinación: el acelerador irá solo (automático).', 3500); });
+          }
+          break;
         case 'ayudaVolante': entrada.ponerAyuda(v); break;
         case 'camara': camaras.ponerModo(v); break;
         case 'musica': case 'efectosVol': case 'motor': aplicarVolumen(); break;
