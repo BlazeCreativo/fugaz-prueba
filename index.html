@@ -166,6 +166,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 .h-grande.entra { animation: golpe 0.34s cubic-bezier(0.2, 1.6, 0.4, 1); }
 .h-grande.rojo { color: var(--rojo); }
 .h-grande.ambar { color: var(--ambar); }
+.h-grande.verde { color: var(--verde); }
 .h-grande.libre { color: var(--verde); font-size: clamp(50px, 13vw, 116px); }
 .h-grande.hueco { color: var(--cian); }
 .h-grande.bien { color: var(--verde); }
@@ -311,6 +312,49 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 .portada .nota-modo { font-size: 12px; color: var(--tenue); max-width: 230px; }
 .record { margin: 0; color: var(--ambar); font-size: 14px; }
 .pie { margin: 0; color: var(--tenue); font-size: 12px; opacity: 0.75; }
+/* v8: rango, garaje y desglose del cobro */
+.carrera { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1.5px solid var(--borde); border-radius: 14px; background: var(--panel-claro); }
+.rango-linea { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.rango-n { font-family: var(--display); font-weight: 800; font-size: 24px; letter-spacing: 0.04em; color: var(--ambar); }
+.rango-nombre { font-family: var(--display); font-weight: 600; font-size: 19px; }
+.rango-chapas { margin-left: auto; font-family: var(--mono); font-size: 13px; color: var(--ambar); }
+.barra { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.barra i { display: block; height: 100%; background: linear-gradient(90deg, var(--ambar), var(--rojo)); }
+.carrera .metro { font-size: 12px; }
+.garaje-btn { border-color: var(--ambar); }
+.panel.garaje { max-width: 960px; }
+.tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.tarjeta { display: flex; flex-direction: column; gap: 6px; padding: 10px; border: 1.5px solid var(--borde); border-radius: 14px; background: var(--panel-claro); }
+.tarjeta.usando { border-color: var(--verde); }
+.tarjeta.prueba { border-color: var(--cian); }
+.tarjeta.bloqueado { opacity: 0.6; }
+.tarjeta .cab { display: flex; align-items: center; gap: 8px; }
+.tarjeta .cab b { font-family: var(--display); font-weight: 800; font-size: 20px; line-height: 1.05; }
+.tarjeta .rg { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--tenue); }
+.tarjeta .pint { width: 16px; height: 16px; flex: none; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, 0.4); }
+.tarjeta .lema { margin: 0; font-size: 12.5px; line-height: 1.35; color: var(--tenue); }
+.ficha { display: flex; flex-direction: column; gap: 3px; }
+.dato { display: grid; grid-template-columns: 72px 1fr 64px; align-items: center; gap: 6px; font-size: 11.5px; color: var(--tenue); }
+.dato i { height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.dato i b { display: block; height: 100%; background: var(--cian); }
+.dato em { font-style: normal; font-family: var(--mono); text-align: right; color: var(--texto); }
+.tarjeta .acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: auto; }
+.tarjeta .acciones .pri, .tarjeta .acciones .sec { padding: 7px 14px; font-size: 15px; min-height: 38px; }
+.tarjeta .usando { font-family: var(--display); font-weight: 800; letter-spacing: 0.06em; color: var(--verde); }
+.tarjeta .precio { font-family: var(--mono); font-size: 12px; color: var(--ambar); }
+.taller { display: flex; flex-direction: column; gap: 3px; padding-top: 6px; border-top: 1px solid var(--borde); }
+.pieza { display: grid; grid-template-columns: 1fr auto 78px; align-items: center; gap: 6px; font-size: 12px; color: var(--tenue); }
+.pieza i { font-style: normal; letter-spacing: 2px; color: var(--ambar); }
+.pieza .sec { padding: 3px 6px; min-height: 30px; font-size: 12px; font-family: var(--mono); }
+.pieza .tope { text-align: center; font-family: var(--mono); font-size: 11px; color: var(--tenue); }
+.taller-ayuda { margin: 0 0 10px; font-size: 13px; color: var(--tenue); }
+.taller-ayuda summary { cursor: pointer; color: var(--texto); }
+.taller-ayuda ul { margin: 6px 0 0; padding-left: 18px; }
+.final .subida { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 14px; border: 1.5px solid var(--ambar); border-radius: 14px; background: rgba(40, 30, 8, 0.6); }
+.final .subida b { font-family: var(--display); font-weight: 800; font-size: 34px; color: var(--ambar); }
+.final .subida span { font-family: var(--display); font-size: 18px; }
+.final .subida p { margin: 0; font-size: 13px; }
+.final .progreso { width: min(440px, 92%); display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--tenue); }
 @media (max-width: 640px) { .escenarios { grid-template-columns: 1fr; } .esc { min-height: 0; } }
 
 .panel {
@@ -708,6 +752,9 @@ const CALLEJONES = [
   { x0: -145.5, x1: -79.5, y0: -40.6, y1: -37.4, nombre: 'el callejón del Horno' },
 ];
 const GLORIETA = { x: 0, y: 0, r: 9, rExt: 26, nombre: 'la glorieta del Puerto' };
+// v8: el taller, en el carril derecho de la avenida del Puerto hacia el este (acera sur), entre la calle del Hospital
+// y la de la Cerámica. El recuadro es donde tiene que quedar el centro de tu coche.
+const TALLER = { x0: 100, x1: 112, y0: -8, y1: -3.6, x: 106, y: -5.8, puerta: -11, nombre: 'el taller del Puerto' };
 
 // Rampas: cuartos de círculo de 39,5 m de radio entre el carril lento de la Ronda y una calle del borde del barrio.
 // a0 → a1 es el sentido de la marcha (las salidas van de la Ronda al barrio; las entradas, al revés).
@@ -1358,7 +1405,7 @@ function ruta(grafo, ox, oy, dx, dy, op = {}) {
   for (let i = 1; i < puntos.length; i++) largo += dist(puntos[i - 1][0], puntos[i - 1][1], puntos[i][0], puntos[i][1]);
   return { puntos, largo };
 }
-return { LARGO_RONDA, CARRILES, CARRILES_EXT, D_MEDIANA, D_GUARDA, ANCHO_CARRIL, TRAMOS_RONDA, normS, difS, tramoNombre, esCurva, curvaturaRonda, rondaPunto, rondaProyectar, CIMA, alturaRonda, alturaEn, BARRIO, CALLES_NS, CALLES_EO, TUNEL, PARKING, CALLEJONES, GLORIETA, RAMPA_R, RAMPA_MEDIO, RAMPAS, crearMapa, aristaCercana, nodosCerca, ruta };
+return { LARGO_RONDA, CARRILES, CARRILES_EXT, D_MEDIANA, D_GUARDA, ANCHO_CARRIL, TRAMOS_RONDA, normS, difS, tramoNombre, esCurva, curvaturaRonda, rondaPunto, rondaProyectar, CIMA, alturaRonda, alturaEn, BARRIO, CALLES_NS, CALLES_EO, TUNEL, PARKING, CALLEJONES, GLORIETA, TALLER, RAMPA_R, RAMPA_MEDIO, RAMPAS, crearMapa, aristaCercana, nodosCerca, ruta };
 })();
 
 // ---- src/logica/coche.js
@@ -1369,21 +1416,84 @@ const { clamp, lerp, angNorm } = __m[1]; // src/logica/mates.js
 
 
 // potencia: W/kg útiles; traccion: m/s² máximos al arrancar; agarre: m/s² laterales; vMax: m/s.
+// v8, tu garaje con coches de verdad (Alberto, 25/09: «nombres y modelos de coches reales, cada uno con sus diferencias,
+// y cosas flipadísimas, como un Fórmula 1»). Cifras de juego, no de ficha: la ciudad es pequeña.
+// Los nombres reales son solo para la beta privada: para las tiendas hará falta licencia o nombres propios
+// (norma 5.2.1 de Apple; el informe 02 ya proponía marcas inventadas). Además de las cifras de siempre:
+// - visibilidad: por cuánto se multiplica la distancia a la que te ve la policía (1 = normal);
+// - fijar: segundos que tarda una patrulla en volver a fijarte cuando ya te buscan (0,3 = normal);
+// - danioMotor: potencia que pierde el motor con el daño al 100 % (0,3 = normal);
+// - aguante: por cuánto se multiplica el daño que recibes (1 = normal; más de 1, más frágil);
+// - carga: agarre extra que dan los alerones a toda velocidad (el Fórmula 1);
+// - respuesta: lo rápido que gira el coche cuando giras el volante (1 = el Golf; v10, Alberto 25/09: «que pueda girar
+//   más de golpe, parar más de golpe»). Las frenadas van de 32 m (911) a 46 m (Mustang) de 100 a 0; el Golf, 42 m;
+// - nitroDura: por cuánto dura más el nitro (1 = normal; el taller de mejoras lo sube);
+// - sonido: cilindros, escala de vueltas, brillo, volumen, graves y silbido del turbo (audio.js).
+// Nunca discreción y velocidad a la vez: eso mantiene vivos a los coches baratos (informe 06).
 const BASE = {
-  rayo: { nombre: 'Rayo GT', masa: 1250, largo: 4.2, ancho: 1.8, potencia: 120, traccion: 6.6, vMax: 57, agarre: 9.3, frenada: 9.2, giroMax: 0.6, ejes: 2.55, turbo: true },
+  rayo: { nombre: 'Volkswagen Golf GTI', masa: 1250, largo: 4.2, ancho: 1.8, potencia: 120, traccion: 6.6, vMax: 57, agarre: 9.3, frenada: 9.2, giroMax: 0.6, ejes: 2.55, turbo: true },
+  // Utilitario de los 90: te ven a tres cuartos de la distancia y tardan el doble en fijarte. En recta, el más lento (180 km/h).
+  ibiza: { nombre: 'SEAT Ibiza 1.2', masa: 950, largo: 3.85, ancho: 1.64, potencia: 90, traccion: 6.4, vMax: 50, agarre: 9.7, frenada: 8.8, giroMax: 0.64, respuesta: 1.2, ejes: 2.35, turbo: false, visibilidad: 0.75, fijar: 0.6, sonido: { cil: 4, escala: 0.9, brillo: 0.75, volumen: 0.8, graves: 0.7, turbo: 0 } },
+  // Berlina de todos los días con tracción quattro: discreta (te ven un poco más tarde) y muy estable.
+  a5sb: { nombre: 'Audi A5 Sportback', masa: 1600, largo: 4.76, ancho: 1.84, potencia: 125, traccion: 7.0, vMax: 60, agarre: 9.8, frenada: 9.6, giroMax: 0.57, respuesta: 0.9, ejes: 2.76, turbo: true, visibilidad: 0.9, aguante: 0.9, sonido: { cil: 4, escala: 1, brillo: 0.9, volumen: 0.9, graves: 1, turbo: 0.8 } },
+  // La berlina deportiva de siempre: propulsión, se ve como un coche más.
+  bmw330: { nombre: 'BMW 330i', masa: 1500, largo: 4.71, ancho: 1.83, potencia: 135, traccion: 7.2, vMax: 62, agarre: 9.5, frenada: 10.0, giroMax: 0.58, respuesta: 1.05, ejes: 2.85, turbo: true, visibilidad: 0.9, sonido: { cil: 4, escala: 1.05, brillo: 1, volumen: 1, graves: 1, turbo: 1 } },
+  // El A5 de dos puertas: algo más rápido y más llamativo que el Sportback.
+  a5c: { nombre: 'Audi A5 Coupé', masa: 1550, largo: 4.7, ancho: 1.85, potencia: 130, traccion: 7.6, vMax: 61, agarre: 9.9, frenada: 9.9, giroMax: 0.58, ejes: 2.76, turbo: true, sonido: { cil: 4, escala: 1.05, brillo: 1, volumen: 0.95, graves: 1, turbo: 0.9 } },
+  // Turbo de rally de los 80: salida brutal (0-100 en unos 3,5 s); la caja es de cristal: con el daño pierde el doble de motor.
+  r5: { nombre: 'Renault 5 Turbo', masa: 1000, largo: 3.66, ancho: 1.75, potencia: 150, traccion: 8.4, vMax: 59, agarre: 9.4, frenada: 9.3, giroMax: 0.6, respuesta: 1.3, ejes: 2.43, turbo: true, danioMotor: 0.6, sonido: { cil: 4, escala: 1.05, brillo: 1.2, volumen: 1.1, graves: 0.9, turbo: 2.2 } },
+  // Eléctrico: empuja desde parado sin cambios de marcha y casi no se oye (te ven más tarde); la batería pesa.
+  tesla: { nombre: 'Tesla Model 3', masa: 1850, largo: 4.69, ancho: 1.85, potencia: 190, traccion: 8.8, vMax: 65, agarre: 9.6, frenada: 10.2, giroMax: 0.58, respuesta: 0.9, ejes: 2.88, turbo: false, electrico: true, visibilidad: 0.8, aguante: 0.85, sonido: { cil: 16, escala: 2, brillo: 1.4, volumen: 0.35, graves: 0, turbo: 0, admision: 0 } },
+  // V8: el más rápido de los de calle (238 km/h) y aguanta golpes (pesa); se oye: te ven desde más lejos y te fijan antes.
+  mustang: { nombre: 'Ford Mustang GT', masa: 1700, largo: 4.79, ancho: 1.92, potencia: 170, traccion: 7.0, vMax: 66, agarre: 8.9, frenada: 8.4, giroMax: 0.56, respuesta: 0.85, ejes: 2.72, turbo: false, visibilidad: 1.25, fijar: 0.2, aguante: 0.7, sonido: { cil: 8, escala: 0.8, brillo: 0.85, volumen: 1.3, graves: 1.8, turbo: 0 } },
+  // BMW M: la berlina (M3), el cupé (M4, más llamativo) y la grande con V8 y tracción total (M5, aguanta más).
+  m3: { nombre: 'BMW M3', masa: 1700, largo: 4.79, ancho: 1.9, potencia: 200, traccion: 8.4, vMax: 70, agarre: 10, frenada: 11.3, giroMax: 0.58, respuesta: 1.15, ejes: 2.86, turbo: true, visibilidad: 1.05, aguante: 0.95, sonido: { cil: 6, escala: 1.1, brillo: 1.3, volumen: 1.2, graves: 1.1, turbo: 1.2 } },
+  m4: { nombre: 'BMW M4', masa: 1650, largo: 4.79, ancho: 1.89, potencia: 205, traccion: 8.4, vMax: 71, agarre: 10.1, frenada: 11.3, giroMax: 0.58, respuesta: 1.15, ejes: 2.86, turbo: true, visibilidad: 1.15, sonido: { cil: 6, escala: 1.12, brillo: 1.35, volumen: 1.2, graves: 1.1, turbo: 1.2 } },
+  m5: { nombre: 'BMW M5', masa: 1950, largo: 4.98, ancho: 1.9, potencia: 215, traccion: 9.2, vMax: 72, agarre: 9.9, frenada: 11.0, giroMax: 0.56, respuesta: 0.85, ejes: 2.98, turbo: true, aguante: 0.8, sonido: { cil: 8, escala: 1, brillo: 1.1, volumen: 1.3, graves: 1.4, turbo: 1.2 } },
+  // Tracción total: acelera y gira como ninguno (263 km/h); el daño le quita más motor que a un coche normal.
+  p911: { nombre: 'Porsche 911 Turbo', masa: 1600, largo: 4.54, ancho: 1.9, potencia: 230, traccion: 9.6, vMax: 73, agarre: 10.4, frenada: 12.0, giroMax: 0.6, respuesta: 1.25, ejes: 2.45, turbo: true, visibilidad: 1.1, danioMotor: 0.45, sonido: { cil: 6, escala: 1.05, brillo: 1.15, volumen: 1.1, graves: 1.1, turbo: 1.4 } },
+  // Gran turismo inglés con V12: rapidísimo y elegante; la policía duda antes de fijarte (0,45 s), pero te ve de lejos.
+  db11: { nombre: 'Aston Martin DB11', masa: 1800, largo: 4.74, ancho: 1.95, potencia: 245, traccion: 8.2, vMax: 77, agarre: 9.7, frenada: 10.5, giroMax: 0.55, respuesta: 0.85, ejes: 2.8, turbo: true, visibilidad: 1.2, fijar: 0.45, aguante: 0.9, sonido: { cil: 12, escala: 0.95, brillo: 1.3, volumen: 1.2, graves: 1.1, turbo: 0.8 } },
+  // El póster de los 80: 288 km/h y un V12 que grita. Te ven desde muy lejos, gira peor y la carrocería es delicada.
+  countach: { nombre: 'Lamborghini Countach', masa: 1500, largo: 4.14, ancho: 2.0, potencia: 260, traccion: 8.2, vMax: 80, agarre: 9.8, frenada: 10.3, giroMax: 0.52, respuesta: 0.95, ejes: 2.45, turbo: false, visibilidad: 1.5, fijar: 0.15, aguante: 1.15, sonido: { cil: 12, escala: 1, brillo: 1.6, volumen: 1.3, graves: 0.9, turbo: 0 } },
+  // Un Fórmula 1 en la ciudad: 331 km/h, frenada de otro mundo y más agarre cuanto más corre. Un golpe fuerte lo destroza,
+  // se ve desde lejísimos y gira poco a baja velocidad (las esquinas del barrio, despacio). Aguante 1,5 (el más frágil):
+  // con 2,2, el piloto automático del banco lo destrozaba en 18 s de media, 8 de 8 (el Golf, en 75 s).
+  f1: { nombre: 'Monoplaza de Fórmula 1', masa: 800, largo: 5.6, ancho: 2.0, potencia: 420, traccion: 12, vMax: 92, agarre: 11, carga: 0.6, frenada: 16, giroMax: 0.42, respuesta: 1.6, ejes: 3.6, turbo: false, visibilidad: 1.6, fijar: 0.15, aguante: 1.5, danioMotor: 0.6, sonido: { cil: 10, escala: 2.2, brillo: 2.4, volumen: 1.4, graves: 0.5, turbo: 0 } },
   lince: { nombre: 'Lince', masa: 1450, largo: 4.6, ancho: 1.86, potencia: 100, traccion: 6.0, vMax: 51.4, agarre: 9.0, frenada: 8.6, giroMax: 0.58, ejes: 2.7, turbo: false },
   lobo: { nombre: 'Lobo', masa: 1600, largo: 4.8, ancho: 1.9, potencia: 175, traccion: 6.8, vMax: 64, agarre: 7.9, frenada: 8.2, giroMax: 0.55, ejes: 2.8, turbo: true },
   toro: { nombre: 'Toro', masa: 2300, largo: 4.9, ancho: 2.1, potencia: 95, traccion: 5.6, vMax: 48.6, agarre: 8.3, frenada: 7.8, giroMax: 0.55, ejes: 2.9, turbo: false },
 };
+const MARCHAS = [0, 0.21, 0.37, 0.53, 0.69, 0.85];
 const MODELOS = {};
 for (const [id, m] of Object.entries(BASE)) {
   MODELOS[id] = {
+    visibilidad: 1, fijar: 0.3, danioMotor: 0.3, aguante: 1, carga: 0, respuesta: 1, nitroDura: 1,
+    sonido: { cil: 4, escala: 1, brillo: 1, volumen: 1, graves: 1, turbo: m.turbo ? 1 : 0 },
     ...m,
     id,
     // Resistencia al aire calculada para que la punta salga justo en vMax.
     k: (m.potencia / m.vMax - 0.15) / (m.vMax * m.vMax),
     // Velocidades de cambio a la marcha siguiente (1.ª a 5.ª).
-    marchas: [0, 0.21, 0.37, 0.53, 0.69, 0.85].map((f) => f * m.vMax),
+    marchas: MARCHAS.map((f) => f * m.vMax),
+  };
+}
+
+// v8: una copia del modelo con más motor y más agarre (la policía de los rangos altos). Con la misma resistencia al aire,
+// la punta sale de potencia = 0,15·v + k·v³: un 25 % más de motor da un 8 % más de punta.
+// v10: también las mejoras del taller (carrera.js): frenos, dirección, nitro y blindaje. Cada cifra es un multiplicador
+// (1 = de serie). La potencia va por kilo: el blindaje, que pesa, se la reparte entre más kilos.
+function modeloMejorado(id, mult = {}) {
+  const b = MODELOS[id];
+  const { potencia = 1, agarre = 1, frenada = 1, giroMax = 1, respuesta = 1, masa = 1, aguante = 1, visibilidad = 1, nitroDura = 1 } = mult;
+  if ([potencia, agarre, frenada, giroMax, respuesta, masa, aguante, visibilidad, nitroDura].every((x) => x === 1)) return b;
+  const P = (b.potencia * potencia) / masa;
+  let v = b.vMax;
+  for (let i = 0; i < 30; i++) v -= (0.15 * v + b.k * v * v * v - P) / (0.15 + 3 * b.k * v * v);
+  return {
+    ...b, potencia: P, agarre: b.agarre * agarre, vMax: v, marchas: MARCHAS.map((f) => f * v),
+    frenada: b.frenada * frenada, giroMax: b.giroMax * giroMax, respuesta: b.respuesta * respuesta, masa: b.masa * masa,
+    aguante: b.aguante * aguante, visibilidad: b.visibilidad * visibilidad, nitroDura: b.nitroDura * nitroDura,
   };
 }
 
@@ -1398,7 +1508,8 @@ function agilDe(c, v) {
   return extra > 1 ? extra + 0.4 * clamp((40 - v) / 25, 0, 1) : 1;
 }
 function agarreDe(c, v) {
-  return c.m.agarre * agilDe(c, v) * (c.pinchado ? 0.72 : 1) * (1 - 0.15 * c.danio) * (c.sacudida > 0 ? 0.55 : 1);
+  const alerones = c.m.carga ? 1 + c.m.carga * Math.min(1, (v / c.m.vMax) ** 2) : 1;
+  return c.m.agarre * alerones * agilDe(c, v) * (c.pinchado ? 0.72 : 1) * (1 - 0.15 * c.danio) * (c.sacudida > 0 ? 0.55 : 1);
 }
 // Ángulo de volante máximo: con ayuda, el giro a tope gasta justo el agarre a cualquier velocidad.
 function giroMaxDe(c, v, asist = ASISTENCIA) {
@@ -1414,10 +1525,11 @@ function circulosDe(largo, ancho) {
   return out;
 }
 
+// modelo: el nombre (rayo, lince…) o un modelo ya hecho (modeloMejorado).
 function crearCoche(modelo, x, y, h, v = 0) {
-  const m = MODELOS[modelo];
+  const m = typeof modelo === 'string' ? MODELOS[modelo] : modelo;
   return {
-    modelo, m, x, y, h,
+    modelo: m.id, m, x, y, h,
     vx: Math.sin(h) * v, vy: Math.cos(h) * v, w: 0,
     vf: v, vl: 0, ax: 0,
     largo: m.largo, ancho: m.ancho, masa: m.masa,
@@ -1426,7 +1538,7 @@ function crearCoche(modelo, x, y, h, v = 0) {
     nitro: 0.35, nitroGolpe: 0, nitroSujeto: 0, nitroActivo: false,
     lanzada: 0, salida: 0, salidaMult: 1,
     derrape: false, deriva: 0, sinMano: 0,
-    trompo: 0,
+    trompo: 0, patina: 0, gasAltoT: 0,
     motor: true, calor: 0.35, marchaAtras: false, frenoParado: 0,
     rebufo: 0, rebufoAntes: 0, tirachinas: 0, tirachinasT: 0, tirachinasF: 0,
     pinchado: false, pinchadoT: 0, danio: 0, sacudida: 0,
@@ -1455,6 +1567,16 @@ function pasoCoche(c, e, dt, asist = ASISTENCIA) {
 
   // Pisar a fondo de golpe: el tirón (la presentación hace la pausa de 40 ms y el empujón de cámara).
   if (gas > 0.9 && c.gasAntes < 0.3 && vAbs < 25 && freno < 0.5) ev.push({ tipo: 'tiron' });
+  // v9: soltar el gas de golpe a muchas vueltas escupe una llamarada por el escape (el BMW del vídeo del 25/09).
+  // Vale también con el pedal o inclinando: basta con haber ido a fondo en el último cuarto de segundo.
+  if (gas >= 0.8) c.gasAltoT = 0.25;
+  else {
+    if (gas <= 0.2 && c.gasAltoT > 0 && c.rpm > 5200 && c.motor && !m.electrico) {
+      ev.push({ tipo: 'petardeo' });
+      c.gasAltoT = 0;
+    }
+    c.gasAltoT = Math.max(0, c.gasAltoT - dt);
+  }
   c.gasAntes = gas;
 
   // Salida lanzada: parado, con freno y gas a la vez; la aguja sube y baja, y hay que soltar el freno en la zona verde.
@@ -1492,15 +1614,16 @@ function pasoCoche(c, e, dt, asist = ASISTENCIA) {
   c.turbo += (turboObj - c.turbo) * Math.min(1, dt / (turboObj > c.turbo ? 0.35 : 0.12));
 
   // Nitro en dos tiempos: el toque da el tirón; sujeto, la punta.
-  if (e.nitroToque && c.nitro >= 0.08 && c.nitroGolpe <= 0 && c.motor) {
+  const tiron = 0.08 / m.nitroDura; // v10: el nitro mejorado gasta menos
+  if (e.nitroToque && c.nitro >= tiron && c.nitroGolpe <= 0 && c.motor) {
     c.nitroGolpe = 0.6;
-    c.nitro -= 0.08;
+    c.nitro -= tiron;
     ev.push({ tipo: 'nitroGolpe' });
   }
   c.nitroGolpe = Math.max(0, c.nitroGolpe - dt);
   c.nitroSujeto = e.nitro ? c.nitroSujeto + dt : 0;
   c.nitroActivo = !!e.nitro && c.nitroSujeto > 0.25 && c.nitro > 0 && c.motor;
-  if (c.nitroActivo) c.nitro = Math.max(0, c.nitro - 0.2 * dt);
+  if (c.nitroActivo) c.nitro = Math.max(0, c.nitro - (0.2 * dt) / m.nitroDura);
 
   // Rebufo y tirachinas: aguantar detrás de un camión carga un empujón para salir de él.
   if (c.rebufo > 0.5) c.tirachinas = Math.min(1, c.tirachinas + dt / 2);
@@ -1522,7 +1645,7 @@ function pasoCoche(c, e, dt, asist = ASISTENCIA) {
     if (gas > 0.1) a += 7 * gas;
   } else {
     const traccion = m.traccion * (c.salida > 0 ? c.salidaMult : 1);
-    const potencia = m.potencia * (m.turbo ? 0.74 + 0.26 * c.turbo : 1) * (1 - 0.3 * c.danio);
+    const potencia = m.potencia * (m.turbo ? 0.74 + 0.26 * c.turbo : 1) * (1 - m.danioMotor * c.danio);
     let aMotor = Math.min(traccion, potencia / Math.max(vAbs, 2.5)) * gas;
     if (c.cambio > 0) aMotor = 0;
     if (c.nitroGolpe > 0) aMotor += 8.5 * Math.max(0, 1 - vf / (1.25 * m.vMax));
@@ -1573,7 +1696,7 @@ function pasoCoche(c, e, dt, asist = ASISTENCIA) {
     }
   } else {
     const wc = clamp(wObj, -wLim * 1.08, wLim * 1.08);
-    c.w += (wc - c.w) * Math.min(1, dt * 10);
+    c.w += (wc - c.w) * Math.min(1, dt * 10 * m.respuesta); // v10: cada coche gira «de golpe» a su manera
   }
   c.h = angNorm(c.h + c.w * dt);
 
@@ -1592,8 +1715,20 @@ function pasoCoche(c, e, dt, asist = ASISTENCIA) {
   c.x += c.vx * dt;
   c.y += c.vy * dt;
 
+  // v9: cuánto patinan las ruedas (0-1): de lado (derrape, trompo o curva al límite), frenando fuerte o saliendo quemando
+  // rueda (solo los muy potentes: más de 20 de potencia por cada m/s² de tracción; el eléctrico, nunca). Lo usan las
+  // marcas en el asfalto y el humo de las ruedas (Alberto, 25/09: «los neumáticos, cómo se mueven las cosas»).
+  let patina = c.trompo > 0 ? 1 : c.derrape ? clamp(0.35 + Math.abs(c.deriva) * 1.1, 0, 1) : clamp((Math.abs(nvl) - 1.5) / 5, 0, 0.5);
+  if (freno > 0.8 && vAbs > 14 && nvf > 0 && !c.marchaAtras) patina = Math.max(patina, 0.45 * clamp(vAbs / 30, 0, 1));
+  const quema = m.potencia / m.traccion;
+  if (quema > 20 && !m.electrico && c.motor && gas > 0.9 && !c.marchaAtras && c.lanzada === 0 && vAbs < 0.35 * quema) {
+    patina = Math.max(patina, 0.65 * (1 - vAbs / (0.35 * quema)));
+  }
+  if (c.salida > 0 && c.salidaMult > 0.8 && c.salidaMult < 0.9 && vAbs > 0.5) patina = Math.max(patina, 0.6); // salida pasada de vueltas
+  c.patina = patina;
+
   // ---- caja de cambios automática y cuentavueltas
-  if (!c.marchaAtras && c.lanzada === 0) {
+  if (!c.marchaAtras && c.lanzada === 0 && !m.electrico) { // el eléctrico no cambia de marcha
     if (c.marcha < 6 && nvf > techoMarcha(m, c.marcha)) {
       c.marcha++;
       c.cambio = 0.08;
@@ -1609,7 +1744,7 @@ function pasoCoche(c, e, dt, asist = ASISTENCIA) {
   else if (c.marchaAtras) c.rpm = 1000 + Math.abs(nvf) * 400;
   else if (Math.abs(nvf) < 0.5) c.rpm += (900 + gas * 3200 - c.rpm) * Math.min(1, dt * 8);
   else {
-    const obj = 1000 + 6800 * clamp(nvf / techoMarcha(m, c.marcha), 0, 1.05);
+    const obj = 1000 + 6800 * clamp(nvf / (m.electrico ? m.vMax : techoMarcha(m, c.marcha)), 0, 1.05);
     c.rpm += (obj - c.rpm) * Math.min(1, dt * (c.cambio > 0 ? 40 : 18));
   }
 
@@ -1663,11 +1798,333 @@ function choqueEntre(a, b, nx, ny, pen) {
 
 const velocidadKmh = (c) => Math.abs(c.vf) * 3.6;
 const velocidadMax = (c) => c.m.vMax;
-return { MODELOS, ASISTENCIA, agilDe, agarreDe, giroMaxDe, circulosDe, crearCoche, pasoCoche, choqueFijo, choqueEntre, velocidadKmh, velocidadMax, lerp };
+return { MODELOS, modeloMejorado, ASISTENCIA, agilDe, agarreDe, giroMaxDe, circulosDe, crearCoche, pasoCoche, choqueFijo, choqueEntre, velocidadKmh, velocidadMax, lerp };
+})();
+
+// ---- src/logica/botin.js
+__m[4] = (() => {
+
+// Botín en juego: crece con el tiempo, el nivel de alerta y el estilo; se cobra al escapar.
+// El estilo premia la pericia (casi-choques, huecos, derrapes), nunca las infracciones.
+
+const TASA = [5, 9, 14]; // chapas por segundo con el Ojo en rojo, según el nivel
+const FINALES = { FANTASMA: 2, LIMPIO: 1, CLAVE9: 0.5, DETENIDO: 0.25, SINIESTRO: 0.25 };
+
+function crearBotin() {
+  return { enJuego: 0, cadena: 0, mult: 1, tCadena: 0, casiChoques: 0, huecos: 0, derrape: 0, estilo: 0 };
+}
+
+function pasoBotin(b, dt, ojo, nivel) {
+  if (ojo === 'cerrado') return;
+  const tasa = TASA[Math.min(3, Math.max(1, nivel)) - 1] * (ojo === 'rojo' ? 1 : 0.4);
+  b.enJuego += tasa * dt * b.mult;
+  if (b.cadena > 0) {
+    b.tCadena += dt;
+    if (b.tCadena > 8) romperCadena(b);
+  }
+}
+
+// extra: el premio del nivel de tráfico (más tráfico, más vale cada rebase).
+function casiChoque(b, fuerza, extra = 1) {
+  b.cadena++;
+  b.tCadena = 0;
+  b.mult = Math.min(2.5, 1 + 0.08 * b.cadena);
+  const g = Math.round((10 + 10 * fuerza) * b.mult * extra);
+  b.enJuego += g;
+  b.estilo += g;
+  b.casiChoques++;
+  return g;
+}
+
+function hueco(b, extra = 1) {
+  b.cadena += 2;
+  b.tCadena = 0;
+  b.mult = Math.min(2.5, 1 + 0.08 * b.cadena);
+  const g = Math.round(60 * b.mult * extra);
+  b.enJuego += g;
+  b.estilo += g;
+  b.huecos++;
+  return g;
+}
+
+function romperCadena(b) {
+  b.cadena = 0;
+  b.mult = 1;
+  b.tCadena = 0;
+}
+
+function derrape(b, dt, enGlorieta) {
+  const g = 16 * dt * (enGlorieta ? 2 : 1) * b.mult;
+  b.enJuego += g;
+  b.estilo += g;
+  b.derrape += dt;
+  return g;
+}
+
+function premio(b, cantidad) {
+  b.enJuego += cantidad;
+  b.estilo += cantidad;
+  return cantidad;
+}
+
+function cobro(b, final) {
+  return Math.round(b.enJuego * (FINALES[final] ?? 1));
+}
+return { FINALES, crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, premio, cobro };
+})();
+
+// ---- src/logica/carrera.js
+__m[5] = (() => {
+const { FINALES } = __m[4]; // src/logica/botin.js
+const { modeloMejorado } = __m[3]; // src/logica/coche.js
+// Tu carrera de fugitivo (v8): el rango del 1 al 10, lo que hace la Metro en cada rango, lo que cobras y el garaje.
+// Sin pantalla ni almacenamiento: main.js guarda la carrera en el móvil y menu.js la enseña.
+// Sin trampas de goma: la policía no mejora cuanto mejor vas en una huida. Mejora con tu rango, que se ve en el menú
+// (plan v6-v9, apartado 4).
+
+
+
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+
+// Chapas cobradas en De verdad, sumadas, para llegar a cada rango. Cifras de beta: se ajustan con el registro.
+// Con una fuga normal (unas 800-1.500 chapas), el rango 3 llega en la primera sesión y el 10, tras unas 60 fugas.
+const RANGOS = [
+  { desde: 0, nombre: 'Novato' },
+  { desde: 1500, nombre: 'Aprendiz' },
+  { desde: 4000, nombre: 'Conocido' },
+  { desde: 8000, nombre: 'Escurridizo' },
+  { desde: 13000, nombre: 'Buscado' },
+  { desde: 20000, nombre: 'Peligroso' },
+  { desde: 29000, nombre: 'Temido' },
+  { desde: 40000, nombre: 'Leyenda del barrio' },
+  { desde: 54000, nombre: 'Enemigo público' },
+  { desde: 72000, nombre: 'Fantasma de la Metro' },
+];
+const RANGO_MAX = RANGOS.length;
+
+function rangoDe(acumulado) {
+  let r = 1;
+  for (let i = 1; i < RANGOS.length; i++) if (acumulado >= RANGOS[i].desde) r = i + 1;
+  return r;
+}
+const rangoValido = (r) => clamp(Math.round(r) || 1, 1, RANGO_MAX);
+const nombreRango = (r) => RANGOS[rangoValido(r) - 1].nombre;
+
+// Cuánto llevas hacia el rango siguiente (para la barra del menú).
+function progresoRango(acumulado) {
+  const r = rangoDe(acumulado);
+  if (r >= RANGO_MAX) return { rango: r, desde: RANGOS[r - 1].desde, hasta: null, falta: 0, fraccion: 1 };
+  const desde = RANGOS[r - 1].desde, hasta = RANGOS[r].desde;
+  return { rango: r, desde, hasta, falta: hasta - acumulado, fraccion: (acumulado - desde) / (hasta - desde) };
+}
+
+// Lo que cambia la Metro en cada rango. El rango 1 es la policía de la v7, tal cual.
+function reglasDelRango(rango = 1) {
+  const r = rangoValido(rango);
+  const k = r - 1;
+  return {
+    rango: r,
+    potencia: 1 + (0.25 * k) / 9,     // motor de las patrullas: hasta +25 % en el rango 10 (la punta, un 8 % más)
+    agarre: 1 + 0.02 * k,             // agarre: hasta +18 %
+    busqueda: 1 + 0.06 * k,           // te buscan más tiempo: hasta +54 %
+    lince2: 10 - 0.5 * k,             // segundos hasta que llega el segundo Lince (10 → 5,5)
+    nivel2: Math.max(20, 35 - 2 * k), // segundos en rojo para el nivel 2, el de los Lobos (35 → 20)
+    nivel3: Math.max(50, 80 - 4 * k), // y para el nivel 3, el del Toro (80 → 50)
+    loboExtra: r >= 6,                // desde el rango 6, un tercer Lobo en el nivel 2
+    trafico: r >= 7 ? 2 : 1,          // desde el rango 7, la Ronda empieza más cargada
+    pago: 1 + 0.1 * k,                // y cobras más: +10 % por rango (×1,9 en el 10)
+  };
+}
+
+// Al subir el nivel de alerta, todas las patrullas aprietan un poco más (plan v6-v9, apartado 4).
+const ALERTA_POTENCIA = [1, 1.05, 1.1];
+// Al escapar, el nivel de alerta multiplica el cobro, como en NFS Heat (informe 13): ×1, ×1,25 y ×1,5.
+const PAGO_ALERTA = [1, 1.25, 1.5];
+const ESCAPES = new Set(['FANTASMA', 'LIMPIO', 'CLAVE9']);
+
+// Lo que cobras y por qué: botín × final × alerta (solo si escapas) × rango.
+function desglose(final, botin, nivel = 1, pagoRango = 1) {
+  const porFinal = FINALES[final] ?? 1;
+  const alerta = ESCAPES.has(final) ? PAGO_ALERTA[clamp(nivel, 1, 3) - 1] : 1;
+  return { botin, porFinal, alerta, rango: pagoRango, total: Math.round(botin * porFinal * alerta * pagoRango) };
+}
+
+// El garaje (Alberto, 25/09: coches de verdad, cada uno con sus diferencias, y uno flipado: un Fórmula 1).
+// El Golf y el Ibiza, desde el principio; los demás se desbloquean con el rango y se compran con tus chapas.
+// En Práctica puedes probar cualquiera, aunque no sea tuyo. Las cifras de cada coche están en coche.js.
+const GARAJE = [
+  { id: 'rayo', rango: 1, precio: 0, lema: 'Equilibrado: el de siempre.' },
+  { id: 'ibiza', rango: 1, precio: 0, lema: 'Discreto: te ven a menos distancia y tardan el doble en fijarte. El más lento en recta.' },
+  { id: 'a5sb', rango: 2, precio: 3000, lema: 'Berlina de diario con tracción quattro: discreta, estable y aguanta bien.' },
+  { id: 'bmw330', rango: 2, precio: 3500, lema: 'La berlina deportiva de siempre: rápida y pasa por un coche más.' },
+  { id: 'a5c', rango: 3, precio: 5000, lema: 'El A5 de dos puertas: algo más rápido y más llamativo.' },
+  { id: 'r5', rango: 3, precio: 6000, lema: 'Salida brutal. Frágil: el daño le quita punta antes que a nadie.' },
+  { id: 'tesla', rango: 4, precio: 9000, lema: 'Eléctrico: empuja desde parado, sin cambios, y casi no se oye. Pesa.' },
+  { id: 'mustang', rango: 5, precio: 14000, lema: 'V8: muy rápido y aguanta golpes. Se oye: te ven desde más lejos.' },
+  { id: 'm3', rango: 5, precio: 15000, lema: 'BMW M3: berlina con seis cilindros y turbo. Rápida en todo.' },
+  { id: 'm4', rango: 6, precio: 19000, lema: 'BMW M4: el cupé del M3, un poco más rápido y más llamativo.' },
+  { id: 'm5', rango: 7, precio: 24000, lema: 'BMW M5: V8 y tracción total en una berlina grande. Aguanta como ninguna.' },
+  { id: 'p911', rango: 7, precio: 28000, lema: 'Porsche 911 Turbo: acelera y gira como ninguno. El daño le quita motor.' },
+  { id: 'db11', rango: 8, precio: 36000, lema: 'Aston Martin DB11: V12 elegante; la policía duda antes de fijarte, pero te ve de lejos.' },
+  { id: 'countach', rango: 9, precio: 45000, lema: 'El póster de los 80: rapidísimo y con un V12 que grita. Te ven desde muy lejos y gira peor.' },
+  { id: 'f1', rango: 10, precio: 70000, lema: 'Un Fórmula 1 en la ciudad: 331 km/h y frenada de otro mundo. Un golpe fuerte lo destroza y se ve desde lejísimos.' },
+];
+const cochePorId = (id) => GARAJE.find((c) => c.id === id);
+
+function crearCarrera() {
+  return { version: 1, acumulado: 0, ahorros: 0, fugas: 0, coches: ['rayo', 'ibiza'], coche: 'rayo', mejoras: {} };
+}
+
+// Lo que venga del móvil se revisa: cifras no negativas, coches que existen y el elegido entre los tuyos.
+function normalizarCarrera(g) {
+  const c = crearCarrera();
+  if (!g || typeof g !== 'object') return c;
+  const num = (v) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? Math.floor(v) : 0);
+  c.acumulado = num(g.acumulado);
+  c.ahorros = Math.min(num(g.ahorros), c.acumulado);
+  c.fugas = num(g.fugas);
+  if (Array.isArray(g.coches)) for (const id of g.coches) if (cochePorId(id) && !c.coches.includes(id)) c.coches.push(id);
+  if (c.coches.includes(g.coche)) c.coche = g.coche;
+  // v10: las mejoras, solo de coches tuyos, de piezas que existen y con niveles enteros de 1 a 3.
+  if (g.mejoras && typeof g.mejoras === 'object') {
+    for (const id of c.coches) {
+      const m = g.mejoras[id];
+      if (!m || typeof m !== 'object') continue;
+      const limpio = {};
+      for (const p of PIEZAS) {
+        const n = m[p.id];
+        if (Number.isInteger(n) && n >= 1 && n <= NIVEL_MAX) limpio[p.id] = n;
+      }
+      if (Object.keys(limpio).length) c.mejoras[id] = limpio;
+    }
+  }
+  return c;
+}
+
+// Una fuga acabada. Solo cuenta en De verdad: en Práctica no hay daño y subir sería gratis.
+function anotarFuga(car, { cobro = 0, modo = 'verdad' } = {}) {
+  const antes = rangoDe(car.acumulado);
+  if (modo === 'practica') return { car, cuenta: false, ganado: 0, antes, despues: antes, sube: false, nuevos: [] };
+  const ganado = Math.max(0, Math.round(cobro) || 0);
+  const nuevo = { ...car, coches: [...car.coches], acumulado: car.acumulado + ganado, ahorros: car.ahorros + ganado, fugas: car.fugas + 1 };
+  const despues = rangoDe(nuevo.acumulado);
+  const nuevos = GARAJE.filter((c) => c.rango > antes && c.rango <= despues).map((c) => c.id);
+  return { car: nuevo, cuenta: true, ganado, antes, despues, sube: despues > antes, nuevos };
+}
+
+// usando · tuyo · bloqueado (falta rango) · caro (faltan chapas) · aLaVenta
+function estadoCoche(car, id) {
+  const c = cochePorId(id);
+  if (!c) return { estado: 'no' };
+  if (car.coches.includes(id)) return { estado: car.coche === id ? 'usando' : 'tuyo' };
+  if (rangoDe(car.acumulado) < c.rango) return { estado: 'bloqueado', rango: c.rango };
+  if (car.ahorros < c.precio) return { estado: 'caro', falta: c.precio - car.ahorros };
+  return { estado: 'aLaVenta', precio: c.precio };
+}
+
+// Comprar gasta ahorros, nunca rango: lo cobrado sigue sumando para tu rango.
+function comprar(car, id) {
+  const e = estadoCoche(car, id);
+  if (e.estado !== 'aLaVenta') return { ok: false, car, motivo: e.estado };
+  return { ok: true, car: { ...car, ahorros: car.ahorros - cochePorId(id).precio, coches: [...car.coches, id], coche: id } };
+}
+
+// ---------------------------------------------------------------- v10: el taller de mejoras
+// Alberto, 25/09: «que cada coche tenga sus características propias… y que se puedan hacer mejoras». Seis piezas con
+// tres niveles, cada una con su pega para que haya que elegir. Se pagan con chapas (nunca con dinero real) y son de
+// cada coche. El rango limita el nivel: 1 hasta el rango 3, 2 hasta el 6 y 3 desde el 7. La policía sube con tu rango,
+// no con tus mejoras.
+const PIEZAS = [
+  { id: 'motor', nombre: 'Motor', letra: 'M', lema: 'Más aceleración y punta. Suena más: te ven de más lejos.' },
+  { id: 'frenos', nombre: 'Frenos', letra: 'F', lema: 'Frenas antes.' },
+  { id: 'neumaticos', nombre: 'Neumáticos', letra: 'N', lema: 'Más agarre en curva; frenas algo mejor.' },
+  { id: 'direccion', nombre: 'Dirección', letra: 'D', lema: 'Gira antes y más cerrado; a mucha velocidad, más nerviosa.' },
+  { id: 'nitro', nombre: 'Nitro', letra: 'X', lema: 'El nitro dura más.' },
+  { id: 'blindaje', nombre: 'Blindaje', letra: 'B', lema: 'Menos daño por golpe; pesa: acelera menos.' },
+];
+const NIVEL_MAX = 3;
+const nivelMaxDelRango = (rango) => (rango >= 7 ? 3 : rango >= 4 ? 2 : 1);
+
+// Lo que hace cada nivel n (multiplicadores del modelo de serie; coche.js, modeloMejorado).
+const EFECTO = {
+  motor: (n) => ({ potencia: 1 + 0.06 * n, visibilidad: 1 + 0.05 * n }),
+  frenos: (n) => ({ frenada: 1 + 0.08 * n }),
+  neumaticos: (n) => ({ agarre: 1 + 0.03 * n, frenada: 1 + 0.03 * n }),
+  direccion: (n) => ({ respuesta: 1 + 0.12 * n, giroMax: 1 + 0.04 * n }),
+  nitro: (n) => ({ nitroDura: 1 + 0.2 * n }),
+  blindaje: (n) => ({ aguante: 1 - 0.1 * n, masa: 1 + 0.04 * n }),
+};
+
+// El nivel n de una pieza cuesta n veces lo mismo: 400 chapas más un 2 % del precio del coche (redondeado a 50).
+function precioMejora(id, nivel) {
+  const c = cochePorId(id);
+  return Math.round(((400 + 0.02 * (c ? c.precio : 0)) * nivel) / 50) * 50;
+}
+
+// Los niveles de cada pieza de un coche tuyo (0 = de serie).
+function mejorasDe(car, id) {
+  const m = (car.mejoras && car.mejoras[id]) || {};
+  return Object.fromEntries(PIEZAS.map((p) => [p.id, m[p.id] || 0]));
+}
+
+// noTuyo · max · bloqueado (falta rango) · caro (faltan chapas) · aLaVenta. nivel: el que tiene; precio: el siguiente.
+function estadoMejora(car, id, pieza) {
+  if (!car.coches.includes(id) || !EFECTO[pieza]) return { estado: 'noTuyo' };
+  const nivel = mejorasDe(car, id)[pieza];
+  if (nivel >= NIVEL_MAX) return { estado: 'max', nivel };
+  const rango = rangoDe(car.acumulado);
+  if (nivel + 1 > nivelMaxDelRango(rango)) return { estado: 'bloqueado', nivel, rango: nivel + 1 >= 3 ? 7 : 4 };
+  const precio = precioMejora(id, nivel + 1);
+  if (car.ahorros < precio) return { estado: 'caro', nivel, precio, falta: precio - car.ahorros };
+  return { estado: 'aLaVenta', nivel, precio };
+}
+
+// Como comprar un coche: gasta ahorros, nunca rango.
+function comprarMejora(car, id, pieza) {
+  const e = estadoMejora(car, id, pieza);
+  if (e.estado !== 'aLaVenta') return { ok: false, car, motivo: e.estado };
+  const mejoras = { ...car.mejoras, [id]: { ...(car.mejoras && car.mejoras[id]), [pieza]: e.nivel + 1 } };
+  return { ok: true, car: { ...car, ahorros: car.ahorros - e.precio, mejoras } };
+}
+
+// Los multiplicadores de todas las piezas juntas.
+function multiplicadoresDe(mejoras = {}) {
+  const out = {};
+  for (const p of PIEZAS) {
+    const n = mejoras[p.id] || 0;
+    if (!n) continue;
+    for (const [k, v] of Object.entries(EFECTO[p.id](n))) out[k] = (out[k] || 1) * v;
+  }
+  return out;
+}
+
+// El modelo del coche con sus mejoras (el mismo de serie si no tiene ninguna).
+const modeloConMejoras = (id, mejoras) => modeloMejorado(id, multiplicadoresDe(mejoras));
+
+// Para el registro: «M2F1B1» (solo las piezas mejoradas); vacío si va de serie.
+const codigoMejoras = (mejoras = {}) => PIEZAS.map((p) => (mejoras[p.id] ? p.letra + mejoras[p.id] : '')).join('');
+
+function elegir(car, id) {
+  return car.coches.includes(id) ? { ...car, coche: id } : car;
+}
+
+// La meta más cercana, para el menú y la pantalla final (informe 11: «te faltan 1.800 chapas para el Trueno»).
+function metaCercana(car) {
+  for (const c of GARAJE) {
+    const e = estadoCoche(car, c.id);
+    if (e.estado === 'aLaVenta') return { tipo: 'comprar', id: c.id, precio: e.precio };
+    if (e.estado === 'caro') return { tipo: 'chapas', id: c.id, falta: e.falta };
+  }
+  const pr = progresoRango(car.acumulado);
+  if (pr.hasta === null) return null;
+  const coche = GARAJE.find((c) => c.rango === pr.rango + 1);
+  return { tipo: 'rango', rango: pr.rango + 1, falta: pr.falta, id: coche ? coche.id : null };
+}
+return { RANGOS, RANGO_MAX, rangoDe, nombreRango, progresoRango, reglasDelRango, ALERTA_POTENCIA, PAGO_ALERTA, desglose, GARAJE, cochePorId, crearCarrera, normalizarCarrera, anotarFuga, estadoCoche, comprar, PIEZAS, NIVEL_MAX, nivelMaxDelRango, precioMejora, mejorasDe, estadoMejora, comprarMejora, multiplicadoresDe, modeloConMejoras, codigoMejoras, elegir, metaCercana };
 })();
 
 // ---- src/logica/asistencia.js
-__m[4] = (() => {
+__m[6] = (() => {
 const { clamp, angDif, rumbo } = __m[1]; // src/logica/mates.js
 const { rondaProyectar, rondaPunto, curvaturaRonda } = __m[2]; // src/logica/mapa.js
 const { agarreDe, giroMaxDe } = __m[3]; // src/logica/coche.js
@@ -1759,7 +2216,7 @@ return { crearAyuda, asistir, crucero };
 })();
 
 // ---- src/logica/choques.js
-__m[5] = (() => {
+__m[7] = (() => {
 const { clamp, angNorm } = __m[1]; // src/logica/mates.js
 // Choques en cadena, explosiones y patrullas fuera de combate (v7; Alberto, 25/09: «que si te chocas con ellos también
 // reaccionen y se choquen, o incluso que haya una explosión»). Lógica pura: las cifras, las fórmulas y el paso de un
@@ -1846,10 +2303,10 @@ return { SUELTO, DANIO_TRAFICO, EXPLOSION, TUMBAR, factorMasa, danioTrafico, dan
 })();
 
 // ---- src/logica/trafico.js
-__m[6] = (() => {
+__m[8] = (() => {
 const { clamp, angNorm, angDif, rumbo, proyectarSegmento } = __m[1]; // src/logica/mates.js
 const { LARGO_RONDA, CARRILES, CARRILES_EXT, D_MEDIANA, D_GUARDA, rondaPunto, rondaProyectar, normS, difS, esCurva } = __m[2]; // src/logica/mapa.js
-const { SUELTO, DANIO_TRAFICO, pasoSuelto, huella } = __m[5]; // src/logica/choques.js
+const { SUELTO, DANIO_TRAFICO, pasoSuelto, huella } = __m[7]; // src/logica/choques.js
 // Tráfico: la Ronda (calzada interior, sentido horario), la calzada exterior (solo decorado) y el barrio.
 // Semicinemático: cada vehículo sigue su carril a su velocidad. Un golpe lo desplaza y lo deja aturdido un rato.
 // Se aparta para la sirena, no para ti; solo frena si te tiene delante.
@@ -2409,17 +2866,21 @@ return { TIPOS_TRAFICO, NIVELES_TRAFICO, crearTrafico, subirTrafico, pasoTrafico
 })();
 
 // ---- src/logica/ojo.js
-__m[7] = (() => {
+__m[9] = (() => {
 const { clamp } = __m[1]; // src/logica/mates.js
 // El Ojo: rojo = te ven; ámbar = te buscan donde te vieron por última vez; cerrado = libre.
 
 
 const GRACIA = 1.2;           // segundos sin visual antes de pasar a «te buscan»
-const BUSQUEDA = [8, 14, 20]; // duración del anillo de búsqueda según el nivel de alerta
+// Duración del anillo de búsqueda según el nivel de alerta. v8: 10 y 15 s en los niveles 1 y 2 (antes 8 y 14):
+// Alberto, 25/09: «parece que se escapa fácilmente». En los rangos altos, más (carrera.js).
+const BUSQUEDA = [10, 15, 20];
 const LIMITE_FANTASMA = 5;    // si te vieron de cerca menos de esto, el final es FANTASMA
 
-function crearOjo(x, y, h) {
+// rastreo: por cuánto se multiplica la búsqueda (v8: la Metro de los rangos altos te busca más tiempo).
+function crearOjo(x, y, h, rastreo = 1) {
   return {
+    rastreo,
     estado: 'rojo',
     ultima: { x, y, h, v: 0, t: 0 },
     sinVisual: 0,
@@ -2453,7 +2914,7 @@ function pasoOjo(o, visto, jugador, nivel, dt, t, distMin = Infinity) {
     if (o.sinVisual >= GRACIA) {
       o.estado = 'ambar';
       o.busqueda = 0;
-      o.duracion = BUSQUEDA[clamp(nivel, 1, 3) - 1];
+      o.duracion = BUSQUEDA[clamp(nivel, 1, 3) - 1] * (o.rastreo ?? 1);
       ev.push('perdido');
     }
   } else if (o.estado === 'ambar') {
@@ -2484,11 +2945,11 @@ return { GRACIA, BUSQUEDA, LIMITE_FANTASMA, crearOjo, pasoOjo, restante, radioBu
 })();
 
 // ---- src/logica/policia.js
-__m[8] = (() => {
+__m[10] = (() => {
 const { clamp, angDif, rumbo, dist, proyectarSegmento } = __m[1]; // src/logica/mates.js
 const { crearCoche, pasoCoche, agilDe } = __m[3]; // src/logica/coche.js
 const { rondaProyectar, rondaPunto, CARRILES, normS, difS, RAMPAS } = __m[2]; // src/logica/mapa.js
-const { radioBusqueda } = __m[7]; // src/logica/ojo.js
+const { radioBusqueda } = __m[9]; // src/logica/ojo.js
 // La policía de la Metro. Lince: persigue. Lobo: rápido en recta, torpe en curva; hace la maniobra PIT con aviso.
 // Toro: pesado, corta el paso y pone pinchos. Conductas: perseguir, cortar, buscar desde la última posición y cancelar.
 
@@ -2516,8 +2977,9 @@ const EMBESTIDA_TIPO = {
 // Tú conservas algo de ventaja en curva (unos 131 km/h frente a 117 del Lince); el Lobo sigue siendo el torpe en curva.
 const AGIL_POLICIA = { lince: 1.3, toro: 1.3, lobo: 1.15 };
 
-function crearUnidad(tipo, numero, x, y, h, v = 0, rol = 'perseguir') {
-  const coche = crearCoche(tipo, x, y, h, v);
+// modelo: por defecto, el de su tipo; en los rangos altos, uno mejorado (coche.js, modeloMejorado).
+function crearUnidad(tipo, numero, x, y, h, v = 0, rol = 'perseguir', modelo = tipo) {
+  const coche = crearCoche(modelo, x, y, h, v);
   coche.nitro = 0;
   coche.agil = AGIL_POLICIA[tipo] ?? 1;
   return {
@@ -3009,80 +3471,8 @@ function puntoAparicion(mapa, j, azar, zonaJugador, extraVisible, rol = 'persegu
 return { NOMBRES, EMBESTIDA, PIT_ADAPTA, EMBESTIDA_TIPO, crearUnidad, prepararRuta, puntoRuta, pilotar, rutaRonda, pasoUnidad, puntoBusqueda, puntoAparicion };
 })();
 
-// ---- src/logica/botin.js
-__m[9] = (() => {
-
-// Botín en juego: crece con el tiempo, el nivel de alerta y el estilo; se cobra al escapar.
-// El estilo premia la pericia (casi-choques, huecos, derrapes), nunca las infracciones.
-
-const TASA = [5, 9, 14]; // chapas por segundo con el Ojo en rojo, según el nivel
-const FINALES = { FANTASMA: 2, LIMPIO: 1, CLAVE9: 0.5, DETENIDO: 0.25, SINIESTRO: 0.25 };
-
-function crearBotin() {
-  return { enJuego: 0, cadena: 0, mult: 1, tCadena: 0, casiChoques: 0, huecos: 0, derrape: 0, estilo: 0 };
-}
-
-function pasoBotin(b, dt, ojo, nivel) {
-  if (ojo === 'cerrado') return;
-  const tasa = TASA[Math.min(3, Math.max(1, nivel)) - 1] * (ojo === 'rojo' ? 1 : 0.4);
-  b.enJuego += tasa * dt * b.mult;
-  if (b.cadena > 0) {
-    b.tCadena += dt;
-    if (b.tCadena > 8) romperCadena(b);
-  }
-}
-
-// extra: el premio del nivel de tráfico (más tráfico, más vale cada rebase).
-function casiChoque(b, fuerza, extra = 1) {
-  b.cadena++;
-  b.tCadena = 0;
-  b.mult = Math.min(2.5, 1 + 0.08 * b.cadena);
-  const g = Math.round((10 + 10 * fuerza) * b.mult * extra);
-  b.enJuego += g;
-  b.estilo += g;
-  b.casiChoques++;
-  return g;
-}
-
-function hueco(b, extra = 1) {
-  b.cadena += 2;
-  b.tCadena = 0;
-  b.mult = Math.min(2.5, 1 + 0.08 * b.cadena);
-  const g = Math.round(60 * b.mult * extra);
-  b.enJuego += g;
-  b.estilo += g;
-  b.huecos++;
-  return g;
-}
-
-function romperCadena(b) {
-  b.cadena = 0;
-  b.mult = 1;
-  b.tCadena = 0;
-}
-
-function derrape(b, dt, enGlorieta) {
-  const g = 16 * dt * (enGlorieta ? 2 : 1) * b.mult;
-  b.enJuego += g;
-  b.estilo += g;
-  b.derrape += dt;
-  return g;
-}
-
-function premio(b, cantidad) {
-  b.enJuego += cantidad;
-  b.estilo += cantidad;
-  return cantidad;
-}
-
-function cobro(b, final) {
-  return Math.round(b.enJuego * (FINALES[final] ?? 1));
-}
-return { FINALES, crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, premio, cobro };
-})();
-
 // ---- src/logica/radio.js
-__m[10] = (() => {
+__m[11] = (() => {
 
 // La radio de la Metro narra la persecución. Claves ficticias:
 // 7 persecución · 3 pinchos · 5 control · 9 cancelar · 0 detenido.
@@ -3093,6 +3483,23 @@ const LINEAS = {
     ['CENTRAL', 'Central a unidades: Clave 7 en {lugar}. {Coche} {color}. {unidad}, eres principal.'],
     ['CENTRAL', 'Un lector de matrículas ha cantado un {coche} {color} en {lugar}. {unidad}, adelante.'],
     ['CENTRAL', 'Clave 7. {Coche} {color} con orden de busca en {lugar}. {unidad}, lo tienes delante.'],
+  ],
+  // v8: desde el rango 3 la Metro ya te conoce; desde el 7, eres su prioridad.
+  inicioFichado: [
+    ['CENTRAL', 'Central a unidades: Clave 7 en {lugar}. {Coche} {color}. Está fichado: se nos ha escapado otras veces. {unidad}, eres principal.'],
+    ['CENTRAL', 'Clave 7 en {lugar}. Es el {coche} {color} de las otras noches. {unidad}, esta vez no lo pierdas.'],
+  ],
+  inicioBuscado: [
+    ['CENTRAL', 'Central a todas las unidades: el {coche} {color} más buscado de la Metro está en {lugar}. Máxima prioridad.'],
+    ['CENTRAL', 'Clave 7 en {lugar}. Es él: el {color}. Todas las unidades disponibles, hacia allí. {unidad}, eres principal.'],
+  ],
+  interceptor: [
+    ['CENTRAL', 'Se nos escapa. {unidad}, sal a interceptar por {lugar}.'],
+    ['{unidad}', 'Aquí {unidad}, el interceptor. Voy hacia {lugar}: a este lo paro yo.'],
+  ],
+  formula1: [
+    ['{unidad}', 'Central, confirmo: es un Fórmula 1. Sí, un Fórmula 1. No, no es una broma.'],
+    ['{unidad}', 'Central... ¿Un monoplaza por {lugar}? Esto no viene en el manual.'],
   ],
   refuerzo: [
     ['{unidad}', '{unidad} en camino. Llego por {lugar}.'],
@@ -3121,7 +3528,7 @@ const LINEAS = {
     ['CENTRAL', 'Revisad las salidas. Ha podido bajar por cualquiera.'],
     ['{unidad}', 'Voy por la Ronda. Nada de momento.'],
     ['{unidad}', 'Aquí no está. ¿Ha salido o sigue en la Ronda?'],
-    ['CENTRAL', 'Atentos a cualquier compacto {color}.'],
+    ['CENTRAL', 'Atentos a cualquier {coche} {color}.'],
   ],
   // Embestida lateral (25/09).
   embisteAviso: [
@@ -3262,7 +3669,7 @@ const LINEAS = {
 const PRIORIDAD = {
   clave9: 10, libre: 10, fantasma: 9, detenido: 10,
   pinchosAviso: 8, pit: 7, sentido2: 7, sentido1: 6, control: 6, nivel2: 6, nivel3: 6,
-  pinchosCaida: 7, pitHecho: 7, inicio: 9, perdido: 6, visto: 5, relevo: 5, rasante: 5,
+  pinchosCaida: 7, pitHecho: 7, inicio: 9, inicioFichado: 9, inicioBuscado: 9, formula1: 8, interceptor: 7, perdido: 6, visto: 5, relevo: 5, rasante: 5,
   salidaPerfecta: 4, choque: 4, tunel: 4, parking: 4, callejon: 4, salidaRonda: 4, fuga120: 5,
   hueco: 3, refuerzo: 3, busqueda: 2, busquedaRonda: 2, pinchosFallo: 4, pitFallo: 4,
   trafico2: 5, trafico3: 5, trafico4: 6, embisteAviso: 6, embestida: 7, embisteFallo: 4,
@@ -3294,20 +3701,22 @@ return { LINEAS, PRIORIDAD, lineaRadio, cuantasLineas };
 })();
 
 // ---- src/logica/partida.js
-__m[11] = (() => {
+__m[12] = (() => {
 const { crearAzar, subSemilla, semillaNueva } = __m[0]; // src/logica/azar.js
 const { clamp, dist, rumbo, circuloCaja, circuloMuro, circuloCirculo } = __m[1]; // src/logica/mates.js
-const { crearMapa, rondaPunto, rondaProyectar, CARRILES, normS, difS, RAMPAS } = __m[2]; // src/logica/mapa.js
-const { crearCoche, pasoCoche, choqueFijo, choqueEntre, circulosDe, ASISTENCIA } = __m[3]; // src/logica/coche.js
-const { crearAyuda, asistir } = __m[4]; // src/logica/asistencia.js
-const { crearTrafico, pasoTrafico, golpeado, cercaDe, camiones, subirTrafico, soltar, grua } = __m[6]; // src/logica/trafico.js
-const { SUELTO, DANIO_TRAFICO, EXPLOSION, TUMBAR, danioTrafico, danioPatrulla, alcance, empuje, giroGolpe } = __m[5]; // src/logica/choques.js
-const { crearUnidad, pasoUnidad, puntoAparicion, EMBESTIDA, EMBESTIDA_TIPO } = __m[8]; // src/logica/policia.js
-const { crearOjo, pasoOjo, finalDeEscape, LIMITE_FANTASMA } = __m[7]; // src/logica/ojo.js
-const { crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, premio, FINALES } = __m[9]; // src/logica/botin.js
-const { lineaRadio, PRIORIDAD } = __m[10]; // src/logica/radio.js
+const { crearMapa, rondaPunto, rondaProyectar, CARRILES, normS, difS, RAMPAS, TALLER } = __m[2]; // src/logica/mapa.js
+const { crearCoche, pasoCoche, choqueFijo, choqueEntre, circulosDe, ASISTENCIA, modeloMejorado } = __m[3]; // src/logica/coche.js
+const { reglasDelRango, desglose, cochePorId, ALERTA_POTENCIA, modeloConMejoras, codigoMejoras } = __m[5]; // src/logica/carrera.js
+const { crearAyuda, asistir } = __m[6]; // src/logica/asistencia.js
+const { crearTrafico, pasoTrafico, golpeado, cercaDe, camiones, subirTrafico, soltar, grua } = __m[8]; // src/logica/trafico.js
+const { SUELTO, DANIO_TRAFICO, EXPLOSION, TUMBAR, danioTrafico, danioPatrulla, alcance, empuje, giroGolpe } = __m[7]; // src/logica/choques.js
+const { crearUnidad, pasoUnidad, puntoAparicion, EMBESTIDA, EMBESTIDA_TIPO } = __m[10]; // src/logica/policia.js
+const { crearOjo, pasoOjo, finalDeEscape, LIMITE_FANTASMA } = __m[9]; // src/logica/ojo.js
+const { crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, premio } = __m[4]; // src/logica/botin.js
+const { lineaRadio, PRIORIDAD } = __m[11]; // src/logica/radio.js
 // Una partida: une el mapa, tu coche, el tráfico, la policía, el Ojo, el botín y la radio.
 // Sin pantalla ni 3D: avanza a pasos fijos de 1/60 s y deja eventos para la presentación (sonido, vibración, textos).
+
 
 
 
@@ -3339,8 +3748,39 @@ function danioGolpe(fuerza, masaOtro = Infinity, masaJ = 1250) {
 }
 const MODOS = ['verdad', 'practica'];
 
-const NIVEL2 = 35;   // segundos con el Ojo en rojo para subir a nivel 2
+const NIVEL2 = 35;   // segundos con el Ojo en rojo para subir a nivel 2 (en el rango 1; carrera.js los adelanta)
 const NIVEL3 = 80;
+
+// v8: el taller del Puerto (plan v6-v9: «parar 3 s te arregla la mitad, si te atreves a parar»). Una vez por fuga,
+// solo en De verdad y con algo de daño. Mientras esperas, la policía puede alcanzarte (informe 13: reparar sin menús).
+const TALLER_REGLAS = { segundos: 3, arregla: 0.5, minimo: 0.02, parado: 1 };
+
+// v8: cómo llama la radio a cada coche del garaje, y su color.
+const EN_RADIO = {
+  rayo: { coche: 'Golf', color: 'rojo' },
+  ibiza: { coche: 'Seat Ibiza', color: 'blanco' },
+  a5sb: { coche: 'Audi A5', color: 'gris' },
+  bmw330: { coche: 'BMW', color: 'azul' },
+  a5c: { coche: 'Audi A5 Coupé', color: 'negro' },
+  r5: { coche: 'Renault 5 Turbo', color: 'amarillo' },
+  tesla: { coche: 'Tesla', color: 'blanco' },
+  mustang: { coche: 'Mustang', color: 'naranja' },
+  m3: { coche: 'BMW M3', color: 'verde' },
+  m4: { coche: 'BMW M4', color: 'azul' },
+  m5: { coche: 'BMW M5', color: 'gris' },
+  p911: { coche: 'Porsche', color: 'plateado' },
+  db11: { coche: 'Aston Martin', color: 'verde' },
+  countach: { coche: 'Lamborghini', color: 'verde' },
+  f1: { coche: 'Fórmula 1', color: 'rojo' },
+};
+
+// Las patrullas de este rango y este nivel de alerta: un modelo por tipo, compartido por todas las unidades de la partida.
+function modelosPolicia(reglas, nivel) {
+  const potencia = reglas.potencia * ALERTA_POTENCIA[Math.min(3, Math.max(1, nivel)) - 1];
+  const out = {};
+  for (const id of ['lince', 'lobo', 'toro']) out[id] = modeloMejorado(id, { potencia, agarre: reglas.agarre });
+  return out;
+}
 const ALCANCE = { ronda: 150, barrio: 115 };
 
 const mapas = new Map();
@@ -3353,9 +3793,14 @@ function ponerMarcha(c) {
   while (c.marcha < 6 && c.vf > c.m.marchas[c.marcha]) c.marcha++;
 }
 
-// op: { escenario, semilla, modo ('verdad' | 'practica'), trafico (false = sin tráfico, para las pruebas), asistencia, color }
+// op: { escenario, semilla, modo ('verdad' | 'practica'), trafico (false = sin tráfico, para las pruebas), asistencia, color,
+//       rango (1-10, v8: la Metro de tu rango), coche (v8: uno del garaje), mejoras (v10: { motor: 1-3, frenos… }) }
 function crearPartida(op = {}) {
   const escenario = ESCENARIOS[op.escenario] ? op.escenario : 'mixta';
+  const reglas = reglasDelRango(op.rango);
+  const modelos = modelosPolicia(reglas, 1);
+  const tuyo = cochePorId(op.coche) ? op.coche : 'rayo';
+  const modelo = modeloConMejoras(tuyo, op.mejoras); // v10: el taller de mejoras (el de serie si no hay)
   const semilla = op.semilla ?? semillaNueva();
   const mapa = mapaPara(ESCENARIOS[escenario].rampas);
   const azar = {
@@ -3367,14 +3812,14 @@ function crearPartida(op = {}) {
   };
   let jugador, lince, s0 = 0;
   if (escenario === 'barrio') {
-    jugador = crearCoche('rayo', -75, -100, 0, 0);
-    lince = crearUnidad('lince', 1, -75, -150, 0, 8);
+    jugador = crearCoche(modelo, -75, -100, 0, 0);
+    lince = crearUnidad('lince', 1, -75, -150, 0, 8, 'perseguir', modelos.lince);
   } else {
     s0 = escenario === 'autopista' ? 40 : 330;
     const p = rondaPunto(s0, CARRILES[1]);
-    jugador = crearCoche('rayo', p.x, p.y, rumbo(p.tx, p.ty), 27.8);
+    jugador = crearCoche(modelo, p.x, p.y, rumbo(p.tx, p.ty), 27.8);
     const q = rondaPunto(s0 - 55, CARRILES[1]);
-    lince = crearUnidad('lince', 1, q.x, q.y, rumbo(q.tx, q.ty), 27.8);
+    lince = crearUnidad('lince', 1, q.x, q.y, rumbo(q.tx, q.ty), 27.8, 'perseguir', modelos.lince);
     ponerMarcha(jugador);
     ponerMarcha(lince.coche);
   }
@@ -3389,16 +3834,19 @@ function crearPartida(op = {}) {
   const p = {
     escenario, semilla, mapa, azar,
     modo: op.modo === 'practica' ? 'practica' : 'verdad', // práctica: los golpes no dañan y no cuenta para el récord
+    mejoras: codigoMejoras(op.mejoras), // v10: para el registro («M2F1»)
     crucero: 0,
     t: 0, pasos: 0,
     jugador, asistencia, ayuda: crearAyuda(),
-    color: op.color || 'rojo', cocheNombre: 'compacto',
+    color: op.color || EN_RADIO[tuyo].color, cocheNombre: EN_RADIO[tuyo].coche,
+    reglas, rango: reglas.rango, modelosPolicia: modelos,
     trafico, policia: [lince],
-    ojo: crearOjo(jugador.x, jugador.y, jugador.h),
+    ojo: crearOjo(jugador.x, jugador.y, jugador.h, reglas.busqueda),
     botin: crearBotin(),
     nivel: 1, tRojo: 0, riesgo: 0, contra: false, detencion: 0, fuga120: false,
     zona: mapa.zonaEn(jugador.x, jugador.y),
-    programa: [{ t: 10, tipo: 'lince2' }],
+    programa: [{ t: reglas.lince2, tipo: 'lince2' }],
+    taller: { t: 0, usado: false, avisado: false },
     pinchos: [], pinchosT: null,
     radio: { cola: [], espera: 0.6, actual: null, busquedaT: 3 },
     casi: new Map(), ultimoCasi: null, rebufoGap: Infinity, rebufoOn: false, fuga120T: 0, contraAvisos: 0,
@@ -3411,10 +3859,17 @@ function crearPartida(op = {}) {
     stats: {
       nivelMax: 1, casiChoques: 0, huecos: 0, derrapeSeg: 0, velMaxKmh: 0, choques: 0, vecesVisto: 1,
       pinchazos: 0, pits: 0, contraSeg: 0, escondidoSeg: 0, traficoMax: 1, embestidas: 0, embestidasEsquivadas: 0,
-      danioMax: 0, sueltos: 0, cadenas: 0, explosiones: 0, tumbadas: 0,
+      danioMax: 0, sueltos: 0, cadenas: 0, explosiones: 0, tumbadas: 0, taller: 0,
     },
   };
-  decir(p, 'inicio', { unidad: lince.nombre });
+  // Desde el rango 7, la Ronda empieza más cargada.
+  if (reglas.trafico > 1 && !sinTrafico) {
+    subirTrafico(trafico, reglas.trafico, [jugador], azar.reserva);
+    p.traficoNivel = p.stats.traficoMax = reglas.trafico;
+  }
+  // La radio te reconoce desde el rango 3.
+  decir(p, reglas.rango >= 7 ? 'inicioBuscado' : reglas.rango >= 3 ? 'inicioFichado' : 'inicio', { unidad: lince.nombre });
+  if (tuyo === 'f1') decir(p, 'formula1', { unidad: lince.nombre });
   return p;
 }
 
@@ -3433,6 +3888,7 @@ function emitir(p, tipo, datos = {}) {
 function daniar(p, cantidad, causa) {
   const j = p.jugador;
   if (p.modo === 'practica' || !(cantidad > 0) || p.final) return;
+  cantidad *= j.m.aguante; // v8: el Cóndor V8 aguanta más
   const antes = j.danio;
   p.ultimaCausa = causa;
   j.danio = Math.min(1, j.danio + cantidad);
@@ -3487,22 +3943,29 @@ function pasoRadio(p, dt) {
 function choquesMundo(p, c, dt) {
   let golpe = 0, toca = false;
   const fx = Math.sin(c.h), fy = Math.cos(c.h);
+  // v9: dónde toca (el punto del borde del coche contra el obstáculo), para las chispas: el del golpe más fuerte.
+  c.tocaEn = null;
+  const tocar = (r, k) => {
+    const g = choqueFijo(c, r.nx, r.ny, r.pen, fx * k.o, fy * k.o);
+    if (!c.tocaEn || g >= golpe) c.tocaEn = { x: c.x + fx * k.o - r.nx * k.r, y: c.y + fy * k.o - r.ny * k.r, nx: r.nx, ny: r.ny };
+    golpe = Math.max(golpe, g);
+  };
   for (const k of c.circulos) {
     const cx = c.x + fx * k.o, cy = c.y + fy * k.o;
     const cel = p.mapa.cercanos(cx, cy);
     for (const i of cel.cajas) {
       const b = p.mapa.cajas[i];
       const r = circuloCaja(c.x + fx * k.o, c.y + fy * k.o, k.r, b.x0, b.y0, b.x1, b.y1);
-      if (r) golpe = Math.max(golpe, choqueFijo(c, r.nx, r.ny, r.pen, fx * k.o, fy * k.o));
+      if (r) tocar(r, k);
     }
     for (const i of cel.muros) {
       const r = circuloMuro(c.x + fx * k.o, c.y + fy * k.o, k.r, p.mapa.muros[i]);
-      if (r) golpe = Math.max(golpe, choqueFijo(c, r.nx, r.ny, r.pen, fx * k.o, fy * k.o));
+      if (r) tocar(r, k);
     }
     for (const i of cel.circulos) {
       const o = p.mapa.circulos[i];
       const r = circuloCirculo(c.x + fx * k.o, c.y + fy * k.o, k.r, o.x, o.y, o.r);
-      if (r) golpe = Math.max(golpe, choqueFijo(c, r.nx, r.ny, r.pen, fx * k.o, fy * k.o));
+      if (r) tocar(r, k);
     }
   }
   toca = golpe > 0 || c.roceT > 0;
@@ -3518,6 +3981,12 @@ function choquesMundo(p, c, dt) {
     }
   } else c.roceT = Math.max(0, (c.roceT || 0) - dt);
   return toca ? golpe : 0;
+}
+
+// v9: dónde toca tu coche a otro (para las chispas) y si lo va rozando de lado (roce: chispas y chirrido de chapa).
+function tocarCoche(j, o, k) {
+  j.tocaEn = { x: j.x + Math.sin(j.h) * k.oa - k.nx * j.ancho / 2, y: j.y + Math.cos(j.h) * k.oa - k.ny * j.ancho / 2, nx: k.nx, ny: k.ny };
+  if (Math.abs((j.vx - o.vx) * -k.ny + (j.vy - o.vy) * k.nx) > 4) j.roce = true;
 }
 
 // Contacto entre dos coches (círculos a lo largo de cada eje). Normal de b hacia a; oa, ob: dónde tocan, a lo largo del
@@ -3814,7 +4283,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
 
   // 3. Choques.
   const golpeMuro = choquesMundo(p, j, dt);
-  if (golpeMuro > 3) { emitir(p, 'golpe', { fuerza: golpeMuro, con: 'muro' }); p.stats.choques++; }
+  if (golpeMuro > 3) { emitir(p, 'golpe', { fuerza: golpeMuro, con: 'muro', ...(j.tocaEn || {}) }); p.stats.choques++; }
   if (golpeMuro > DANIO.umbral) daniar(p, danioGolpe(golpeMuro, Infinity, j.masa), 'muro');
   for (const u of p.policia) {
     const g = choquesMundo(p, u.coche, dt);
@@ -3825,6 +4294,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     const k = contacto(j, t);
     if (!k) continue;
     const f = choqueEntre(j, t, k.nx, k.ny, k.pen);
+    tocarCoche(j, t, k);
     golpearTrafico(p, t, j, k, f, 'jugador');
     if (f > DANIO.umbral) daniar(p, danioGolpe(f, t.masa, j.masa), t.quemado ? 'restos' : 'trafico');
     const seg = p.casi.get(t.id);
@@ -3832,7 +4302,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     if (f > 1.5) {
       romperCadena(p.botin);
       p.stats.choques++;
-      emitir(p, 'golpe', { fuerza: f, con: 'trafico' });
+      emitir(p, 'golpe', { fuerza: f, con: 'trafico', ...j.tocaEn });
       if (f > 8 && p.ojo.estado === 'rojo') {
         p.riesgo += 0.18;
         decir(p, 'choque');
@@ -3843,7 +4313,8 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     const k = contacto(j, u.coche);
     if (k) {
       const f = choqueEntre(j, u.coche, k.nx, k.ny, k.pen);
-      if (f > 1.5) emitir(p, 'golpe', { fuerza: f, con: 'policia' });
+      tocarCoche(j, u.coche, k);
+      if (f > 1.5) emitir(p, 'golpe', { fuerza: f, con: 'policia', ...j.tocaEn });
       const embiste = u.emb && u.emb.fase === 'ataque';
       if (!embiste && f > DANIO.umbral) daniar(p, danioGolpe(f, u.coche.masa, j.masa), 'policia');
       if (embiste) {
@@ -3924,8 +4395,9 @@ function pasoPartida(p, entrada = {}, dt = DT) {
   const vJ = Math.abs(j.vf);
   p.stats.velMaxKmh = Math.max(p.stats.velMaxKmh, vJ * 3.6);
 
-  // 5. Estilo: casi-choques, huecos, rebufo y derrape.
+  // 5. Estilo: casi-choques, huecos, rebufo y derrape. Y el taller (v8).
   estilo(p, cercanos, dt);
+  pasoTaller(p, dt);
 
   // 6. Te ven: línea de visión de cada unidad.
   deteccion(p, dt);
@@ -4113,7 +4585,7 @@ function alcanceDeteccion(p) {
   } else if (parado) r = base * 0.75;
   else r = base;
   if (p.fuga120) r *= 0.5;
-  return r;
+  return r * j.m.visibilidad; // v8: el Pulga se ve de más cerca; el Cóndor, de más lejos
 }
 
 function deteccion(p, dt) {
@@ -4149,10 +4621,10 @@ function deteccion(p, dt) {
       }
       ve = u.los;
     } else u.los = undefined;
-    // Para volver a verte cuando ya te buscan hace falta mantener la vista 0,3 s.
+    // Para volver a verte cuando ya te buscan hace falta mantener la vista 0,3 s (v8: el Pulga, 0,6 s; el Cóndor, 0,2 s).
     if (ve) u.veT += dt;
     else u.veT = 0;
-    u.ve = ve && (p.ojo.estado === 'rojo' || u.veT >= 0.3);
+    u.ve = ve && (p.ojo.estado === 'rojo' || u.veT >= j.m.fijar);
     if (u.ve) {
       visto = true;
       if (d < distMin) { distMin = d; quien = u; }
@@ -4170,11 +4642,22 @@ function deteccion(p, dt) {
       const lugar = mapa.nombreLugar(p.ojo.ultima.x, p.ojo.ultima.y);
       const trasCamion = u && camionEntre(p, u.coche, j);
       decir(p, trasCamion ? 'relevo' : enRasante(p) ? 'rasante' : 'perdido', { unidad: u ? u.nombre : 'CENTRAL', lugar });
+      interceptar(p);
     } else if (ev === 'libre') {
       emitir(p, 'ojo', { estado: 'cerrado', antes });
       terminar(p, finalDeEscape(p.ojo));
     }
   }
+}
+
+// v8 (Alberto, 25/09: «se escapa fácilmente… no viene un refuerzo más rápido, más potente»): la primera vez que te
+// pierden, Central manda un Lobo a cortarte el paso, si aún no hay ninguno. Una vez por huida.
+function interceptar(p) {
+  if (p.interceptor || p.t < 8 || p.final || p.policia.some((u) => u.tipo === 'lobo')) return;
+  p.interceptor = true;
+  const u = aparecer(p, 'lobo', 1, 'cortar');
+  emitir(p, 'interceptor', { id: u.id, nombre: u.nombre });
+  decir(p, 'interceptor', { unidad: u.nombre, lugar: p.mapa.nombreLugar(p.ojo.ultima.x, p.ojo.ultima.y) });
 }
 
 function camionEntre(p, c, j) {
@@ -4202,7 +4685,7 @@ function aparecer(p, tipo, numero, rol) {
   const j = p.jugador;
   const cam = { camiones: camiones(p.trafico) };
   const a = puntoAparicion(p.mapa, j, p.azar.policia, p.zona, cam, rol);
-  const u = crearUnidad(tipo, siguienteNumero(p, tipo, numero), a.x, a.y, a.h, a.v, rol);
+  const u = crearUnidad(tipo, siguienteNumero(p, tipo, numero), a.x, a.y, a.h, a.v, rol, p.modelosPolicia[tipo]);
   p.usados.add(u.id);
   ponerMarcha(u.coche);
   p.policia.push(u);
@@ -4210,17 +4693,28 @@ function aparecer(p, tipo, numero, rol) {
   return u;
 }
 
+// Al subir el nivel de alerta, todas las patrullas (también las que ya están) aprietan un poco más.
+function mejorarPolicia(p) {
+  p.modelosPolicia = modelosPolicia(p.reglas, p.nivel);
+  for (const u of p.policia) u.coche.m = p.modelosPolicia[u.tipo];
+}
+
 function escalar(p, dt) {
   if (p.ojo.estado === 'rojo') p.tRojo += dt;
-  if (p.nivel === 1 && p.tRojo >= NIVEL2) {
+  // v8: el nivel también sube con lo que dura la huida, no solo con el tiempo a la vista: quien se escapa rápido
+  // también acaba viendo los Lobos y el Toro (rango 1: nivel 2 al minuto y nivel 3 a los 2 minutos).
+  if (p.nivel === 1 && (p.tRojo >= p.reglas.nivel2 || p.t >= p.reglas.nivel2 * 1.7)) {
     p.nivel = 2;
+    mejorarPolicia(p);
     emitir(p, 'nivel', { nivel: 2 });
     decir(p, 'nivel2', {}, true);
     aparecer(p, 'lobo', 2, 'perseguir');
     aparecer(p, 'lobo', 5, 'cortar');
+    if (p.reglas.loboExtra) aparecer(p, 'lobo', 7, 'perseguir'); // desde el rango 6
     if (p.mapa.rampasAbiertas) p.programa.push({ t: p.t + 6, tipo: 'controles' });
-  } else if (p.nivel === 2 && p.tRojo >= NIVEL3) {
+  } else if (p.nivel === 2 && (p.tRojo >= p.reglas.nivel3 || p.t >= p.reglas.nivel3 * 1.5)) {
     p.nivel = 3;
+    mejorarPolicia(p);
     emitir(p, 'nivel', { nivel: 3 });
     decir(p, 'nivel3', {}, true);
     aparecer(p, 'toro', 1, 'cortar');
@@ -4244,7 +4738,7 @@ function escalar(p, dt) {
         if (r.tipo !== 'salida') continue;
         const [bx, by] = r.barrio;
         const x = bx - Math.sign(bx) * 4;
-        const u = crearUnidad('lince', siguienteNumero(p, 'lince', 3), x, by, 0, 0, 'control');
+        const u = crearUnidad('lince', siguienteNumero(p, 'lince', 3), x, by, 0, 0, 'control', p.modelosPolicia.lince);
         p.usados.add(u.id);
         p.policia.push(u);
         emitir(p, 'unidad', { id: u.id, nombre: u.nombre, modelo: 'lince', control: true });
@@ -4350,12 +4844,16 @@ function terminar(p, final) {
   if (p.final) return;
   const j = p.jugador;
   // Se cobra sobre el botín que ve el jugador (redondeado), para que la cuenta cuadre en pantalla.
+  // v8: × el nivel de alerta si escapas y × tu rango (carrera.js).
   const botin = Math.round(p.botin.enJuego);
-  const pago = Math.round(botin * (FINALES[final] ?? 1));
+  const cuenta = desglose(final, botin, p.nivel, p.reglas.pago);
   p.final = {
     final,
-    cobro: pago,
+    cobro: cuenta.total,
     botin,
+    desglose: cuenta,
+    rango: p.rango,
+    coche: j.modelo,
     t: p.t,
     escondido: !j.motor && Math.abs(j.vf) < 0.5,
     quemado: p.ojo.vistoCerca > LIMITE_FANTASMA || final === 'DETENIDO' || final === 'SINIESTRO',
@@ -4398,13 +4896,42 @@ function resumen(p) {
     fuga120: p.fuga120,
     zona: p.zona,
     lugar: p.mapa.nombreLugar(j.x, j.y),
+    taller: p.taller.usado ? -1 : p.taller.t / TALLER_REGLAS.segundos, // v8: -1 usado · 0-1 reparando
   };
 }
-return { DT, ESCENARIOS, DANIO, danioGolpe, MODOS, NIVEL2, NIVEL3, mapaPara, crearPartida, sacarEventos, pasoPartida, cuantizar, entradaDeCinta, TRAFICO_T, premioTrafico, alcanceDeteccion, resumen };
+
+// v8: el taller. Quieto 3 s dentro del recuadro y te quita la mitad del daño.
+function pasoTaller(p, dt) {
+  const j = p.jugador, tl = p.taller, z = TALLER;
+  const dentro = j.x >= z.x0 && j.x <= z.x1 && j.y >= z.y0 && j.y <= z.y1 && Math.abs(j.vf) < TALLER_REGLAS.parado;
+  if (!dentro) {
+    if (tl.t > 0) emitir(p, 'tallerCorta');
+    tl.t = 0;
+    tl.avisado = false;
+    return;
+  }
+  if (tl.usado || p.modo === 'practica' || j.danio < TALLER_REGLAS.minimo) {
+    if (!tl.avisado) emitir(p, 'tallerNo', { motivo: tl.usado ? 'usado' : p.modo === 'practica' ? 'practica' : 'sano' });
+    tl.avisado = true;
+    return;
+  }
+  if (tl.t === 0) emitir(p, 'tallerEmpieza', { segundos: TALLER_REGLAS.segundos });
+  tl.t += dt;
+  if (tl.t >= TALLER_REGLAS.segundos) {
+    const antes = j.danio;
+    j.danio = Math.max(0, j.danio - TALLER_REGLAS.arregla);
+    tl.usado = true;
+    tl.t = 0;
+    tl.avisado = true;
+    p.stats.taller++;
+    emitir(p, 'taller', { antes, despues: j.danio });
+  }
+}
+return { DT, ESCENARIOS, DANIO, danioGolpe, MODOS, NIVEL2, NIVEL3, TALLER_REGLAS, mapaPara, crearPartida, sacarEventos, pasoPartida, cuantizar, entradaDeCinta, TRAFICO_T, premioTrafico, alcanceDeteccion, resumen };
 })();
 
 // ---- src/logica/registro.js
-__m[12] = (() => {
+__m[13] = (() => {
 
 // Registro mínimo por partida (fase 0): escenario, duración, final, capturas, casi-choques, cámara y control,
 // segundos hasta la siguiente partida y los fps que dio el móvil. La presentación lo guarda en el móvil y deja copiarlo.
@@ -4435,6 +4962,10 @@ function registroDe(p, extra = {}) {
     tumbadas: p.stats.tumbadas ?? 0,       // patrullas fuera de combate (v7)
     explosiones: p.stats.explosiones ?? 0,
     causa: f && f.causa ? f.causa : '',    // qué dio el golpe del siniestro (informe 13)
+    coche: p.jugador ? p.jugador.modelo : 'rayo', // v8: con qué coche
+    rango: p.rango ?? 1,                   // v8: tu rango al empezar
+    taller: p.stats.taller ?? 0,           // v8: si pasaste por el taller
+    mejoras: p.mejoras ?? '',              // v10: las piezas mejoradas («M2F1»; vacío, de serie)
   };
 }
 
@@ -4445,7 +4976,7 @@ function anotarSiguiente(lista, ahoraMs) {
   return lista;
 }
 
-const COLUMNAS = ['fecha', 'escenario', 'semilla', 'duracion', 'final', 'capturas', 'casiChoques', 'huecos', 'nivelMax', 'cobro', 'camara', 'control', 'revancha', 'siguienteEn', 'fps', 'fpsPeor', 'trafico', 'modo', 'danio', 'tumbadas', 'explosiones', 'causa'];
+const COLUMNAS = ['fecha', 'escenario', 'semilla', 'duracion', 'final', 'capturas', 'casiChoques', 'huecos', 'nivelMax', 'cobro', 'camara', 'control', 'revancha', 'siguienteEn', 'fps', 'fpsPeor', 'trafico', 'modo', 'danio', 'tumbadas', 'explosiones', 'causa', 'coche', 'rango', 'taller', 'mejoras'];
 
 // Texto para copiar y pegar en un mensaje o una hoja de cálculo (separado por punto y coma).
 function aTexto(lista) {
@@ -4457,7 +4988,7 @@ return { registroDe, anotarSiguiente, aTexto };
 })();
 
 // ---- src/presentacion/geometria.js
-__m[13] = (() => {
+__m[14] = (() => {
 
 // Piezas de geometría hechas a mano: cajas fundidas con color por vértice y texturas pintadas en un lienzo.
 // Mundo → three.js: (x, y) del mapa pasa a (x, altura, -y). Los coches miran hacia -Z; rotation.y = -rumbo.
@@ -4516,6 +5047,30 @@ function texturaMancha(color = '#ffffff') {
   g.fillStyle = r;
   g.fillRect(0, 0, 64, 64);
   return texturaDe(c);
+}
+
+// v8: haz de faro sobre el asfalto. Arriba del lienzo, lo lejano; abajo, el parachoques: estrecho y fuerte junto al
+// coche, se abre y se apaga a lo lejos (Alberto, 25/09: «algún punto de luz para que se pueda ver un poco más»).
+function texturaHaz() {
+  const W = 64, H = 256, c = lienzo(W, H), g = c.getContext('2d');
+  for (let y = 0; y < H; y++) {
+    const d = 1 - y / (H - 1); // 0 en el parachoques, 1 al final del haz
+    const abre = 0.34 + 0.66 * Math.sqrt(d);
+    const fuerza = Math.min(1, d / 0.06) * Math.pow(1 - d, 1.5);
+    const x0 = (W * (1 - abre)) / 2;
+    const gr = g.createLinearGradient(x0, 0, W - x0, 0);
+    gr.addColorStop(0, 'rgba(255,255,255,0)');
+    gr.addColorStop(0.3, `rgba(255,255,255,${(fuerza * 0.8).toFixed(3)})`);
+    gr.addColorStop(0.5, `rgba(255,255,255,${fuerza.toFixed(3)})`);
+    gr.addColorStop(0.7, `rgba(255,255,255,${(fuerza * 0.8).toFixed(3)})`);
+    gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr;
+    g.fillRect(0, y, W, 1);
+  }
+  const t = texturaDe(c);
+  t.userData = t.userData || {};
+  t.userData.compartida = true; // la usan todos los coches: no se libera con ninguno
+  return t;
 }
 
 // Tira que sigue una curva del mapa: puntos [{ x, y, h }] (h: altura del suelo) y dos desplazamientos laterales.
@@ -4589,16 +5144,104 @@ function unir(geos) {
   out.setIndex(idx);
   return out;
 }
-return { fundirCajas, lienzo, texturaDe, texturaMancha, tira, pared, unir };
+return { fundirCajas, lienzo, texturaDe, texturaMancha, texturaHaz, tira, pared, unir };
+})();
+
+// ---- src/presentacion/chapa.js
+__m[15] = (() => {
+
+// v9: la carrocería que se mueve y se abolla (Alberto, 25/09: «cómo se mueven las cosas, los coches… cuando hay un
+// toque con un guardarraíl, con otro coche»). Cuentas puras, sin three.js, para poder probarlas; escena.js las aplica a
+// la malla. Coordenadas del coche como en three.js: x a la derecha, y arriba, z hacia atrás (el morro, en -z).
+
+// Muelles: balanceo y cabeceo a 1,4 Hz con amortiguación 0,45 (deportivo de calle: se asienta sin bailar; balanceo de
+// unos 3,6° por g) y el bote de los golpes, más vivo (2,2 Hz, 0,35). Topes: 7° de balanceo, 4,5° de cabeceo, 12 cm.
+const MUELLES = { w: 9, z: 0.45, wBote: 14, zBote: 0.35, balanceo: 0.12, cabeceo: 0.08, bote: 0.12 };
+// Una abolladura hunde como mucho 30 cm cada punto de la chapa, aunque se sumen muchos golpes.
+const CHAPA = { hundidoMax: 0.3 };
+
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+
+function crearMuelles() {
+  return { r: 0, rv: 0, p: 0, pv: 0, y: 0, yv: 0 };
+}
+
+// Un paso de dt segundos. objR: balanceo al que tiende la carrocería (rad; + sube el lado derecho); objP: cabeceo
+// (rad; + sube el morro). Devuelve la postura acotada { r, p, y }.
+function pasoMuelles(s, objR, objP, dt) {
+  const { w, z, wBote, zBote } = MUELLES;
+  s.rv += ((objR - s.r) * w * w - 2 * z * w * s.rv) * dt;
+  s.r += s.rv * dt;
+  s.pv += ((objP - s.p) * w * w - 2 * z * w * s.pv) * dt;
+  s.p += s.pv * dt;
+  s.yv += (-s.y * wBote * wBote - 2 * zBote * wBote * s.yv) * dt;
+  s.y += s.yv * dt;
+  return {
+    r: clamp(s.r, -MUELLES.balanceo, MUELLES.balanceo),
+    p: clamp(s.p, -MUELLES.cabeceo, MUELLES.cabeceo),
+    y: clamp(s.y, -MUELLES.bote, MUELLES.bote),
+  };
+}
+
+// Un golpe (fuerza 0-1,5): la carrocería salta y se aparta del lado que recibe. lado: -1 (izquierda) a 1 (derecha);
+// frente: -1 (cola) a 1 (morro). Golpe en el morro: el morro se hunde; en la cola, se levanta.
+function patada(s, fuerza, lado = 0, frente = 0) {
+  const f = clamp(fuerza, 0, 1.5);
+  s.yv += 0.6 * f;
+  s.rv += 0.9 * f * clamp(lado, -1, 1);
+  s.pv -= 0.8 * f * clamp(frente, -1, 1);
+}
+
+// Del mundo al coche: el punto (x, y) del mundo visto desde un coche en (cx, cy) con rumbo h. Con cx = cy = 0 gira
+// una dirección.
+function aLocal(cx, cy, h, x, y) {
+  const dx = x - cx, dy = y - cy;
+  return { lx: dx * Math.cos(h) - dy * Math.sin(h), lz: -(dx * Math.sin(h) + dy * Math.cos(h)) };
+}
+
+// Abolla la chapa alrededor de (lx, lz): los puntos a menos de R se hunden en la dirección (ix, iz) y un poco hacia
+// abajo; más cuanto más cerca y más bajos (el techo, apenas). a: posiciones actuales [x, y, z…]; o: las originales;
+// alto: del coche. Todo depende solo de la posición, así que los vértices repetidos de una misma esquina se mueven igual
+// y la malla no se abre. Devuelve cuántos vértices ha movido.
+function abollarVertices(a, o, lx, lz, ix, iz, fuerza, alto) {
+  const f = clamp(fuerza, 0, 1.5);
+  const R = 0.6 + 0.5 * Math.min(1, f), hondo = Math.min(0.25, 0.05 + 0.12 * f), max = CHAPA.hundidoMax;
+  let n = 0;
+  for (let i = 0; i < a.length; i += 3) {
+    const d = Math.hypot(a[i] - lx, a[i + 2] - lz);
+    if (d > R) continue;
+    const k = (1 - d / R) ** 2 * hondo * clamp(1.25 - o[i + 1] / alto, 0.2, 1);
+    a[i] += ix * k;
+    if (o[i + 1] > 0.15) a[i + 1] -= k * 0.3; // lo que toca el suelo (las ruedas) no se hunde en el asfalto
+    a[i + 2] += iz * k;
+    const ex = a[i] - o[i], ey = a[i + 1] - o[i + 1], ez = a[i + 2] - o[i + 2], e = Math.hypot(ex, ey, ez);
+    if (e > max) {
+      a[i] = o[i] + (ex * max) / e;
+      a[i + 1] = o[i + 1] + (ey * max) / e;
+      a[i + 2] = o[i + 2] + (ez * max) / e;
+    }
+    n++;
+  }
+  return n;
+}
+
+// Quita la fracción k de las abolladuras (1: como nueva).
+function enderezarVertices(a, o, k) {
+  const q = clamp(k, 0, 1);
+  for (let i = 0; i < a.length; i++) a[i] += (o[i] - a[i]) * q;
+}
+return { MUELLES, CHAPA, crearMuelles, pasoMuelles, patada, aLocal, abollarVertices, enderezarVertices };
 })();
 
 // ---- src/presentacion/escena.js
-__m[14] = (() => {
-const { LARGO_RONDA, rondaPunto, alturaRonda, alturaEn, CALLES_NS, CALLES_EO, TUNEL, PARKING, CALLEJONES, GLORIETA, RAMPAS, RAMPA_R, RAMPA_MEDIO, BARRIO, CARRILES } = __m[2]; // src/logica/mapa.js
+__m[16] = (() => {
+const { LARGO_RONDA, rondaPunto, alturaRonda, alturaEn, CALLES_NS, CALLES_EO, TUNEL, PARKING, CALLEJONES, GLORIETA, RAMPAS, RAMPA_R, RAMPA_MEDIO, BARRIO, CARRILES, TALLER } = __m[2]; // src/logica/mapa.js
 const { crearAzar } = __m[0]; // src/logica/azar.js
-const { fundirCajas, lienzo, texturaDe, texturaMancha, tira, pared } = __m[13]; // src/presentacion/geometria.js
+const { fundirCajas, lienzo, texturaDe, texturaMancha, texturaHaz, tira, pared } = __m[14]; // src/presentacion/geometria.js
+const { crearMuelles, pasoMuelles, patada, aLocal, abollarVertices, enderezarVertices } = __m[15]; // src/presentacion/chapa.js
 // La ciudad de noche en 3D, con pocas llamadas de dibujo: casi todo va fundido en una geometría o en instancias.
 // Mundo → three.js: (x, y) pasa a (x, altura, -y); los coches miran a -Z y rotation.y = -rumbo.
+
 
 
 
@@ -4609,6 +5252,28 @@ const COLOR_NOCHE = '#0B1122';
 // ------------------------------------------------------------------ modelos de coche (cajas fundidas)
 const GRIS = '#1A1D22', CRISTAL = '#2A3442', RUEDA = '#0E0F11';
 
+// v8: la pintura de cada coche de tu garaje (y de las patrullas): carrocería y franja.
+const PINTURA = {
+  rayo: ['#B3121F', null], ibiza: ['#E4E2DC', null], a5sb: ['#7A7F87', null], bmw330: ['#2F6FD0', null],
+  a5c: ['#202329', null], r5: ['#F2B705', null], tesla: ['#EDEDEA', null], mustang: ['#D35A1B', null],
+  m3: ['#3E6B48', null], m4: ['#2E9BD6', null], m5: ['#3A3D42', null], p911: ['#B9BEC4', null],
+  db11: ['#1F4B35', null], countach: ['#7BC043', null], f1: ['#C8102E', '#F4F4F4'],
+  lince: ['#E8EBEF', '#1C3A7A'], lobo: ['#15171C', '#2456C8'], toro: ['#1C2436', '#D8DDE5'],
+};
+const NEGRO = '#15171C';
+// v8: un único haz de faro para todos los coches (se crea al primer uso).
+let hazTex = null;
+const haz = () => hazTex || (hazTex = texturaHaz());
+
+// Un Fórmula 1: ruedas al aire, más anchas detrás.
+function ruedasF1(largo, ancho) {
+  const out = [];
+  for (const [z, r, w] of [[-largo * 0.31, 0.33, 0.34], [largo * 0.29, 0.36, 0.42]]) {
+    for (const x of [-ancho / 2 + w / 2, ancho / 2 - w / 2]) out.push({ w, h: r * 2, d: r * 2, x, y: r, z, color: RUEDA });
+  }
+  return out;
+}
+
 function ruedas(largo, ancho, r = 0.34) {
   const out = [];
   for (const z of [-largo * 0.32, largo * 0.32]) for (const x of [-ancho / 2 + 0.12, ancho / 2 - 0.12]) {
@@ -4618,10 +5283,78 @@ function ruedas(largo, ancho, r = 0.34) {
 }
 
 // pintura: el color de la carrocería; con instancias se pasa blanco y el color va por instancia.
+// Forma de cada coche: largo, ancho, alto y cabina [largo, desplazamiento hacia atrás], y sus detalles (v8, el garaje):
+// rejilla: bmw (dos riñones), audi (una grande) o aston (ancha) · escapes: 2 o 4 · aleron: golf, lobo, techo, labio,
+// ballena o ala · franjas: dos franjas negras de punta a punta · toma: toma de aire en el capó · aletas: aletas traseras
+// anchas · tomas: tomas de aire en los costados · techo: color del techo (cristal o negro).
+const FORMA = {
+  rayo: { L: 4.2, A: 1.8, alto: 1.42, cab: [2.1, 0.25], aleron: 'golf' },
+  ibiza: { L: 3.85, A: 1.64, alto: 1.42, cab: [2.0, 0.3] },
+  a5sb: { L: 4.76, A: 1.84, alto: 1.39, cab: [2.3, 0.2], rejilla: 'audi', escapes: 2 },
+  a5c: { L: 4.7, A: 1.85, alto: 1.35, cab: [1.95, 0.3], rejilla: 'audi', escapes: 2 },
+  bmw330: { L: 4.71, A: 1.83, alto: 1.43, cab: [2.2, 0.15], rejilla: 'bmw', escapes: 2 },
+  r5: { L: 3.66, A: 1.75, alto: 1.33, cab: [1.75, 0.2], aletas: true, tomas: true, aleron: 'techo' },
+  tesla: { L: 4.69, A: 1.85, alto: 1.44, cab: [2.4, 0.1], techo: CRISTAL },
+  mustang: { L: 4.79, A: 1.92, alto: 1.38, cab: [1.85, 0.55], franjas: true, toma: true, escapes: 4 },
+  m3: { L: 4.79, A: 1.9, alto: 1.43, cab: [2.2, 0.15], rejilla: 'bmw', escapes: 4, aleron: 'labio' },
+  m4: { L: 4.79, A: 1.89, alto: 1.39, cab: [1.9, 0.35], rejilla: 'bmw', escapes: 4, aleron: 'labio', techo: '#1B1D22' },
+  m5: { L: 4.98, A: 1.9, alto: 1.47, cab: [2.35, 0.15], rejilla: 'bmw', escapes: 4 },
+  p911: { L: 4.54, A: 1.9, alto: 1.3, cab: [1.9, 0.45], aleron: 'ballena' },
+  db11: { L: 4.74, A: 1.95, alto: 1.28, cab: [1.8, 0.55], rejilla: 'aston', escapes: 2 },
+  countach: { L: 4.14, A: 2.0, alto: 1.07, cab: [1.7, 0.05], aleron: 'ala', tomas: true },
+  f1: { L: 5.6, A: 2.0 },
+  lince: { L: 4.6, A: 1.86, alto: 1.45, cab: [2.3, 0.1] },
+  lobo: { L: 4.8, A: 1.9, alto: 1.28, cab: [1.9, 0.35], aleron: 'lobo' },
+  toro: { L: 4.9, A: 2.1, alto: 1.8, cab: [2.8, 0.25] },
+  coche: { L: 4.3, A: 1.8, alto: 1.45, cab: [2.2, 0.1] },
+  furgo: { L: 5.4, A: 2.0 },
+  camion: { L: 12, A: 2.5 },
+};
+const altoCoche = (tipo) => (FORMA[tipo] && FORMA[tipo].alto) || 1.42;
+
+// Los detalles de un turismo: rejilla, escapes, alerones, franjas y tomas de aire.
+function detalles(f, partes, pintura) {
+  const { L, A, alto, cab } = f;
+  const baja = alto * 0.48;
+  const cubierta = 0.25 + baja;
+  const frente = -L / 2 - 0.01;
+  if (f.rejilla === 'bmw') for (const s of [-1, 1]) partes.push({ w: 0.24, h: 0.2, d: 0.04, x: s * 0.16, y: 0.25 + baja * 0.62, z: frente, color: NEGRO });
+  if (f.rejilla === 'audi') partes.push({ w: 0.66, h: 0.3, d: 0.04, x: 0, y: 0.25 + baja * 0.5, z: frente, color: NEGRO });
+  if (f.rejilla === 'aston') partes.push({ w: 0.9, h: 0.22, d: 0.04, x: 0, y: 0.25 + baja * 0.42, z: frente, color: GRIS });
+  if (f.escapes) {
+    const xs = f.escapes === 4 ? [-0.72, -0.56, 0.56, 0.72] : [-0.6, 0.6];
+    for (const x of xs) partes.push({ w: 0.11, h: 0.09, d: 0.06, x: (x * A) / 1.9, y: 0.32, z: L / 2 + 0.01, color: NEGRO });
+  }
+  if (f.aleron === 'golf') partes.push({ w: A * 0.9, h: 0.06, d: 0.35, x: 0, y: alto - 0.05, z: L / 2 - 0.2, color: GRIS });
+  if (f.aleron === 'lobo') partes.push({ w: A * 0.95, h: 0.08, d: 0.3, x: 0, y: baja + 0.45, z: L / 2 - 0.15, color: GRIS });
+  if (f.aleron === 'techo') partes.push({ w: A * 0.8, h: 0.05, d: 0.3, x: 0, y: alto + 0.03, z: cab[1] + cab[0] / 2 - 0.1, color: GRIS });
+  if (f.aleron === 'labio') partes.push({ w: A * 0.7, h: 0.04, d: 0.16, x: 0, y: cubierta + 0.02, z: L / 2 - 0.12, color: NEGRO });
+  if (f.aleron === 'ballena') {
+    partes.push({ w: A * 0.78, h: 0.06, d: 0.45, x: 0, y: cubierta + 0.14, z: L / 2 - 0.32, color: pintura });
+    partes.push({ w: A * 0.5, h: 0.12, d: 0.1, x: 0, y: cubierta + 0.06, z: L / 2 - 0.32, color: GRIS });
+  }
+  if (f.aleron === 'ala') {
+    const ala = alto + 0.13;
+    partes.push({ w: A * 0.95, h: 0.06, d: 0.42, x: 0, y: ala + 0.03, z: L / 2 - 0.35, color: pintura });
+    for (const s of [-1, 1]) partes.push({ w: 0.06, h: ala - cubierta, d: 0.12, x: s * 0.55, y: (ala + cubierta) / 2, z: L / 2 - 0.35, color: GRIS });
+  }
+  if (f.aletas) for (const s of [-1, 1]) partes.push({ w: 0.16, h: baja * 0.95, d: 1.15, x: s * (A / 2 + 0.06), y: 0.25 + baja * 0.5, z: L * 0.27, color: pintura });
+  if (f.tomas) for (const s of [-1, 1]) partes.push({ w: 0.03, h: 0.24, d: 0.6, x: s * (A / 2 + 0.01), y: 0.25 + baja * 0.7, z: L * 0.06, color: GRIS });
+  if (f.toma) partes.push({ w: 0.55, h: 0.09, d: 0.7, x: 0, y: cubierta + 0.05, z: -L / 2 + 1.1, color: GRIS });
+  if (f.franjas) {
+    for (const s of [-1, 1]) {
+      partes.push({ w: 0.2, h: 0.02, d: L * 0.34, x: s * 0.2, y: cubierta + 0.01, z: -L * 0.31, color: NEGRO });
+      partes.push({ w: 0.2, h: 0.02, d: cab[0] * 0.9, x: s * 0.2, y: alto + 0.055, z: cab[1], color: NEGRO });
+      partes.push({ w: 0.2, h: 0.02, d: L * 0.16, x: s * 0.2, y: cubierta + 0.01, z: L * 0.41, color: NEGRO });
+    }
+  }
+}
+
+// pintura: el color de la carrocería; con instancias se pasa blanco y el color va por instancia.
 function modeloCoche(tipo, pintura = '#FFFFFF', franja = null) {
   let partes, luces;
-  const L = { rayo: 4.2, lince: 4.6, lobo: 4.8, toro: 4.9, coche: 4.3, furgo: 5.4, camion: 12 }[tipo];
-  const A = { rayo: 1.8, lince: 1.86, lobo: 1.9, toro: 2.1, coche: 1.8, furgo: 2.0, camion: 2.5 }[tipo];
+  const f = FORMA[tipo] || FORMA.coche;
+  const { L, A } = f;
   if (tipo === 'camion') {
     partes = [
       { w: A, h: 2.5, d: 2.3, x: 0, y: 1.6, z: -L / 2 + 1.15, color: pintura },
@@ -4639,19 +5372,36 @@ function modeloCoche(tipo, pintura = '#FFFFFF', franja = null) {
       { w: A - 0.1, h: 0.75, d: 0.6, x: 0, y: 1.75, z: -L / 2 + 1.1, color: CRISTAL, rx: -0.5 },
       ...ruedas(L, A),
     ];
+  } else if (tipo === 'f1') {
+    // v8: monocasco, morro, alerones, pontones, cubierta del motor, halo y casco (Alberto, 25/09: «uno que sea un Fórmula 1»).
+    const fr = franja || pintura;
+    partes = [
+      { w: 0.8, h: 0.42, d: 2.6, x: 0, y: 0.4, z: 0.1, color: pintura },
+      { w: 0.36, h: 0.22, d: 1.5, x: 0, y: 0.34, z: -1.9, color: pintura },
+      { w: 1.9, h: 0.05, d: 0.5, x: 0, y: 0.12, z: -L / 2 + 0.3, color: fr },
+      { w: 0.05, h: 0.22, d: 0.5, x: -0.93, y: 0.2, z: -L / 2 + 0.3, color: NEGRO },
+      { w: 0.05, h: 0.22, d: 0.5, x: 0.93, y: 0.2, z: -L / 2 + 0.3, color: NEGRO },
+      { w: 0.5, h: 0.38, d: 1.5, x: -0.62, y: 0.33, z: 0.45, color: pintura },
+      { w: 0.5, h: 0.38, d: 1.5, x: 0.62, y: 0.33, z: 0.45, color: pintura },
+      { w: 0.46, h: 0.45, d: 1.6, x: 0, y: 0.8, z: 1.0, color: pintura },
+      { w: 1.05, h: 0.07, d: 0.42, x: 0, y: 1.02, z: L / 2 - 0.3, color: fr },
+      { w: 0.05, h: 0.5, d: 0.5, x: -0.52, y: 0.8, z: L / 2 - 0.3, color: NEGRO },
+      { w: 0.05, h: 0.5, d: 0.5, x: 0.52, y: 0.8, z: L / 2 - 0.3, color: NEGRO },
+      { w: 0.66, h: 0.05, d: 0.75, x: 0, y: 0.9, z: -0.35, color: NEGRO },
+      { w: 0.26, h: 0.24, d: 0.3, x: 0, y: 0.78, z: -0.05, color: '#F2C400' },
+      ...ruedasF1(L, A),
+    ];
   } else {
-    const alto = { rayo: 1.42, lince: 1.45, lobo: 1.28, toro: 1.8, coche: 1.45 }[tipo];
+    const { alto, cab } = f;
     const baja = alto * 0.48;
-    const cab = { rayo: [2.1, 0.25], lince: [2.3, 0.1], lobo: [1.9, 0.35], toro: [2.8, 0.25], coche: [2.2, 0.1] }[tipo];
     partes = [
       { w: A, h: baja, d: L, x: 0, y: 0.25 + baja / 2, color: pintura },
       { w: A * 0.86, h: alto - baja - 0.25, d: cab[0], x: 0, y: 0.25 + baja + (alto - baja - 0.25) / 2, z: cab[1], color: CRISTAL },
-      { w: A * 0.84, h: 0.06, d: cab[0] * 0.9, x: 0, y: alto + 0.02, z: cab[1], color: pintura },
+      { w: A * 0.84, h: 0.06, d: cab[0] * 0.9, x: 0, y: alto + 0.02, z: cab[1], color: f.techo || pintura },
       ...ruedas(L, A),
     ];
     if (franja) partes.push({ w: A + 0.02, h: 0.18, d: L * 0.7, x: 0, y: 0.25 + baja * 0.55, z: 0.1, color: franja });
-    if (tipo === 'rayo') partes.push({ w: A * 0.9, h: 0.06, d: 0.35, x: 0, y: alto - 0.05, z: L / 2 - 0.2, color: GRIS });
-    if (tipo === 'lobo') partes.push({ w: A * 0.95, h: 0.08, d: 0.3, x: 0, y: baja + 0.45, z: L / 2 - 0.15, color: GRIS });
+    detalles(f, partes, pintura);
   }
   // Faros delante (-Z) y pilotos detrás (+Z).
   const yL = tipo === 'camion' ? 0.9 : 0.25 + 0.35;
@@ -4661,6 +5411,15 @@ function modeloCoche(tipo, pintura = '#FFFFFF', franja = null) {
     { w: 0.3, h: 0.12, d: 0.05, x: -A / 2 + 0.25, y: yL + 0.08, z: L / 2 + 0.02, color: '#FF2A1A' },
     { w: 0.3, h: 0.12, d: 0.05, x: A / 2 - 0.25, y: yL + 0.08, z: L / 2 + 0.02, color: '#FF2A1A' },
   ];
+  if (tipo === 'f1') {
+    // Sin faros de verdad: dos luces pequeñas en el morro y la luz de lluvia detrás.
+    luces = [
+      { w: 0.12, h: 0.06, d: 0.05, x: -0.1, y: 0.38, z: -2.66, color: '#FFF4D6' },
+      { w: 0.12, h: 0.06, d: 0.05, x: 0.1, y: 0.38, z: -2.66, color: '#FFF4D6' },
+      { w: 0.16, h: 0.08, d: 0.05, x: 0, y: 0.5, z: L / 2 + 0.02, color: '#FF2A1A' },
+      { w: 0.16, h: 0.08, d: 0.05, x: 0, y: 0.62, z: L / 2 + 0.02, color: '#FF2A1A' },
+    ];
+  }
   return { cuerpo: fundirCajas(partes), luces: fundirCajas(luces), largo: L, ancho: A };
 }
 
@@ -4824,10 +5583,22 @@ function crearEscena(mapa, opciones = {}) {
   const escena = new THREE.Scene();
   escena.background = new THREE.Color(COLOR_NOCHE);
   escena.fog = new THREE.Fog(COLOR_NOCHE, 70, calidad < 1 ? 330 : 430);
-  escena.add(new THREE.HemisphereLight('#6D7FAF', '#1A1410', 0.55));
-  const luna = new THREE.DirectionalLight('#9FB2FF', 0.35);
+  // v8: algo más de luz de ambiente y el ajuste «Más luz» (Alberto, 25/09: «aunque sea de noche… que se pueda ver un
+  // poco más»). Sin manchas de luz (gama baja), el ambiente sube un poco más para compensar.
+  const ambiente = new THREE.HemisphereLight('#6D7FAF', '#1A1410', 0.66);
+  escena.add(ambiente);
+  const luna = new THREE.DirectionalLight('#9FB2FF', 0.4);
   luna.position.set(-0.4, 1, 0.3);
   escena.add(luna);
+  const nieblaLejos = escena.fog.far;
+  function ponerLuz(modo) {
+    const clara = modo === 'clara';
+    ambiente.intensity = (clara ? 1.05 : 0.66) + (calidad < 1 ? 0.14 : 0);
+    luna.intensity = clara ? 0.62 : 0.4;
+    escena.fog.near = clara ? 95 : 70;
+    escena.fog.far = clara ? nieblaLejos + 90 : nieblaLejos;
+  }
+  ponerLuz(opciones.luz);
 
   const mat = {
     hormigon: new THREE.MeshLambertMaterial({ color: '#5A5D63' }),
@@ -5021,13 +5792,33 @@ function crearEscena(mapa, opciones = {}) {
     const im = new THREE.InstancedMesh(geo, matMancha, cabezas.length);
     const col = new THREE.Color();
     cabezas.forEach((cb, i) => {
-      const r = cb.color === 'tunel' ? 7 : cb.color === 'blanca' ? 13 : 12;
+      // v8: manchas más grandes y más claras (Alberto, 25/09: «que se pueda ver un poco más»).
+      const r = cb.color === 'tunel' ? 8 : cb.color === 'blanca' ? 16 : 15;
       m4.compose(v3.set(cb.pool[0], cb.pool[2] + 0.06, -cb.pool[1]), q.identity(), esc.set(r, 1, r));
       im.setMatrixAt(i, m4);
-      im.setColorAt(i, col.set(cb.color === 'sodio' ? '#5A3A14' : cb.color === 'tunel' ? '#4A3E2A' : '#2A3448'));
+      im.setColorAt(i, col.set(cb.color === 'sodio' ? '#7A5220' : cb.color === 'tunel' ? '#5E4F36' : '#3C4C6A'));
     });
     im.frustumCulled = false;
     escena.add(im);
+  }
+  // v8: un halo en cada farola, para que se vean como puntos de luz también de lejos (una llamada de dibujo).
+  {
+    const pos = [], col = [];
+    const c = new THREE.Color();
+    for (const cb of cabezas) {
+      pos.push(cb.x, cb.h - 0.1, -cb.y);
+      c.set(cb.color === 'sodio' ? '#FFB561' : cb.color === 'tunel' ? '#FFE9C2' : '#DCE8FF').multiplyScalar(cb.color === 'tunel' ? 0.4 : 0.75);
+      col.push(c.r, c.g, c.b);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    const halos = new THREE.Points(g, new THREE.PointsMaterial({
+      map: texturaMancha('#FFFFFF'), size: calidad < 1 ? 1.8 : 2.4, sizeAttenuation: true, vertexColors: true,
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    }));
+    halos.frustumCulled = false;
+    escena.add(halos);
   }
 
   // Glorieta: isleta con un monumento que se ve desde lejos.
@@ -5060,12 +5851,56 @@ function crearEscena(mapa, opciones = {}) {
     escena.add(im);
   }
 
-  return { escena, mat, texturaMancha };
+  // v8: el taller del Puerto. Portón iluminado en la fachada, rótulo y recuadro verde en el carril donde hay que parar.
+  if (mapa.rampasAbiertas !== undefined) escena.add(crearTaller());
+
+  return { escena, mat, texturaMancha, ponerLuz };
+}
+
+function crearTaller() {
+  const g = new THREE.Group();
+  const T = TALLER;
+  const ancho = T.x1 - T.x0;
+  // Recuadro en el suelo: cuatro líneas verdes que brillan solas.
+  const verde = new THREE.MeshBasicMaterial({ color: '#3DDC84' });
+  const linea = (w, d, x, y) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.02, d), verde);
+    m.position.set(x, 0.04, -y);
+    g.add(m);
+  };
+  const alto = T.y1 - T.y0;
+  linea(ancho, 0.25, T.x, T.y0 + 0.2);
+  linea(ancho, 0.25, T.x, T.y1 - 0.12);
+  linea(0.25, alto, T.x0 + 0.12, (T.y0 + T.y1) / 2);
+  linea(0.25, alto, T.x1 - 0.12, (T.y0 + T.y1) / 2);
+  // Rótulo «TALLER».
+  const c = lienzo(512, 128);
+  const x = c.getContext('2d');
+  x.fillStyle = '#0E1A12';
+  x.fillRect(0, 0, 512, 128);
+  x.strokeStyle = '#3DDC84';
+  x.lineWidth = 8;
+  x.strokeRect(6, 6, 500, 116);
+  x.fillStyle = '#3DDC84';
+  x.font = 'bold 84px sans-serif';
+  x.textAlign = 'center';
+  x.textBaseline = 'middle';
+  x.fillText('TALLER', 256, 68);
+  const rotulo = new THREE.Mesh(new THREE.PlaneGeometry(8, 2), new THREE.MeshBasicMaterial({ map: texturaDe(c) }));
+  rotulo.position.set(T.x, 6.2, -(T.puerta + 0.05));
+  rotulo.rotation.y = Math.PI; // mira a la calle (hacia -y del mundo, +z de three)
+  g.add(rotulo);
+  // Portón abierto con luz dentro.
+  const porton = new THREE.Mesh(new THREE.PlaneGeometry(ancho - 2, 4.2), new THREE.MeshBasicMaterial({ color: '#C9F2D8' }));
+  porton.position.set(T.x, 2.1, -(T.puerta + 0.04));
+  porton.rotation.y = Math.PI;
+  g.add(porton);
+  return g;
 }
 
 // ------------------------------------------------------------------ coches que se mueven
 // Tráfico en instancias: una malla por tipo para la carrocería y otra para los faros.
-function crearTraficoVisual(escena, trafico) {
+function crearTraficoVisual(escena, trafico, opciones = {}) {
   const tipos = {};
   const todos = [...trafico.ronda, ...trafico.exterior, ...trafico.barrio, ...(trafico.reserva || [])]; // la reserva, escondida
   for (const t of ['coche', 'furgo', 'camion']) {
@@ -5080,7 +5915,18 @@ function crearTraficoVisual(escena, trafico) {
     const col = new THREE.Color();
     lista.forEach((v, i) => cuerpo.setColorAt(i, col.set(v.color)));
     escena.add(cuerpo, luces);
-    tipos[t] = { lista, cuerpo, luces, quemados: lista.map(() => false) };
+    // v8: el haz de los faros de cada coche sobre el asfalto (solo en calidad normal: es relleno de pantalla).
+    let haces = null;
+    if (opciones.haces) {
+      const geo = new THREE.PlaneGeometry(t === 'camion' ? 7.5 : 6.5, 22);
+      geo.rotateX(-Math.PI / 2);
+      geo.translate(0, 0.05, -(mod.largo / 2 + 11));
+      haces = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ map: haz(), color: '#4F4838', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }), lista.length);
+      haces.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      haces.frustumCulled = false;
+      escena.add(haces);
+    }
+    tipos[t] = { lista, cuerpo, luces, haces, quemados: lista.map(() => false) };
   }
   const QUEMADO = new THREE.Color('#16120F'), col = new THREE.Color();
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), p = new THREE.Vector3(), uno = new THREE.Vector3(1, 1, 1), eje = new THREE.Vector3(0, 1, 0);
@@ -5102,16 +5948,18 @@ function crearTraficoVisual(escena, trafico) {
             t.cuerpo.setColorAt(i, v.quemado ? QUEMADO : col.set(v.color));
             colores = true;
           }
-          if (v.oculto) { t.cuerpo.setMatrixAt(i, cero); t.luces.setMatrixAt(i, cero); return; }
+          if (v.oculto) { t.cuerpo.setMatrixAt(i, cero); t.luces.setMatrixAt(i, cero); if (t.haces) t.haces.setMatrixAt(i, cero); return; }
           const x = v._px !== undefined ? v._px + (v.x - v._px) * alpha : v.x;
           const y = v._py !== undefined ? v._py + (v.y - v._py) * alpha : v.y;
           q.setFromAxisAngle(eje, -v.h);
           m4.compose(p.set(x, alturaEn(x, y), -y), q, uno);
           t.cuerpo.setMatrixAt(i, m4);
           t.luces.setMatrixAt(i, v.quemado ? cero : m4);
+          if (t.haces) t.haces.setMatrixAt(i, v.quemado ? cero : m4);
         });
         t.cuerpo.instanceMatrix.needsUpdate = true;
         t.luces.instanceMatrix.needsUpdate = true;
+        if (t.haces) t.haces.instanceMatrix.needsUpdate = true;
         if (colores && t.cuerpo.instanceColor) t.cuerpo.instanceColor.needsUpdate = true;
       }
       const encendido = Math.floor(performance.now() / 330) % 2 === 0;
@@ -5149,6 +5997,11 @@ function crearTraficoVisual(escena, trafico) {
         t.luces.geometry.dispose();
         t.cuerpo.material.dispose();
         t.luces.material.dispose();
+        if (t.haces) {
+          escena.remove(t.haces);
+          t.haces.geometry.dispose();
+          t.haces.material.dispose(); // la textura del haz es compartida: no se libera
+        }
       }
     },
   };
@@ -5156,20 +6009,21 @@ function crearTraficoVisual(escena, trafico) {
 
 // Un coche suelto (el tuyo o una patrulla): carrocería, faros y, si es policía, puente de luces y destello en el suelo.
 function crearCocheVisual(escena, tipo, { policia = false, texturaMancha: tm = null } = {}) {
-  const pint = { rayo: ['#B3121F', null], lince: ['#E8EBEF', '#1C3A7A'], lobo: ['#15171C', '#2456C8'], toro: ['#1C2436', '#D8DDE5'] }[tipo];
+  const pint = PINTURA[tipo] || PINTURA.rayo;
   const mod = modeloCoche(tipo, pint[0], pint[1]);
   const g = new THREE.Group();
   const cuerpo = new THREE.Mesh(mod.cuerpo, new THREE.MeshLambertMaterial({ vertexColors: true }));
   const lucesMat = new THREE.MeshBasicMaterial({ vertexColors: true });
   const luces = new THREE.Mesh(mod.luces, lucesMat);
-  g.add(cuerpo, luces);
+  g.add(cuerpo);
+  cuerpo.add(luces); // v9: los faros y el puente de luces van con la carrocería (se inclinan con los muelles)
   const out = { grupo: g, cuerpo, luces, largo: mod.largo, ancho: mod.ancho, azul: null, rojo: null, destello: null, fase: Math.random() * 6 };
-  const alto = { rayo: 1.42, lince: 1.45, lobo: 1.28, toro: 1.8 }[tipo];
+  const alto = altoCoche(tipo);
   if (policia) {
     const barra = (color, x) => {
       const m = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.14, 0.32), new THREE.MeshBasicMaterial({ color }));
       m.position.set(x, alto + 0.12, 0.1);
-      g.add(m);
+      cuerpo.add(m);
       return m;
     };
     out.azul = barra('#2C6BFF', -0.3);
@@ -5182,18 +6036,27 @@ function crearCocheVisual(escena, tipo, { policia = false, texturaMancha: tm = n
       out.destello = d;
     }
   } else if (tm) {
-    // Tus faros sobre el asfalto.
-    const d = new THREE.Mesh(new THREE.PlaneGeometry(9, 22), new THREE.MeshBasicMaterial({ map: tm, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: '#6A6450' }));
+    // Tus faros sobre el asfalto. v8: un haz de verdad, largo y claro (Alberto, 25/09: «que se pueda ver un poco más»).
+    const d = new THREE.Mesh(new THREE.PlaneGeometry(10, 36), new THREE.MeshBasicMaterial({ map: haz(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: '#A49B7E' }));
     d.rotation.x = -Math.PI / 2;
-    d.position.set(0, 0.07, -13);
+    d.position.set(0, 0.07, -(mod.largo / 2 + 18));
     g.add(d);
     out.destello = d;
   }
+  if (policia) {
+    // Las patrullas también alumbran: por el retrovisor se ve la luz que se te acerca.
+    const d = new THREE.Mesh(new THREE.PlaneGeometry(8, 26), new THREE.MeshBasicMaterial({ map: haz(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: '#77735F' }));
+    d.rotation.x = -Math.PI / 2;
+    d.position.set(0, 0.065, -(mod.largo / 2 + 13));
+    g.add(d);
+  }
+  out.tipo = tipo;
+  out.pintura = pint;
   escena.add(g);
   return out;
 }
 
-// Coloca un coche suelto: posición interpolada, cabeceo en la rasante y un poco de balanceo.
+// Coloca un coche suelto: posición interpolada, cabeceo en la rasante y la carrocería sobre sus muelles (v9).
 // luces: el puente de luces encendido (por defecto, si lleva la sirena puesta).
 function colocarCoche(v, c, alpha, t, luces = c.sirena !== false) {
   const x = c._px !== undefined ? c._px + (c.x - c._px) * alpha : c.x;
@@ -5210,8 +6073,16 @@ function colocarCoche(v, c, alpha, t, luces = c.sirena !== false) {
   v.grupo.position.set(x, (h0 + h1) / 2, -y);
   v.grupo.rotation.set(0, -h, 0, 'YXZ');
   v.grupo.rotation.x = Math.atan2(h1 - h0, 3.2);
-  v.cuerpo.rotation.z = clamp(-(c.vl || 0) * 0.012, -0.05, 0.05);
-  v.cuerpo.rotation.x = clamp((c.ax || 0) * 0.0035, -0.03, 0.03);
+  // v9: la carrocería sobre muelles (chapa.js): se inclina hacia fuera en las curvas, hunde el morro al frenar, se
+  // agacha al acelerar y rebota con los golpes (sacudirCoche). Solo se ve: la física no cambia.
+  const s = v.susp || (v.susp = { ...crearMuelles(), t });
+  const dt = clamp(t - s.t, 0, 0.05);
+  s.t = t;
+  const lat = (c.vf || 0) * (c.w || 0); // aceleración hacia dentro de la curva (m/s², + a la derecha)
+  const k = pasoMuelles(s, clamp(lat * 0.0065, -0.075, 0.075) + clamp(-(c.vl || 0) * 0.006, -0.03, 0.03), clamp((c.ax || 0) * 0.0045, -0.05, 0.05), dt);
+  v.cuerpo.rotation.z = k.r;
+  v.cuerpo.rotation.x = k.p;
+  v.cuerpo.position.y = k.y;
   if (v.azul) {
     const on = luces;
     const fase = Math.floor((t * 6 + v.fase)) % 2;
@@ -5227,9 +6098,55 @@ function colocarCoche(v, c, alpha, t, luces = c.sirena !== false) {
 
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 
+// v9: un golpe en (x, y) del mundo hace rebotar la carrocería (fuerza 0-1,5), apartándose del lado que recibe.
+function sacudirCoche(v, c, fuerza, x, y) {
+  if (!v.susp) return;
+  let lado = 0, frente = 0;
+  if (Number.isFinite(x)) {
+    const { lx, lz } = aLocal(c.x, c.y, c.h, x, y);
+    lado = lx / (v.ancho / 2);
+    frente = -lz / (v.largo / 2);
+  }
+  patada(v.susp, fuerza, lado, frente);
+}
+
+// v9: abolladura donde ha tocado el golpe ((x, y) del mundo; (nx, ny): hacia dónde empuja, del obstáculo al coche) en
+// un coche suelto (el tuyo). La chapa y los faros se hunden juntos. enderezar() la quita (taller, otra fuga).
+function abollar(v, c, x, y, fuerza, nx, ny) {
+  const { lx, lz } = aLocal(c.x, c.y, c.h, x, y);
+  let ix, iz;
+  if (Number.isFinite(nx) && Number.isFinite(ny)) ({ lx: ix, lz: iz } = aLocal(0, 0, c.h, nx, ny));
+  else {
+    const d = Math.hypot(lx, lz) || 1;
+    ix = -lx / d;
+    iz = -lz / d;
+  }
+  const alto = altoCoche(v.tipo);
+  for (const m of [v.cuerpo, v.luces]) {
+    const pos = m.geometry.attributes.position;
+    if (!pos) continue;
+    if (!m.userData.origen) m.userData.origen = Float32Array.from(pos.array);
+    if (!abollarVertices(pos.array, m.userData.origen, lx, lz, ix, iz, fuerza, alto)) continue;
+    pos.needsUpdate = true;
+    if (m === v.cuerpo) m.geometry.computeVertexNormals(); // la luz marca el bollo
+  }
+}
+
+// Quita la fracción k de las abolladuras (1: como nuevo).
+function enderezar(v, k = 1) {
+  for (const m of [v.cuerpo, v.luces]) {
+    const o = m.userData.origen;
+    if (!o) continue;
+    const pos = m.geometry.attributes.position;
+    enderezarVertices(pos.array, o, k);
+    pos.needsUpdate = true;
+    if (m === v.cuerpo) m.geometry.computeVertexNormals();
+  }
+}
+
 // Tu coche en la última posición conocida (translúcido): lo que la policía cree que eres.
-function crearFantasma(escena) {
-  const mod = modeloCoche('rayo');
+function crearFantasma(escena, tipo = 'rayo') {
+  const mod = modeloCoche(tipo);
   const m = new THREE.Mesh(mod.cuerpo, new THREE.MeshBasicMaterial({ color: '#FFB020', transparent: true, opacity: 0.28, depthWrite: false }));
   m.visible = false;
   escena.add(m);
@@ -5270,12 +6187,189 @@ function crearPinchosVisual(escena) {
     },
   };
 }
-return { COLOR_NOCHE, modeloCoche, crearEscena, crearTraficoVisual, crearCocheVisual, colocarCoche, crearFantasma, crearPinchosVisual };
+return { COLOR_NOCHE, PINTURA, altoCoche, modeloCoche, crearEscena, crearTraficoVisual, crearCocheVisual, colocarCoche, sacudirCoche, abollar, enderezar, crearFantasma, crearPinchosVisual };
+})();
+
+// ---- src/presentacion/plano.js
+__m[17] = (() => {
+const { alturaEn } = __m[2]; // src/logica/mapa.js
+const { segmentosSeCortan } = __m[1]; // src/logica/mates.js
+// v9: hacia dónde mira el piloto en cabina (Alberto, 25/09: «va donde hay movimiento, ahí se va») y desde dónde se ve
+// un choque fuerte. Cuentas puras, sin three.js. Mundo: x al este, y al norte, rumbo h desde el norte hacia el este.
+
+
+
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+
+// Ángulo (rad, + a la derecha de tu morro) hacia lo que se mueve cerca: el coche que adelantas o la patrulla que se te
+// pega (pesa más, aunque vaya a tu paso). Solo lo que va a los lados, de 2 m por detrás a 22 m por delante (el de tu
+// carril ya lo ves y lo de atrás sale en el retrovisor). Devuelve un 45 % del ángulo: la cabeza se gira, no se da la
+// vuelta. 0 si no hay nada que mirar.
+function foco(j, patrullas, ...listas) {
+  const fx = Math.sin(j.h), fy = Math.cos(j.h), rx = fy, ry = -fx;
+  let mejor = 0, peso = 0;
+  const mirar = (c, extra) => {
+    if (c.oculto || c.quemado) return;
+    const dx = c.x - j.x, dy = c.y - j.y;
+    const lon = dx * fx + dy * fy, lat = dx * rx + dy * ry;
+    if (lon < -2 || lon > 22 || Math.abs(lat) < 1.2 || Math.abs(lat) > 9) return;
+    const rel = Math.abs((j.vx - c.vx) * fx + (j.vy - c.vy) * fy); // lo rápido que pasa a tu lado
+    const w = (extra + Math.min(1, rel / 8)) / (1 + Math.hypot(lon, lat) / 6);
+    if (w > peso) {
+      peso = w;
+      mejor = Math.atan2(lat, Math.max(lon, 1.5));
+    }
+  };
+  for (const c of patrullas) mirar(c, 1);
+  for (const lista of listas) for (const c of lista) mirar(c, 0);
+  return peso > 0.25 ? mejor * 0.45 : 0;
+}
+
+// Desde dónde se ve un choque fuerte: un punto de la calzada a un lado de la trayectoria y algo por delante (el coche
+// llega hacia la cámara), fuera de edificios y obstáculos, sin muros ni vallas en medio y viendo el coche. Si no vale,
+// prueba el otro lado, más cerca y por detrás. null si no hay sitio. lado: 1 prueba primero la derecha; -1, la izquierda.
+function sitioPlano(mapa, j, lado = Math.random() < 0.5 ? -1 : 1) {
+  const v = Math.hypot(j.vx, j.vy);
+  const dx = v > 1 ? j.vx / v : Math.sin(j.h), dy = v > 1 ? j.vy / v : Math.cos(j.h);
+  const ade = clamp(v * 0.3, 4, 9);
+  for (const [a, l] of [[ade, 3.5], [ade, -3.5], [ade * 0.5, 5], [ade * 0.5, -5], [-6, 2.5], [-6, -2.5]]) {
+    const x = j.x + dx * a + dy * l * lado, y = j.y + dy * a - dx * l * lado;
+    if (libre(mapa, x, y) && despejado(mapa, x, y, j.x, j.y)) {
+      return { x, y, z: Math.max(alturaEn(x, y), alturaEn(j.x, j.y)) + 1.1 };
+    }
+  }
+  return null;
+}
+
+// Las celdas del mapa (de 16 m) que toca un rectángulo de menos de 16 m de lado: las de sus cuatro esquinas.
+function celdas(mapa, x0, y0, x1, y1) {
+  const out = new Set();
+  for (const [x, y] of [[x0, y0], [x1, y0], [x0, y1], [x1, y1]]) out.add(mapa.cercanos(x, y));
+  return out;
+}
+
+// A más de 80 cm de cualquier caja (edificios, tapias) y de los obstáculos redondos.
+function libre(mapa, x, y) {
+  const m = 0.8;
+  for (const celda of celdas(mapa, x - m, y - m, x + m, y + m)) {
+    for (const i of celda.cajas) {
+      const b = mapa.cajas[i];
+      if (x > b.x0 - m && x < b.x1 + m && y > b.y0 - m && y < b.y1 + m) return false;
+    }
+    for (const i of celda.circulos) {
+      const c = mapa.circulos[i];
+      if (Math.hypot(x - c.x, y - c.y) < c.r + m) return false;
+    }
+  }
+  return true;
+}
+
+// Ni edificios ni la rasante (mapa.visible), ni muros o guardarraíles entre la cámara y el coche: la cámara no sale al
+// otro lado de la valla.
+function despejado(mapa, x, y, jx, jy) {
+  if (!mapa.visible(x, y, jx, jy)) return false;
+  for (const celda of celdas(mapa, Math.min(x, jx), Math.min(y, jy), Math.max(x, jx), Math.max(y, jy))) {
+    for (const i of celda.muros) {
+      const w = mapa.muros[i];
+      if (segmentosSeCortan(x, y, jx, jy, w.ax, w.ay, w.bx, w.by)) return false;
+    }
+  }
+  return true;
+}
+return { foco, sitioPlano };
+})();
+
+// ---- src/presentacion/marcas.js
+__m[18] = (() => {
+const { alturaEn } = __m[2]; // src/logica/mapa.js
+// v9: marcas de neumático en el asfalto (Alberto, 25/09: «las dinámicas… cómo se mueven los coches, los neumáticos»).
+// Un búfer circular de tramos para todos los coches: una sola llamada de dibujo. Cada rueda trasera deja un tramo cada
+// 0,35 m mientras patina, más oscuro cuanto más patina; cuando se llena, los tramos más viejos se reutilizan
+// (unos 250 m de marcas en total). Mundo → three.js como en escena.js: (x, y) pasa a (x, altura, -y).
+
+
+const THREE = globalThis.THREE;
+const MARCAS = { max: 720, paso: 0.35, ancho: 0.26, salto: 3, minimo: 0.18, alto: 0.045 };
+
+// Los seis vértices (dos triángulos) de un tramo de a a b, de «ancho» m. Devuelve [x, y, z] × 6 en three.js.
+function tramo(ax, ay, ha, bx, by, hb, ancho = MARCAS.ancho) {
+  const d = Math.hypot(bx - ax, by - ay) || 1e-6;
+  const nx = (-(by - ay) / d) * (ancho / 2), ny = ((bx - ax) / d) * (ancho / 2);
+  return [
+    ax + nx, ha, -(ay + ny), ax - nx, ha, -(ay - ny), bx + nx, hb, -(by + ny),
+    ax - nx, ha, -(ay - ny), bx - nx, hb, -(by - ny), bx + nx, hb, -(by + ny),
+  ];
+}
+
+function crearMarcas(escena) {
+  const { max } = MARCAS;
+  const pos = new Float32Array(max * 18), col = new Float32Array(max * 18);
+  const geo = new THREE.BufferGeometry();
+  const aPos = new THREE.BufferAttribute(pos, 3), aCol = new THREE.BufferAttribute(col, 3);
+  aPos.setUsage(THREE.DynamicDrawUsage);
+  aCol.setUsage(THREE.DynamicDrawUsage);
+  geo.setAttribute('position', aPos);
+  geo.setAttribute('color', aCol);
+  geo.setDrawRange(0, 0);
+  const malla = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+    vertexColors: true, transparent: true, opacity: 0.6, depthWrite: false, side: THREE.DoubleSide,
+    polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+  }));
+  malla.frustumCulled = false;
+  escena.add(malla);
+  let n = 0, usados = 0, desde = -1, hasta = -1;
+  const ultimo = new Map(); // llave de cada rueda → último punto marcado
+
+  return {
+    // Una rueda (llave única) en (x, y) del mundo que patina «fuerza» (0-1). Por debajo del mínimo deja de marcar.
+    anotar(llave, x, y, fuerza) {
+      const u = ultimo.get(llave);
+      if (!(fuerza >= MARCAS.minimo)) { if (u) ultimo.delete(llave); return; }
+      if (!u) { ultimo.set(llave, { x, y }); return; }
+      const d = Math.hypot(x - u.x, y - u.y);
+      if (d < MARCAS.paso) return;
+      if (d > MARCAS.salto) { u.x = x; u.y = y; return; } // un salto (la grúa, otra partida): no se une
+      const v = tramo(u.x, u.y, alturaEn(u.x, u.y) + MARCAS.alto, x, y, alturaEn(x, y) + MARCAS.alto);
+      pos.set(v, n * 18);
+      const c = 0.13 - 0.11 * Math.min(1, fuerza);
+      for (let i = 0; i < 6; i++) { col[n * 18 + i * 3] = c; col[n * 18 + i * 3 + 1] = c; col[n * 18 + i * 3 + 2] = c * 1.05; }
+      desde = desde < 0 ? n : Math.min(desde, n);
+      hasta = Math.max(hasta, n);
+      n = (n + 1) % max;
+      usados = Math.min(max, usados + 1);
+      u.x = x;
+      u.y = y;
+    },
+    // Sube a la tarjeta solo lo que ha cambiado en este fotograma.
+    actualizar() {
+      if (desde < 0) return;
+      for (const a of [aPos, aCol]) {
+        a.updateRange.offset = desde * 18;
+        a.updateRange.count = (hasta - desde + 1) * 18;
+        a.needsUpdate = true;
+      }
+      geo.setDrawRange(0, usados * 6);
+      desde = hasta = -1;
+    },
+    vaciar() {
+      n = usados = 0;
+      desde = hasta = -1;
+      ultimo.clear();
+      geo.setDrawRange(0, 0);
+    },
+    destruir() {
+      escena.remove(malla);
+      geo.dispose();
+      malla.material.dispose();
+    },
+  };
+}
+return { MARCAS, tramo, crearMarcas };
 })();
 
 // ---- src/presentacion/efectos.js
-__m[15] = (() => {
-const { texturaMancha } = __m[13]; // src/presentacion/geometria.js
+__m[19] = (() => {
+const { texturaMancha } = __m[14]; // src/presentacion/geometria.js
 const { alturaEn } = __m[2]; // src/logica/mapa.js
 // Fuego, humo y explosiones (v7; Alberto, 25/09: «que si te chocas reaccionen y se choquen, o incluso que haya una explosión»).
 // Partículas baratas para un móvil modesto: dos InstancedMesh de cuadrados que miran a la cámara, el fuego sumando luz y el
@@ -5287,7 +6381,7 @@ const { alturaEn } = __m[2]; // src/logica/mapa.js
 
 
 const THREE = globalThis.THREE;
-const MAX_FUEGO = 160, MAX_HUMO = 120;
+const MAX_FUEGO = 260, MAX_HUMO = 200; // v9: sitio para chispas, humo de ruedas, llamaradas y restos
 const NIEBLA = [0.043, 0.067, 0.133]; // el color de la niebla de la noche: el humo se deshace en ella
 
 const mezcla = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
@@ -5380,6 +6474,65 @@ function crearEfectos(escena) {
         });
       }
     },
+    // v9: chispas de un golpe o de un roce contra el muro u otro coche: puntos que salen con parte de la velocidad del
+    // coche, caen y rebotan en el asfalto. (x, y): el punto del mundo; (vx, vy): la velocidad del coche.
+    chispas(x, y, vx, vy, n = 6, alto = 0.45) {
+      const h = alturaEn(x, y);
+      for (let i = 0; i < n; i++) {
+        const k = azar(0.3, 0.85);
+        meter(pf, MAX_FUEGO, {
+          x, y: h + alto * azar(0.5, 1.2), z: -y, vx: vx * k + azar(-2.5, 2.5), vy: azar(0.8, 3.5), vz: -vy * k + azar(-2.5, 2.5),
+          vida: 0, dur: azar(0.25, 0.55), s0: azar(0.16, 0.28), s1: 0.05, c0: [1, 0.95, 0.75], c1: [1, 0.4, 0.08],
+          sube: -9.8, roce: 0.6, suelo: h + 0.03,
+        });
+      }
+    },
+    // Chorro de chispas mientras dura el roce: más cuanto más rápido vas (llave: de quién es).
+    roce(llave, x, y, vx, vy, dt) {
+      const v = Math.hypot(vx, vy);
+      const n = cuantas('c' + llave, Math.min(90, v * 2.5), dt);
+      if (n > 0) this.chispas(x, y, vx, vy, n);
+    },
+    // v9: humo de las ruedas (derrape, frenada o salida quemando rueda): blanco, bajo y que se abre.
+    humoRueda(llave, x, y, densidad, dt) {
+      const h = alturaEn(x, y);
+      for (let n = cuantas('r' + llave, 22 * densidad, dt); n > 0; n--) {
+        meter(ph, MAX_HUMO, {
+          x: x + azar(-0.2, 0.2), y: h + 0.3, z: -y + azar(-0.2, 0.2), vx: azar(-0.8, 0.8), vy: azar(0.3, 0.9), vz: azar(-0.8, 0.8),
+          vida: 0, dur: azar(0.9, 1.6), s0: azar(0.6, 0.9), s1: azar(2.8, 4.2), c0: [0.62, 0.62, 0.66], c1: NIEBLA, sube: 0.15, roce: 1.4,
+        });
+      }
+    },
+    // v9: llamarada del escape: una lengua corta hacia atrás. (x, y): la salida; (dx, dy): hacia atrás del coche.
+    llamarada(x, y, dx, dy, vx, vy, alto = 0.35) {
+      const h = alturaEn(x, y);
+      for (let i = 0; i < 4; i++) {
+        const v = azar(3, 7);
+        meter(pf, MAX_FUEGO, {
+          x: x + azar(-0.05, 0.05), y: h + alto, z: -y + azar(-0.05, 0.05), vx: vx + dx * v, vy: azar(-0.2, 0.3), vz: -(vy + dy * v),
+          vida: 0, dur: azar(0.07, 0.15), s0: azar(0.35, 0.5), s1: azar(0.6, 0.9), c0: [1, 0.9, 0.6], c1: [1, 0.35, 0.05], sube: 0, roce: 3,
+        });
+      }
+    },
+    // v9: restos de un golpe fuerte: trozos oscuros que saltan y rebotan, y cristales que brillan un momento.
+    restos(x, y, vx, vy, fuerza = 1) {
+      const f = Math.max(0.3, Math.min(1.5, fuerza));
+      const h = alturaEn(x, y), n = Math.round(4 + 6 * f);
+      for (let i = 0; i < n; i++) {
+        const k = azar(0.2, 0.8), a = azar(0, Math.PI * 2), s = azar(1, 4) * f;
+        meter(ph, MAX_HUMO, {
+          x, y: h + azar(0.3, 0.8), z: -y, vx: vx * k + Math.cos(a) * s, vy: azar(2, 5) * f, vz: -vy * k + Math.sin(a) * s,
+          vida: 0, dur: azar(1.2, 2.2), s0: azar(0.14, 0.3), s1: azar(0.12, 0.25), c0: [0.06, 0.06, 0.07], c1: [0.06, 0.06, 0.07],
+          sube: -9.8, roce: 0.3, suelo: h + 0.05,
+        });
+        const b = azar(0, Math.PI * 2), sv = azar(1.5, 5) * f;
+        meter(pf, MAX_FUEGO, {
+          x, y: h + azar(0.6, 1.1), z: -y, vx: vx * k + Math.cos(b) * sv, vy: azar(1.5, 4), vz: -vy * k + Math.sin(b) * sv,
+          vida: 0, dur: azar(0.6, 1.2), s0: azar(0.08, 0.14), s1: 0.06, c0: [0.75, 0.88, 1], c1: [0.35, 0.45, 0.6],
+          sube: -9.8, roce: 0.3, suelo: h + 0.04,
+        });
+      }
+    },
     actualizar(dt, camara) {
       for (const [lista, malla] of [[pf, fuego], [ph, humo]]) {
         for (let i = lista.length - 1; i >= 0; i--) {
@@ -5397,6 +6550,12 @@ function crearEfectos(escena) {
           p.x += p.vx * dt;
           p.y += p.vy * dt;
           p.z += p.vz * dt;
+          if (p.suelo !== undefined && p.y < p.suelo) { // v9: chispas y restos rebotan en el asfalto
+            p.y = p.suelo;
+            p.vy = Math.abs(p.vy) * 0.3;
+            p.vx *= 0.6;
+            p.vz *= 0.6;
+          }
           const s = p.s0 + (p.s1 - p.s0) * k;
           m4.compose(pos.set(p.x, p.y, p.z), camara.quaternion, esc.set(s, s, 1));
           malla.setMatrixAt(n, m4);
@@ -5438,15 +6597,19 @@ return { crearEfectos };
 })();
 
 // ---- src/presentacion/camaras.js
-__m[16] = (() => {
+__m[20] = (() => {
 
 // Tres cámaras: persecución (por defecto), capó y cabina. Horizonte estable: la cámara nunca se inclina de lado.
 // Sensación de velocidad: muelle que se queda atrás al acelerar, campo de visión que se abre y mirar atrás 150°.
+// v8: cabina propia del Fórmula 1, capó del color de tu coche y retrovisor. Alberto, 25/09: la vista de fuera «es más
+// cómoda para rebasar», pero «desde dentro es la experiencia»; el espejo enseña desde dentro lo que viene por detrás.
 const THREE = globalThis.THREE;
 
 const MODOS = ['persecucion', 'capo', 'cabina'];
 const NOMBRE_MODO = { persecucion: 'Persecución', capo: 'Capó', cabina: 'Cabina' };
 const HFOV = { persecucion: 68, capo: 74, cabina: 85 };
+// El retrovisor: una imagen pequeña que se repinta uno de cada tres fotogramas (unas 20 veces por segundo).
+const ESPEJO = { ancho: 288, alto: 80, cada: 3, w: 0.3, h: 0.085 };
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 function angLerp(a, b, t) {
@@ -5456,62 +6619,76 @@ function angLerp(a, b, t) {
   return a + d * t;
 }
 
-// La cabina: capó visto por el parabrisas, salpicadero, volante con guantes, montantes y techo. Va dentro de tu coche.
-// Sin personas visibles: solo los guantes sobre el aro (límite del prompt).
-function crearCabina() {
+// Material de la cabina: se tiñe de azul y rojo cuando la policía está cerca.
+const mate = (color) => new THREE.MeshLambertMaterial({ color, emissive: '#000000' });
+
+// v9: la tira de luz del salpicadero, del color de cada marca (los BMW de los vídeos del 25/09, en azul).
+const LED = {
+  rayo: '#FF2A3A', ibiza: '#FF8A2A', a5sb: '#FF3040', a5c: '#FF3040', r5: '#FFD020', bmw330: '#2F7BFF', m3: '#2F7BFF',
+  m4: '#2F7BFF', m5: '#2F7BFF', tesla: '#E8F0FF', mustang: '#FF5A1A', p911: '#FFB020', db11: '#E8E2D0', countach: '#7CFF4A',
+};
+
+// v9: la pantalla central encendida con los modos de conducción (como la del BMW del vídeo del 25/09).
+function texPantalla() {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 104;
+  const g = c.getContext('2d');
+  const fondo = g.createLinearGradient(0, 0, 256, 0);
+  fondo.addColorStop(0, '#0A1430');
+  fondo.addColorStop(1, '#10204A');
+  g.fillStyle = fondo;
+  g.fillRect(0, 0, 256, 104);
+  g.font = '11px "Overpass Mono", monospace';
+  const filas = [['MOTOR', 'SPORT PLUS'], ['CHASIS', 'SPORT'], ['DIRECCIÓN', 'CONFORT'], ['FRENO', 'SPORT'], ['TRACCIÓN', 'SPORT']];
+  filas.forEach(([a, b], i) => {
+    g.fillStyle = '#9FC2FF';
+    g.fillText(a, 12, 20 + i * 18);
+    g.fillStyle = i % 2 ? '#FFFFFF' : '#FF4A5A';
+    g.fillText(b, 104, 20 + i * 18);
+  });
+  const barra = g.createLinearGradient(196, 0, 244, 0);
+  barra.addColorStop(0, '#1E6BFF');
+  barra.addColorStop(1, '#7FE3FF');
+  g.fillStyle = barra;
+  g.beginPath();
+  g.moveTo(222, 8);
+  g.lineTo(246, 8);
+  g.lineTo(214, 96);
+  g.lineTo(190, 96);
+  g.fill();
+  const tex = new THREE.CanvasTexture(c);
+  tex.userData = tex.userData || {}; // en three.js r128 las texturas no traen userData
+  tex.userData.compartida = true; // al cambiar de coche no se libera: la cabina es siempre la misma
+  return tex;
+}
+
+// El retrovisor: un marco y la imagen de la cámara de atrás, cambiada de lado como en un espejo.
+function crearEspejo(tex) {
   const g = new THREE.Group();
-  const oscuro = new THREE.MeshLambertMaterial({ color: '#16181C', emissive: '#000000' });
-  const medio = new THREE.MeshLambertMaterial({ color: '#23262C', emissive: '#000000' });
-  const guante = new THREE.MeshLambertMaterial({ color: '#3A332C', emissive: '#000000' });
-  const capo = new THREE.MeshLambertMaterial({ color: '#7A0C16', emissive: '#000000' });
-  const caja = (w, h, d, x, y, z, m, rx = 0, rz = 0) => {
-    const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
-    b.position.set(x, y, z);
-    b.rotation.set(rx, 0, rz);
-    g.add(b);
-    return b;
-  };
-  caja(1.6, 0.06, 1.35, 0, 0.9, -1.72, capo, 0.06);          // capó: la referencia de la carretera que pasa
-  caja(1.72, 0.3, 0.6, 0, 0.8, -0.9, medio);                  // salpicadero
-  caja(0.44, 0.12, 0.2, -0.37, 0.99, -0.74, oscuro, -0.3);    // visera del cuadro
-  caja(0.06, 0.85, 0.06, -0.8, 1.28, -0.82, oscuro, 0.62, 0.12); // montantes
-  caja(0.06, 0.85, 0.06, 0.8, 1.28, -0.82, oscuro, 0.62, -0.12);
-  caja(1.7, 0.06, 0.6, 0, 1.5, -0.45, oscuro);                // techo
-  // Velocímetro en el salpicadero: un lienzo pequeño que se repinta 10 veces por segundo.
+  const marco = new THREE.Mesh(new THREE.BoxGeometry(ESPEJO.w + 0.03, ESPEJO.h + 0.03, 0.03), mate('#101215'));
+  marco.position.z = -0.018;
+  const geo = new THREE.PlaneGeometry(ESPEJO.w, ESPEJO.h);
+  const uv = geo.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setX(i, 1 - uv.getX(i));
+  const cristal = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, fog: false }));
+  g.add(marco, cristal);
+  return { grupo: g, marco: marco.material };
+}
+
+// Velocímetro: un lienzo pequeño que se repinta 10 veces por segundo.
+function crearVelo(w, h) {
   const lz = document.createElement('canvas');
   lz.width = 128;
   lz.height = 64;
   const tex = new THREE.CanvasTexture(lz);
-  const velo = new THREE.Mesh(new THREE.PlaneGeometry(0.26, 0.13), new THREE.MeshBasicMaterial({ map: tex }));
-  velo.position.set(-0.37, 0.99, -0.72);
-  velo.rotation.x = -0.3;
-  g.add(velo);
-  // Volante (gira como el móvil) con los dos guantes sobre el aro.
-  const volante = new THREE.Group();
-  volante.position.set(-0.37, 0.93, -0.52);
-  const aro = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.022, 6, 20), oscuro);
-  const radio = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.03, 0.02), oscuro);
-  const centro = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.07, 0.03), medio);
-  volante.add(aro, radio, centro);
-  for (const x of [-0.17, 0.17]) {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.1, 0.07), guante);
-    m.position.set(x, 0.01, 0.02);
-    volante.add(m);
-  }
-  const eje = new THREE.Group(); // inclinación de la columna: el volante gira sobre su propio eje
-  eje.rotation.x = -0.35;
-  eje.position.copy(volante.position);
-  volante.position.set(0, 0, 0);
-  eje.add(volante);
-  g.add(eje);
-  let ultimoPintado = -1;
+  const malla = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex }));
+  let ultimo = -1;
   return {
-    grupo: g,
-    volante,
-    materiales: [oscuro, medio, guante],
+    malla,
     pintar(kmh, marcha, t) {
-      if (t - ultimoPintado < 0.1) return;
-      ultimoPintado = t;
+      if (t >= ultimo && t - ultimo < 0.1) return;
+      ultimo = t;
       const c = lz.getContext('2d');
       c.fillStyle = '#05070A';
       c.fillRect(0, 0, 128, 64);
@@ -5529,19 +6706,139 @@ function crearCabina() {
   };
 }
 
+function cajero(g) {
+  return (w, h, d, x, y, z, m, rx = 0, rz = 0) => {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+    b.position.set(x, y, z);
+    b.rotation.set(rx, 0, rz);
+    g.add(b);
+    return b;
+  };
+}
+
+// La cabina de un turismo: capó (del color de tu coche) por el parabrisas, salpicadero, volante con guantes, montantes,
+// techo y retrovisor. Va dentro de tu coche. Sin personas visibles: solo los guantes sobre el aro (límite del prompt).
+function crearCabina(texEspejo) {
+  const g = new THREE.Group();
+  const oscuro = mate('#16181C'), medio = mate('#23262C'), guante = mate('#3A332C'), capo = mate('#7A0C16');
+  const caja = cajero(g);
+  caja(1.6, 0.06, 1.35, 0, 0.9, -1.72, capo, 0.06);          // capó: la referencia de la carretera que pasa
+  caja(1.72, 0.3, 0.6, 0, 0.8, -0.9, medio);                  // salpicadero
+  caja(0.44, 0.12, 0.2, -0.37, 0.99, -0.74, oscuro, -0.3);    // visera del cuadro
+  caja(0.06, 0.85, 0.06, -0.8, 1.28, -0.82, oscuro, 0.62, 0.12); // montantes
+  caja(0.06, 0.85, 0.06, 0.8, 1.28, -0.82, oscuro, 0.62, -0.12);
+  caja(1.7, 0.06, 0.6, 0, 1.5, -0.45, oscuro);                // techo
+  const velo = crearVelo(0.26, 0.13);
+  velo.malla.position.set(-0.37, 0.99, -0.72);
+  velo.malla.rotation.x = -0.3;
+  g.add(velo.malla);
+  // Volante (gira como el móvil) con los dos guantes sobre el aro.
+  const volante = new THREE.Group();
+  const aro = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.022, 6, 20), oscuro);
+  const radio = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.03, 0.02), oscuro);
+  const centro = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.07, 0.03), medio);
+  volante.add(aro, radio, centro);
+  for (const x of [-0.17, 0.17]) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.1, 0.07), guante);
+    m.position.set(x, 0.01, 0.02);
+    volante.add(m);
+  }
+  const eje = new THREE.Group(); // inclinación de la columna: el volante gira sobre su propio eje
+  eje.rotation.x = -0.35;
+  eje.position.set(-0.37, 0.93, -0.52);
+  eje.add(volante);
+  g.add(eje);
+  // Retrovisor colgado del techo, un poco a la derecha y girado hacia el conductor.
+  const espejo = crearEspejo(texEspejo);
+  espejo.grupo.position.set(0, 1.36, -0.66);
+  espejo.grupo.rotation.set(-0.1, -0.35, 0, 'YXZ');
+  g.add(espejo.grupo);
+  caja(0.02, 0.1, 0.02, 0, 1.45, -0.67, oscuro);
+  // v9: tira de luz a lo largo del salpicadero y pantalla central encendida.
+  const led = new THREE.MeshBasicMaterial({ color: '#2F7BFF' });
+  const tira = new THREE.Mesh(new THREE.BoxGeometry(1.56, 0.012, 0.012), led);
+  tira.position.set(0.02, 0.93, -0.59);
+  g.add(tira);
+  const pantalla = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.138), new THREE.MeshBasicMaterial({ map: texPantalla() }));
+  pantalla.position.set(0.05, 1.02, -0.74);
+  pantalla.rotation.x = -0.22;
+  g.add(pantalla);
+  return {
+    grupo: g, volante, capo, led, espejo: espejo.grupo, pintar: velo.pintar,
+    materiales: [oscuro, medio, guante, espejo.marco],
+    ojo: { lat: -0.37, lon: -0.15, alt: 1.18 },
+  };
+}
+
+// v8: la cabina del Fórmula 1. Sentado en el centro y muy bajo, con el morro delante, las ruedas delanteras al aire,
+// el halo por encima de la cabeza y un volante rectangular con su pantalla.
+function crearCabinaF1(texEspejo) {
+  const g = new THREE.Group();
+  const oscuro = mate('#16181C'), medio = mate('#23262C'), guante = mate('#3A332C'), capo = mate('#C8102E'), goma = mate('#0E0F11');
+  const caja = cajero(g);
+  caja(0.5, 0.2, 1.3, 0, 0.62, -1.15, capo, 0.1);   // monocasco, delante de las piernas
+  caja(0.34, 0.16, 1.4, 0, 0.44, -2.4, capo, 0.06); // morro
+  caja(0.07, 0.14, 1.0, -0.34, 0.8, -0.3, capo);    // bordes de la bañera
+  caja(0.07, 0.14, 1.0, 0.34, 0.8, -0.3, capo);
+  for (const x of [-0.83, 0.83]) {
+    const r = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.33, 0.34, 14), goma);
+    r.rotation.z = Math.PI / 2;
+    r.position.set(x, 0.33, -1.74);
+    g.add(r);
+  }
+  const arco = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.028, 6, 18, Math.PI), oscuro);
+  arco.rotation.x = -Math.PI / 2; // el arco pasa por delante de la cabeza
+  arco.position.set(0, 1.1, -0.2);
+  g.add(arco);
+  caja(0.05, 0.38, 0.05, 0, 0.92, -0.66, oscuro, 0.3); // pilar del halo
+  const volante = new THREE.Group();
+  volante.add(new THREE.Mesh(new THREE.BoxGeometry(0.27, 0.13, 0.04), oscuro));
+  for (const x of [-0.15, 0.15]) {
+    const asa = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.13, 0.05), medio);
+    asa.position.set(x, -0.01, 0);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.09, 0.07), guante);
+    m.position.set(x, 0, 0.03);
+    volante.add(asa, m);
+  }
+  const velo = crearVelo(0.12, 0.06);
+  velo.malla.position.set(0, 0.005, 0.021);
+  volante.add(velo.malla);
+  const eje = new THREE.Group();
+  eje.rotation.x = -0.25;
+  eje.position.set(0, 0.8, -0.45);
+  eje.add(volante);
+  g.add(eje);
+  const espejo = crearEspejo(texEspejo);
+  espejo.grupo.position.set(0, 1.2, -0.72);
+  g.add(espejo.grupo);
+  return {
+    grupo: g, volante, capo, espejo: espejo.grupo, pintar: velo.pintar,
+    materiales: [oscuro, medio, guante, goma, espejo.marco],
+    ojo: { lat: 0, lon: 0.05, alt: 0.95 },
+  };
+}
+
 function crearCamaras(escena) {
   const camara = new THREE.PerspectiveCamera(40, 1, 0.08, 1300);
   escena.add(camara);
-  const cabina = crearCabina();
+  // El retrovisor: una cámara que mira atrás desde tus ojos y pinta en una textura pequeña.
+  const rt = new THREE.WebGLRenderTarget(ESPEJO.ancho, ESPEJO.alto);
+  rt.texture.userData = rt.texture.userData || {};
+  rt.texture.userData.compartida = true; // al cambiar de coche o de mapa no se libera
+  const camEspejo = new THREE.PerspectiveCamera(16, ESPEJO.w / ESPEJO.h, 0.5, 320);
+  const cabinas = { turismo: crearCabina(rt.texture), f1: crearCabinaF1(rt.texture) };
+  let cabina = cabinas.turismo;
   const e = {
     modo: 'persecucion', yaw: 0, atras: 0, muelle: 0, muelleV: 0, cabeceo: 0, fovExtra: 0, sacudida: 0,
-    iniciada: false, aspecto: 1, alto: 1, tinte: 0,
+    iniciada: false, aspecto: 1, alto: 1, tinte: 0, espejoN: 0,
+    mirar: 0, ladeo: 0, plano: null, // v9: la cabeza del piloto y el plano de choque
   };
   const tmp = new THREE.Vector3(), mira = new THREE.Vector3();
   let cocheVisual = null;
 
   function ponerModo(m) {
     e.modo = MODOS.includes(m) ? m : 'persecucion';
+    e.plano = null; // v9: cambiar de cámara corta el plano de choque
     if (cocheVisual) {
       const dentro = e.modo !== 'persecucion';
       cocheVisual.cuerpo.visible = !dentro;
@@ -5553,10 +6850,13 @@ function crearCamaras(escena) {
   return {
     camara,
     get modo() { return e.modo; },
-    // El coche del jugador: la cabina va dentro de él.
+    // El coche del jugador: la cabina va dentro de él (la del F1 si llevas el F1; el capó, de su color).
     atar(v) {
       if (cocheVisual) cocheVisual.grupo.remove(cabina.grupo);
       cocheVisual = v;
+      cabina = v.tipo === 'f1' ? cabinas.f1 : cabinas.turismo;
+      if (v.pintura) cabina.capo.color.set(v.pintura[0]).multiplyScalar(0.85);
+      if (cabina.led) cabina.led.color.set(LED[v.tipo] || '#2F7BFF');
       v.grupo.add(cabina.grupo);
       ponerModo(e.modo);
       e.iniciada = false;
@@ -5577,7 +6877,17 @@ function crearCamaras(escena) {
       e.fovExtra = Math.max(e.fovExtra, 4 * fuerza);
     },
     sacudir(f) { e.sacudida = Math.max(e.sacudida, clamp(f, 0, 1)); },
-    // pose: { x, y, h } interpolada; c: el coche (física); o: { mirarAtras, angVolante, policiaCerca, reducir }
+    // v9: plano de choque. Tras un golpe muy fuerte visto desde dentro, la cámara sale un momento a la calzada (sitio:
+    // { x, y, z } del mundo, lo elige plano.js), se queda quieta y mira cómo llega el coche (el trompo del vídeo del
+    // 25/09). Luego vuelve sola; tocar la cámara lo corta.
+    plano(sitio, seg = 1.2) {
+      if (e.modo === 'persecucion' || !cocheVisual || !sitio || e.plano) return;
+      e.plano = { t: seg, x: sitio.x, y: sitio.y, z: sitio.z };
+      cocheVisual.cuerpo.visible = true;
+      cocheVisual.luces.visible = true;
+      cabina.grupo.visible = false;
+    },
+    // pose: { x, y, h } interpolada; c: el coche (física); o: { mirarAtras, angVolante, policiaCerca, reducir, foco }
     actualizar(dt, pose, c, o = {}) {
       const kmh = Math.abs(c.vf) * 3.6;
       const vel = clamp((kmh - 60) / 120, 0, 1);
@@ -5594,6 +6904,20 @@ function crearCamaras(escena) {
       e.atras += ((o.mirarAtras ? 1 : 0) - e.atras) * Math.min(1, dt * 7);
       const giro = e.atras * (150 * Math.PI / 180);
       const suelo = pose.z ?? 0;
+      if (e.plano) {
+        e.plano.t -= dt;
+        camara.position.set(e.plano.x, e.plano.z, -e.plano.y);
+        mira.set(pose.x, suelo + 0.6, -pose.y);
+        camara.up.set(0, 1, 0);
+        camara.lookAt(mira);
+        const vp = clamp((2 * Math.atan(Math.tan((60 * Math.PI) / 360) / e.aspecto) * 180) / Math.PI, 30, 80);
+        if (Math.abs(camara.fov - vp) > 0.01) {
+          camara.fov = vp;
+          camara.updateProjectionMatrix();
+        }
+        if (e.plano.t <= 0) ponerModo(e.modo); // vuelve a tu vista (y esconde la carrocería si vas dentro)
+        return camara;
+      }
       let hfov = HFOV[e.modo] + (12 * vel + (c.nitroActivo || c.nitroGolpe > 0 ? 6 : 0)) * reduce + e.fovExtra * reduce;
       if (e.modo === 'persecucion') {
         e.yaw = angLerp(e.yaw, pose.h, Math.min(1, dt * 5));
@@ -5609,11 +6933,24 @@ function crearCamaras(escena) {
       } else {
         const fx = Math.sin(pose.h), fy = Math.cos(pose.h), rx = Math.cos(pose.h), ry = -Math.sin(pose.h);
         const cab = e.modo === 'cabina';
-        const lat = cab ? -0.37 : 0, lon = (cab ? -0.15 : 0.55) - e.muelle * 0.3, alt = cab ? 1.18 : 1.3;
-        camara.position.set(pose.x + fx * lon + rx * lat, suelo + alt, -(pose.y + fy * lon + ry * lat));
-        const yaw = pose.h + giro;
+        const f1 = !!cocheVisual && cocheVisual.tipo === 'f1';
+        const ojo = cab ? cabina.ojo : { lat: 0, lon: 0.55, alt: f1 ? 0.85 : 1.3 };
+        const lon = ojo.lon - e.muelle * 0.3;
+        camara.position.set(pose.x + fx * lon + rx * ojo.lat, suelo + ojo.alt, -(pose.y + fy * lon + ry * ojo.lat));
+        // v9: la cabeza del piloto, en cabina: mira un poco hacia la curva y hacia lo que se mueve cerca (el coche que
+        // adelantas, la patrulla que se te pega: o.foco) y se ladea con la carrocería. Nada con «efectos suaves».
+        const vivo = cab && reduce === 1;
+        const objMirar = vivo ? clamp((c.w || 0) * 0.1, -0.08, 0.08) + clamp(o.foco || 0, -0.16, 0.16) : 0;
+        e.mirar += (objMirar - e.mirar) * Math.min(1, dt * 2.5);
+        e.ladeo += ((vivo ? clamp((c.vf || 0) * (c.w || 0) * 0.0035, -0.035, 0.035) : 0) - e.ladeo) * Math.min(1, dt * 4);
+        const yaw = pose.h + giro + e.mirar;
         const pendiente = cocheVisual ? cocheVisual.grupo.rotation.x : 0;
         mira.set(camara.position.x + Math.sin(yaw) * 10, camara.position.y - 0.35 + Math.tan(pendiente + e.cabeceo) * 10, camara.position.z - Math.cos(yaw) * 10);
+        if (cab) {
+          // El retrovisor mira atrás desde tus ojos (no gira al mirar atrás), algo hacia abajo para ver la calzada.
+          camEspejo.position.copy(camara.position);
+          camEspejo.lookAt(camara.position.x - fx * 20, camara.position.y - 1.4, camara.position.z + fy * 20);
+        }
       }
       if (e.sacudida > 0) {
         const s = e.sacudida * 0.12 * reduce;
@@ -5622,6 +6959,7 @@ function crearCamaras(escena) {
       }
       camara.up.set(0, 1, 0);
       camara.lookAt(mira);
+      if (e.modo === 'cabina' && e.ladeo) camara.rotateZ(e.ladeo);
       // Campo de visión en grados horizontales → vertical según la pantalla (acotado para el móvil en vertical).
       const vfov = (2 * Math.atan(Math.tan((hfov * Math.PI) / 360) / e.aspecto) * 180) / Math.PI;
       const v = clamp(vfov, 30, 80);
@@ -5642,13 +6980,25 @@ function crearCamaras(escena) {
       tmp.copy(mira);
       return camara;
     },
+    // Retrovisor: solo en cabina y cuando se pide (calidad normal, en juego). Se pinta antes que la imagen principal.
+    espejo(renderer, escena, activo) {
+      const ver = !!activo && e.modo === 'cabina' && !!cocheVisual && !e.plano;
+      cabina.espejo.visible = ver;
+      if (!ver || e.espejoN++ % ESPEJO.cada) return;
+      cabina.grupo.visible = false; // ni la cabina ni el propio espejo salen en el espejo
+      const antes = renderer.getRenderTarget();
+      renderer.setRenderTarget(rt);
+      renderer.render(escena, camEspejo);
+      renderer.setRenderTarget(antes);
+      cabina.grupo.visible = true;
+    },
   };
 }
 return { MODOS, NOMBRE_MODO, crearCamaras };
 })();
 
 // ---- src/logica/pie.js
-__m[17] = (() => {
+__m[21] = (() => {
 const { clamp } = __m[1]; // src/logica/mates.js
 // El pie: qué gas y qué freno llegan al coche según el acelerador elegido (Ajustes › Acelerador).
 // Sin pantalla: la presentación le pasa lo que tocas (o inclinas) y él decide. Así se puede probar y medir (tests/pie.test.mjs,
@@ -5753,8 +7103,8 @@ return { ACELERADORES, PIE, crearPie, frenoProgresivo, gasDelPedal, pieInclinado
 })();
 
 // ---- src/presentacion/entrada.js
-__m[18] = (() => {
-const { crearPie, pisar, gasDelPedal, ACELERADORES } = __m[17]; // src/logica/pie.js
+__m[22] = (() => {
+const { crearPie, pisar, gasDelPedal, ACELERADORES } = __m[21]; // src/logica/pie.js
 // Controles: inclinación (con el vector de gravedad), botones táctiles y teclado.
 // La inclinación mide cuánto giras el móvil respecto a como lo sujetabas al calibrar: no necesita giroscopio
 // y funciona igual en horizontal que en vertical. Si el navegador no da los sensores, se juega con botones.
@@ -5923,8 +7273,9 @@ function crearEntrada({ raiz, ajustes, avisar = () => {} }) {
       return false;
     }
     escuchar();
+    // Algunos móviles tardan en dar el primer dato: se espera hasta 2,5 s (antes 1,5).
     const t0 = performance.now();
-    while (performance.now() - t0 < 1500) {
+    while (performance.now() - t0 < 2500) {
       if (e.grav) return true;
       await new Promise((r) => setTimeout(r, 100));
     }
@@ -6094,9 +7445,9 @@ return { crearEntrada, VIBRACION, vibrar };
 })();
 
 // ---- src/presentacion/hud.js
-__m[19] = (() => {
-const { LARGO_RONDA, rondaPunto, CALLES_NS, CALLES_EO, PARKING, CALLEJONES, RAMPAS, RAMPA_R, CARRILES } = __m[2]; // src/logica/mapa.js
-const { restante, radioBusqueda } = __m[7]; // src/logica/ojo.js
+__m[23] = (() => {
+const { LARGO_RONDA, rondaPunto, CALLES_NS, CALLES_EO, PARKING, CALLEJONES, RAMPAS, RAMPA_R, CARRILES, TALLER } = __m[2]; // src/logica/mapa.js
+const { restante, radioBusqueda } = __m[9]; // src/logica/ojo.js
 // Lo que se lee en pantalla: el Ojo, la alerta, el botín, el velocímetro, el retrovisor de luces, el minimapa,
 // los textos grandes y los subtítulos de la radio (con voz sintética si el móvil la tiene).
 
@@ -6205,6 +7556,15 @@ function crearHud(raiz, ajustes) {
       mctx.strokeStyle = 'rgba(255,176,32,0.8)';
       mctx.lineWidth = 2 / zoom;
       mctx.stroke();
+    }
+    // v8: el taller (verde con una cruz; gris si ya lo usaste en esta fuga). No se llega desde la autopista.
+    if (p.mapa.rampasAbiertas) {
+      const [x, y] = pt(TALLER.x, TALLER.y);
+      mctx.fillStyle = p.taller && p.taller.usado ? 'rgba(154,166,188,0.55)' : '#3DDC84';
+      mctx.fillRect(x - 6, y - 6, 12, 12);
+      mctx.fillStyle = '#0B1122';
+      mctx.fillRect(x - 1.5, y - 4.5, 3, 9);
+      mctx.fillRect(x - 4.5, y - 1.5, 9, 3);
     }
     for (const pz of p.pinchos) {
       const c = rondaPunto(pz.s, CARRILES[1]);
@@ -6405,9 +7765,12 @@ return { crearHud };
 })();
 
 // ---- src/presentacion/menu.js
-__m[20] = (() => {
+__m[24] = (() => {
+const { MODELOS } = __m[3]; // src/logica/coche.js
+const { GARAJE, rangoDe, progresoRango, reglasDelRango, nombreRango, metaCercana, estadoCoche, PIEZAS, NIVEL_MAX, mejorasDe, estadoMejora } = __m[5]; // src/logica/carrera.js
+// Pantallas: «¿Dónde te pillan?», ajustes, calibración, pausa, cuenta atrás, el garaje (v8) y la pantalla final.
 
-// Pantallas: «¿Dónde te pillan?», ajustes, calibración, pausa, cuenta atrás y la pantalla final.
+
 
 const FINALES = {
   FANTASMA: { titulo: 'FANTASMA', lema: 'No te vieron bien. Botín ×2.', clase: 'fantasma' },
@@ -6424,6 +7787,23 @@ const ESCENARIOS = [
 ];
 
 const fmt = (n) => Math.round(n).toLocaleString('es-ES');
+const coma = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
+const pct = (x) => Math.round((x - 1) * 100);
+const acotar = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+
+// v8: lo que hace la Metro en tu rango, dicho en una línea (sin trampas: todo a la vista).
+function textoMetro(g) {
+  if (g.rango === 1) return 'La Metro, de momento, normal. Cada rango aprieta más (más motor, refuerzos antes, búsquedas más largas) y cobras más.';
+  return `La Metro en tu rango: patrullas con +${pct(g.potencia)} % de motor y +${pct(g.agarre)} % de agarre · Lobos a los ${g.nivel2} s · te buscan un ${pct(g.busqueda)} % más${g.loboExtra ? ' · un Lobo más' : ''}${g.trafico > 1 ? ' · la Ronda empieza cargada' : ''} · cobras ×${coma(g.pago)}.`;
+}
+// La meta más cercana (informe 11: «te faltan 1.800 chapas para el Trueno»).
+function textoMeta(m) {
+  if (!m) return 'Lo tienes todo: eres el Fantasma de la Metro.';
+  const n = m.id ? MODELOS[m.id].nombre : '';
+  if (m.tipo === 'comprar') return `Ya puedes comprar el ${n} (${fmt(m.precio)} chapas): entra en el Garaje.`;
+  if (m.tipo === 'chapas') return `Te faltan ${fmt(m.falta)} chapas para el ${n}.`;
+  return `Te faltan ${fmt(m.falta)} chapas para el rango ${m.rango}${n ? `, que trae el ${n}` : ''}.`;
+}
 
 function crearMenu(raiz, api) {
   const capa = document.createElement('div');
@@ -6456,9 +7836,19 @@ function crearMenu(raiz, api) {
   function portada() {
     const a = api.ajustes;
     const rec = api.record();
+    const car = api.carrera();
+    const pr = progresoRango(car.acumulado);
+    const prueba = a.modo === 'practica' ? api.prueba() : null;
+    const tuyo = MODELOS[prueba || car.coche].nombre;
     mostrar(`
       <div class="portada">
         <header><h1>FUGAZ</h1><p class="lema">Pierde a la policía. Que no te vean.</p></header>
+        <div class="carrera">
+          <div class="rango-linea"><b class="rango-n">RANGO ${pr.rango}</b><span class="rango-nombre">${nombreRango(pr.rango)}</span><span class="rango-chapas">${fmt(car.ahorros)} chapas</span></div>
+          <div class="barra"><i style="width:${Math.round(pr.fraccion * 100)}%"></i></div>
+          <p class="nota">${textoMeta(metaCercana(car))}</p>
+          <p class="nota metro">${textoMetro(reglasDelRango(pr.rango))}</p>
+        </div>
         <h2>¿Dónde te pillan?</h2>
         <div class="escenarios">
           ${ESCENARIOS.map((e) => `<button class="esc" data-esc="${e.id}"><b>${e.titulo}</b><span>${e.texto}</span></button>`).join('')}
@@ -6468,6 +7858,7 @@ function crearMenu(raiz, api) {
             <button data-control="inclinacion" class="${a.control === 'inclinacion' ? 'sel' : ''}">Inclinar el móvil</button>
             <button data-control="botones" class="${a.control === 'botones' ? 'sel' : ''}">Botones</button>
           </div>
+          <button class="sec garaje-btn" data-ir="garaje">Garaje · ${tuyo}${prueba ? ' (prueba)' : ''}</button>
           <button class="sec" data-ir="ajustes">Ajustes</button>
           <button class="sec" data-ir="ayuda">Cómo se juega</button>
         </div>
@@ -6476,10 +7867,10 @@ function crearMenu(raiz, api) {
             <button data-modo="verdad" class="${a.modo !== 'practica' ? 'sel' : ''}">De verdad</button>
             <button data-modo="practica" class="${a.modo === 'practica' ? 'sel' : ''}">Práctica</button>
           </div>
-          <span class="nota-modo">${a.modo === 'practica' ? 'Sin daño y sin récord: para ensayar.' : 'Los golpes dañan el coche. Al 100 %, siniestro.'}</span>
+          <span class="nota-modo">${a.modo === 'practica' ? 'Sin daño, sin récord y sin rango: para ensayar y probar coches.' : 'Los golpes dañan el coche y lo que cobras sube tu rango.'}</span>
         </div>
         ${rec ? `<p class="record">Tu mejor botín: <b>${fmt(rec)}</b> chapas</p>` : ''}
-        <p class="pie">Beta v7 · 25/09 · prototipo de la fase 0 · todo el sonido y la ciudad se generan en tu móvil</p>
+        <p class="pie">Beta v10 · 25/09 · prototipo de la fase 0 · todo el sonido y la ciudad se generan en tu móvil · coches con nombre real solo en esta beta privada</p>
       </div>`, 'portada-on');
     capa.querySelectorAll('.esc').forEach((b) => b.addEventListener('click', () => api.alJugar(b.dataset.esc)));
     capa.querySelectorAll('[data-control]').forEach((b) => b.addEventListener('click', () => {
@@ -6490,6 +7881,7 @@ function crearMenu(raiz, api) {
       api.cambiarAjuste('modo', b.dataset.modo);
       portada();
     }));
+    capa.querySelector('[data-ir="garaje"]').addEventListener('click', () => garaje(portada));
     capa.querySelector('[data-ir="ajustes"]').addEventListener('click', () => ajustes(portada));
     capa.querySelector('[data-ir="ayuda"]').addEventListener('click', () => ayuda(portada));
   }
@@ -6510,6 +7902,10 @@ function crearMenu(raiz, api) {
           <li><b>De verdad o práctica</b>: en De verdad los golpes fuertes dañan el coche (menos potencia y agarre; al 100 %, siniestro). En Práctica no hay daño ni récord.</li>
           <li><b>Choques</b>: un golpe fuerte saca a un coche de su carril y puede llevarse a otros por delante. Uno destrozado arde y explota a los pocos segundos: aléjate.</li>
           <li><b>Fuera de combate</b>: la patrulla que choca fuerte contra un muro, el tráfico, otra patrulla o una explosión queda fuera (+150 y medio nitro). Embestirla tú no sirve. Otra llega a los 15 s.</li>
+          <li><b>Rango</b>: lo que cobras en De verdad te sube de rango (del 1 al 10). En cada rango la Metro aprieta más (lo ves en la portada) y cobras más.</li>
+          <li><b>Garaje</b>: 15 coches de verdad, cada uno con lo suyo (frenada y giro propios). Se desbloquean con el rango y se compran con chapas. PROBAR: cualquiera, en Práctica. Taller de mejoras: motor, frenos, neumáticos, dirección, nitro y blindaje, cada pieza con su pega.</li>
+          <li><b>Interceptor y niveles</b>: la primera vez que te pierden, sale un Lobo a cortarte. Escapar en el nivel 2 paga ×1,25; en el 3, ×1,5.</li>
+          <li><b>Taller</b>: en la avenida del Puerto (cuadro verde en el mapa). Para 3 s dentro y te arregla la mitad del daño. Una vez por fuga.</li>
           <li><b>Salida lanzada</b>: parado, freno y acelerador a la vez; suelta el freno con la aguja en verde.</li>
           <li><b>Si te quedas parado</b> con la policía encima, te detienen.</li>
           <li><b>En sentido contrario</b> no puntúas y la policía acaba cancelando (Clave 9).</li>
@@ -6536,8 +7932,10 @@ function crearMenu(raiz, api) {
           <p class="nota">Ayuda completa: en la Ronda el coche sigue la curva y frena antes de ella; tú solo cambias de carril. Solo frenada: giras tú y el acelerador automático levanta el pie antes de las curvas y al doblar esquinas.</p>
           <button class="sec" data-calibrar>Calibrar la inclinación</button>
         </div>
-        <div class="grupo"><h3>Cámara</h3>
+        <div class="grupo"><h3>Cámara y luz</h3>
           <div class="seg">${opcion('camara', 'persecucion', 'Persecución')}${opcion('camara', 'capo', 'Capó')}${opcion('camara', 'cabina', 'Cabina')}</div>
+          <p class="nota">Las tres vistas se cambian en cualquier momento con ◉ (tecla C), también en plena persecución. En Cabina el volante gira con el móvil y el retrovisor enseña lo que viene por detrás; el F1 tiene su propia cabina.</p>
+          <div class="seg">${opcion('luz', 'noche', 'Noche')}${opcion('luz', 'clara', 'Más luz')}</div>
           <div class="seg">${opcion('efectos', 'normales', 'Efectos de velocidad')}${opcion('efectos', 'suaves', 'Efectos suaves')}</div>
         </div>
         <div class="grupo"><h3>Sonido</h3>
@@ -6627,37 +8025,145 @@ function crearMenu(raiz, api) {
     const f = FINALES[d.final] || FINALES.LIMPIO;
     const factor = { FANTASMA: '×2', LIMPIO: '×1', CLAVE9: '×0,5', DETENIDO: '×0,25', SINIESTRO: '×0,25' }[d.final];
     const s = d.stats || {};
+    // v8: el desglose del cobro (botín × final × alerta × rango) y tu carrera.
+    const dg = d.desglose || {};
+    const cuenta = [`Botín ${fmt(d.botin)} ${factor}`];
+    if (dg.alerta > 1) cuenta.push(`alerta ${s.nivelMax || 1} ×${coma(dg.alerta)}`);
+    if (dg.rango > 1) cuenta.push(`rango ${d.rango} ×${coma(dg.rango)}`);
+    const c = d.carrera;
+    let bloque = '';
+    if (c && c.cuenta && c.sube) {
+      bloque = `<div class="subida"><b>¡RANGO ${c.despues}!</b><span>${nombreRango(c.despues)}</span><p>${textoMetro(reglasDelRango(c.despues))}</p>${c.nuevos.length ? `<p>Nuevo en el garaje: ${c.nuevos.map((id) => MODELOS[id].nombre).join(', ')}.</p>` : ''}</div>`;
+    } else if (c && c.cuenta) {
+      const pr = progresoRango(c.car.acumulado);
+      bloque = `<div class="progreso"><span>Rango ${pr.rango} · ${nombreRango(pr.rango)} · ${fmt(c.car.ahorros)} chapas</span><div class="barra"><i style="width:${Math.round(pr.fraccion * 100)}%"></i></div><span>${textoMeta(metaCercana(c.car))}</span></div>`;
+    }
+    const seg = c && c.sube ? 13 : 8;
     mostrar(`
       <div class="final ${f.clase}">
         <h1>${f.titulo}</h1>
         <p class="lema">${f.lema}</p>
-        <p class="cobro"><span>Botín ${fmt(d.botin)} ${factor}</span><b>${fmt(d.cobro)}</b><span>chapas</span></p>
+        <p class="cobro"><span>${cuenta.join(' · ')}</span><b>${fmt(d.cobro)}</b><span>chapas</span></p>
+        ${bloque}
         <p class="coche">Tu coche: <b>${d.quemado ? 'quemado' : 'limpio'}</b>${d.quemado ? ' (te vieron de cerca)' : ''}</p>
         <p class="datos">${Math.round(d.t)} s · ${s.casiChoques || 0} rebases · ${s.huecos || 0} huecos · nivel ${s.nivelMax || 1} · ${Math.round(s.velMaxKmh || 0)} km/h${d.modo === 'practica' ? '' : ` · daño ${Math.round((d.danio || 0) * 100)} %`}</p>
         ${s.tumbadas || s.explosiones ? `<p class="datos">${s.tumbadas ? `${s.tumbadas} ${s.tumbadas === 1 ? 'patrulla' : 'patrullas'} fuera de combate` : ''}${s.tumbadas && s.explosiones ? ' · ' : ''}${s.explosiones ? `${s.explosiones} ${s.explosiones === 1 ? 'explosión' : 'explosiones'}` : ''}</p>` : ''}
-        ${d.modo === 'practica' ? '<p class="datos">Práctica: no cuenta para tu récord.</p>' : ''}
+        ${d.modo === 'practica' ? `<p class="datos">Práctica: no cuenta para tu récord ni para tu rango${d.prueba ? ` · con el ${MODELOS[d.prueba].nombre}` : ''}.</p>` : ''}
         <div class="acciones">
           <button class="pri grande" data-revancha>REVANCHA</button>
           <button class="sec" data-otra>Otra huida</button>
+          <button class="sec" data-garaje>Garaje</button>
         </div>
-        <div class="cuenta-fin"><i></i></div>
+        <div class="cuenta-fin"><i style="animation-duration:${seg}s"></i></div>
       </div>`, 'final-on');
     capa.querySelector('[data-revancha]').addEventListener('click', api.alRevancha);
     capa.querySelector('[data-otra]').addEventListener('click', () => { api.alMenu(); });
+    capa.querySelector('[data-garaje]').addEventListener('click', () => { api.alMenu(); garaje(portada); });
     capa.querySelector('.final').addEventListener('click', (ev) => {
       if (ev.target.closest('button')) return;
       capa.querySelector('.final').classList.add('saltada');
     });
-    temporizador = setTimeout(() => api.alMenu(), 8000);
+    temporizador = setTimeout(() => api.alMenu(), seg * 1000);
   }
 
-  return { portada, ajustes, ayuda, calibracion, pausa, cuentaAtras, final, ocultar, toast, get visible() { return !capa.hidden; } };
+  // v8: el garaje. Cada coche con su ficha (punta y 0-100 medidos con la física del juego), lo que lo distingue,
+  // y USAR, COMPRAR o PROBAR (cualquiera, en Práctica). v10: el taller de mejoras en cada coche tuyo; la ficha enseña
+  // el coche con sus mejoras.
+  function garaje(volver) {
+    const car = api.carrera();
+    const r = rangoDe(car.acumulado);
+    const prueba = api.prueba();
+    const dato = (nombre, valor, frac) => `<div class="dato"><span>${nombre}</span><i><b style="width:${Math.round(acotar(frac) * 100)}%"></b></i><em>${valor}</em></div>`;
+    const tarjetas = GARAJE.map((g) => {
+      const e = estadoCoche(car, g.id);
+      const tuyo = e.estado === 'usando' || e.estado === 'tuyo';
+      const mj = mejorasDe(car, g.id);
+      const f = api.fichaCoche(g.id, tuyo ? mj : {});
+      const m = f.m;
+      const taller = tuyo ? `<div class="taller">${PIEZAS.map((p) => {
+        const em = estadoMejora(car, g.id, p.id);
+        const pips = '●'.repeat(mj[p.id]) + '○'.repeat(NIVEL_MAX - mj[p.id]);
+        let accion = '<span class="tope">MÁX</span>';
+        if (em.estado === 'aLaVenta') accion = `<button class="sec" data-mejorar="${g.id}:${p.id}">+ ${fmt(em.precio)}</button>`;
+        else if (em.estado === 'bloqueado') accion = `<span class="tope">rango ${em.rango}</span>`;
+        else if (em.estado === 'caro') accion = `<span class="tope">${fmt(em.precio)}</span>`;
+        return `<div class="pieza"><span>${p.nombre}</span><i>${pips}</i>${accion}</div>`;
+      }).join('')}</div>` : '';
+      const acciones = [];
+      if (e.estado === 'usando') acciones.push('<span class="usando">EN USO</span>');
+      if (e.estado === 'tuyo') acciones.push(`<button class="pri" data-usar="${g.id}">USAR</button>`);
+      if (e.estado === 'aLaVenta') acciones.push(`<button class="pri" data-comprar="${g.id}">COMPRAR · ${fmt(g.precio)}</button>`);
+      if (e.estado === 'caro') acciones.push(`<span class="precio">${fmt(g.precio)} chapas · te faltan ${fmt(e.falta)}</span>`);
+      if (e.estado === 'bloqueado') acciones.push(`<span class="precio">Rango ${g.rango} · ${fmt(g.precio)} chapas</span>`);
+      if (e.estado !== 'usando' && e.estado !== 'tuyo') acciones.push(`<button class="sec" data-probar="${g.id}">${prueba === g.id ? 'PROBANDO' : 'PROBAR'}</button>`);
+      return `<div class="tarjeta ${e.estado}${prueba === g.id ? ' prueba' : ''}">
+          <div class="cab"><i class="pint" style="background:${f.pintura}"></i><b>${m.nombre}</b><span class="rg">R${g.rango}</span></div>
+          <p class="lema">${g.lema}</p>
+          <div class="ficha">
+            ${dato('Punta', `${f.punta} km/h`, (f.punta - 160) / 180)}
+            ${dato('0-100', `${coma(f.cero100)} s`, (7 - f.cero100) / 5)}
+            ${dato('Frenada', `${f.frena} m`, (46 - f.frena) / 20)}
+            ${dato('Giro', `${coma(f.radio)} m`, (5 - f.radio) / 2.5)}
+            ${dato('Agarre', '', (m.agarre * (1 + m.carga * 0.5) - 8.5) / 5)}
+            ${dato('Aguante', '', (1 / m.aguante - 0.4) / 1.1)}
+            ${dato('Discreción', '', (1 / m.visibilidad - 0.55) / 0.85)}
+          </div>
+          ${taller}
+          <div class="acciones">${acciones.join('')}</div>
+        </div>`;
+    }).join('');
+    mostrar(`
+      <div class="panel garaje">
+        <h2>Garaje</h2>
+        <p class="nota">Rango ${r} · <b>${fmt(car.ahorros)}</b> chapas ahorradas. Comprar gasta chapas, pero tu rango no baja. PROBAR: cualquier coche, en Práctica (sin daño ni récord). Frenada: metros de 100 a 0. Giro: radio de giro en parado (menos, más ágil). Nombres reales solo en esta beta privada.</p>
+        <details class="taller-ayuda"><summary>Taller de mejoras: qué hace cada pieza</summary>
+          <p>En cada coche tuyo, seis piezas con tres niveles. Se pagan con chapas, son de ese coche y tu rango no baja.
+          Nivel 1 desde el principio, nivel 2 desde el rango 4 y nivel 3 desde el 7. Las barras ya cuentan tus mejoras.</p>
+          <ul>${PIEZAS.map((p) => `<li><b>${p.nombre}</b>: ${p.lema}</li>`).join('')}</ul>
+        </details>
+        <div class="tarjetas">${tarjetas}</div>
+        <button class="pri" data-volver>Volver</button>
+      </div>`);
+    // Volver a pintar sin perder por dónde ibas en la lista.
+    const repintar = () => {
+      const y = capa.scrollTop;
+      garaje(volver);
+      capa.scrollTop = y;
+    };
+    capa.querySelectorAll('[data-mejorar]').forEach((b) => b.addEventListener('click', () => {
+      const [id, pieza] = b.dataset.mejorar.split(':');
+      if (api.mejorarCoche(id, pieza)) {
+        const p = PIEZAS.find((x) => x.id === pieza);
+        toast(`${p.nombre} del ${MODELOS[id].nombre}: nivel ${mejorasDe(api.carrera(), id)[pieza]}.`, 2200);
+      }
+      repintar();
+    }));
+    capa.querySelectorAll('[data-usar]').forEach((b) => b.addEventListener('click', () => {
+      api.elegirCoche(b.dataset.usar);
+      toast(`Ahora llevas el ${MODELOS[b.dataset.usar].nombre}.`, 2200);
+      repintar();
+    }));
+    capa.querySelectorAll('[data-comprar]').forEach((b) => b.addEventListener('click', () => {
+      const id = b.dataset.comprar;
+      if (api.comprarCoche(id)) toast(`¡Tuyo! El ${MODELOS[id].nombre} ya está en tu garaje.`, 2600);
+      repintar();
+    }));
+    capa.querySelectorAll('[data-probar]').forEach((b) => b.addEventListener('click', () => {
+      const id = b.dataset.probar;
+      api.probarCoche(id);
+      toast(`Probando el ${MODELOS[id].nombre} en Práctica: elige dónde te pillan.`, 3000);
+      portada();
+    }));
+    capa.querySelector('[data-volver]').addEventListener('click', volver);
+  }
+
+  return { portada, ajustes, ayuda, calibracion, pausa, cuentaAtras, final, garaje, ocultar, toast, get visible() { return !capa.hidden; } };
 }
 return { crearMenu };
 })();
 
 // ---- src/presentacion/audio.js
-__m[21] = (() => {
+__m[25] = (() => {
 
 // FUGAZ · sonido y música sintetizados con Web Audio.
 // Cero ficheros de audio y cero librerías: todo sale de osciladores y de un
@@ -6760,6 +8266,9 @@ function crearAudio() {
   let pausa = false;
 
   const coche = { acel: 0, rpm: 800, acelAlto: false, turboAlto: 0, apagadoHasta: 0, ojo: null };
+  // v8: el motor de cada coche (coche.js, «sonido»): cilindros, escala de vueltas, brillo, volumen, graves y turbo.
+  const PERFIL_BASE = { cil: 4, escala: 1, brillo: 1, volumen: 1, graves: 1, turbo: 1, admision: 1 };
+  let perfil = { ...PERFIL_BASE };
 
   // Secuenciador: la semicorchea k suena en origen + k · SEMI.
   let origen = 0;
@@ -6861,11 +8370,12 @@ function crearAudio() {
     n.ruidoA = ruidoBucle(0);
     n.ruidoB = ruidoBucle(1);
 
-    // Motor de 4 cilindros → saturación suave → pasabajos → ganancia.
+    // Motor (4 cilindros por defecto; v8: el de cada coche) → saturación suave → pasabajos → ganancia.
     n.mezcla = ctx.createGain();
     n.sierra = oscFijo('sawtooth', 27, ganancia(0.5, n.mezcla));
     n.cuadrada = oscFijo('square', 53, ganancia(0.18, n.mezcla));
-    n.sub = oscFijo('sawtooth', 13, ganancia(0.25, n.mezcla));
+    n.gSub = ganancia(0.25 * perfil.graves, n.mezcla);
+    n.sub = oscFijo('sawtooth', 13, n.gSub);
     n.gAdmision = ganancia(0, n.mezcla);
     n.admision = filtro('bandpass', 80, 2, n.gAdmision);
     n.ruidoA.connect(n.admision);
@@ -6892,6 +8402,10 @@ function crearAudio() {
     n.ruidoA.connect(n.filtroNeum);
     n.gNitro = ganancia(0, n.volEfectos);
     n.ruidoA.connect(filtro('bandpass', 900, 1.4, n.gNitro));
+    // v9: roce de chapa contra el guardarraíl o contra otro coche: ruido áspero que tiembla.
+    n.gRoce = ganancia(0, n.volEfectos);
+    n.filtroRoce = filtro('bandpass', 2300, 3.5, n.gRoce);
+    n.ruidoA.connect(n.filtroRoce);
 
     // Tres voces de sirena: triángulo + cuadrada → pasabajos → ganancia → paneo.
     n.sirenas = [];
@@ -7097,7 +8611,7 @@ function crearAudio() {
     ir(g, 0.15, t, 0.008);
     ir(g, 1, t + 0.08, 0.02);
     tono({ tipo: 'square', f: 3000, t, ataque: 0.001, caida: 0.004, pico: 0.02, destino: n.volMotor });
-    if (d.subida && coche.acel > 0.6 && Math.random() < 0.6) {
+    if (d.subida && (d.petardea ?? (coche.acel > 0.6 && Math.random() < 0.6))) { // v9: lo decide quien pinta la llamarada
       const veces = Math.random() < 0.5 ? 2 : 3;
       let tp = t + 0.03;
       for (let i = 0; i < veces; i++) {
@@ -7155,6 +8669,23 @@ function crearAudio() {
     rafaga({ t: t + 0.03, ataque: 0.002, dur: 0.35, pico: 0.18 * k, tipo: 'highpass', f: 4200, f2: 2500, q: 0.5, destino: n.volEfectos });
     tono({ tipo: 'square', f: 190, f2: 70, t, ataque: 0.002, caida: 0.25, pico: 0.08 * k, fl: ['lowpass', 900, 1], destino: n.volEfectos });
     [76, 83].forEach((m, i) => tono({ f: hz(m), t: t + 0.25 + i * 0.09, ataque: 0.004, caida: 0.3, pico: 0.08, destino: n.volEfectos }));
+  }
+
+  // v8. El taller: llave de impacto (tres ráfagas) y, al terminar, tres notas que suben.
+  function taller(t) {
+    for (let i = 0; i < 3; i++) rafaga({ t: t + i * 0.11, ataque: 0.002, dur: 0.07, pico: 0.35, tipo: 'bandpass', f: 1800, q: 2, destino: n.volEfectos });
+  }
+  function tallerHecho(t) {
+    taller(t);
+    [72, 76, 79].forEach((m, i) => tono({ f: hz(m), t: t + 0.35 + i * 0.08, ataque: 0.004, caida: 0.35, pico: 0.09, destino: n.volEfectos }));
+  }
+  // El interceptor: un rugido grave que se acerca.
+  function interceptor(t) {
+    tono({ tipo: 'sawtooth', f: 70, f2: 150, t, ataque: 0.08, sosten: 0.3, caida: 0.45, pico: 0.12, fl: ['lowpass', 500, 1.2, 1500], destino: n.volEfectos });
+  }
+  // Subes de rango: arpegio de cuatro notas.
+  function subeRango(t) {
+    [67, 71, 74, 79].forEach((m, i) => tono({ tipo: 'triangle', f: hz(m), t: t + i * 0.12, ataque: 0.005, sosten: i === 3 ? 0.3 : 0, caida: 0.4, pico: 0.1, destino: n.volEfectos }));
   }
 
   function pinchazo(t) {
@@ -7252,6 +8783,10 @@ function crearAudio() {
     explosion: (t, d) => explosion(t, d.dist, num(d.fuerza, 1)),
     fuego: (t, d) => fuego(t, d.dist),
     fueraDeCombate: (t, d) => fueraDeCombate(t, d.dist),
+    taller: (t) => taller(t),
+    tallerHecho: (t) => tallerHecho(t),
+    interceptor: (t) => interceptor(t),
+    rango: (t) => subeRango(t),
     arranque: (t) => arranque(t),
     apagar: (t) => apagar(t),
     nitroGolpe: (t) => nitroGolpe(t),
@@ -7303,15 +8838,15 @@ function crearAudio() {
       // Ralentí con vaivén de ±30 rpm a 4 Hz.
       const ralenti = (1 - acel) * lim((1500 - rpm) / 700, 0, 1);
       coche.rpm = rpm + 30 * ralenti * Math.sin(2 * Math.PI * 4 * ahora);
-      const f = coche.rpm / 30;       // encendido de 4 cilindros: rpm/60 × 2
+      const f = ((coche.rpm * perfil.escala) / 60) * (perfil.cil / 2); // encendidos por segundo: rpm/60 × cilindros/2
       ir(n.sierra.frequency, f, ahora, 0.03);
       ir(n.cuadrada.frequency, 2 * f, ahora, 0.03);
       ir(n.sub.frequency, f / 2, ahora, 0.03);
       ir(n.admision.frequency, 3 * f, ahora, 0.03);
-      ir(n.gAdmision.gain, 1.6 * acel, ahora, 0.03);
-      const corte = 350 + 3500 * acel * (0.4 + 0.6 * Math.min(rpm, 7800) / 7800);
-      ir(n.filtroMotor.frequency, corte, ahora, 0.03);
-      ir(n.gMotor.gain, encendido && oye ? 0.1 + 0.22 * acel : 0, ahora, 0.017);
+      ir(n.gAdmision.gain, 1.6 * acel * perfil.admision, ahora, 0.03);
+      const corte = (350 + 3500 * acel * (0.4 + 0.6 * Math.min(rpm, 7800) / 7800)) * perfil.brillo;
+      ir(n.filtroMotor.frequency, Math.min(corte, 12000), ahora, 0.03);
+      ir(n.gMotor.gain, encendido && oye ? (0.1 + 0.22 * acel) * perfil.volumen : 0, ahora, 0.017);
     }
 
     // Marcha atrás: silbido de caja proporcional a la velocidad.
@@ -7320,7 +8855,7 @@ function crearAudio() {
 
     // Turbo y válvula de descarga (acelerador de > 0,7 a < 0,2 con turbo > 0,5).
     ir(n.turbo.frequency, 2400 + 2200 * turbo, ahora, 0.05);
-    ir(n.gTurbo.gain, encendido && oye ? 0.035 * turbo * turbo : 0, ahora, 0.05);
+    ir(n.gTurbo.gain, encendido && oye ? 0.035 * turbo * turbo * perfil.turbo : 0, ahora, 0.05);
     if (acel > 0.7) {
       coche.acelAlto = true;
       coche.turboAlto = Math.max(coche.turboAlto, turbo);
@@ -7340,6 +8875,9 @@ function crearAudio() {
     ir(n.filtroNeum.frequency, 1700 * vaiven, ahora, 0.02);
     ir(n.gNeum.gain, oye ? 0.3 * derrape * RUIDO_BANDA : 0, ahora, 0.013);
     ir(n.gNitro.gain, s.nitro && oye ? 0.12 * RUIDO_BANDA : 0, ahora, 0.05);
+    const roce = lim(s.roce, 0, 1, 0);
+    ir(n.filtroRoce.frequency, 2300 * (1 + 0.18 * Math.sin(2 * Math.PI * 23 * ahora) + 0.1 * Math.sin(2 * Math.PI * 7.3 * ahora)), ahora, 0.01);
+    ir(n.gRoce.gain, oye ? 0.55 * roce * RUIDO_BANDA : 0, ahora, 0.015);
   }
 
   function tonoSirena(j) { return mod(j, 2) === 0 ? 650 : 870; }
@@ -7778,6 +9316,20 @@ function crearAudio() {
       } catch (e) { fallo(e); }
     },
 
+    // v8: el motor del coche que llevas (coche.js, «sonido»). Lo que no sea un número válido se queda como está.
+    perfilMotor(p) {
+      try {
+        const nuevo = { ...PERFIL_BASE };
+        if (p && typeof p === 'object') {
+          for (const k of Object.keys(PERFIL_BASE)) if (Number.isFinite(p[k])) nuevo[k] = lim(p[k], 0, k === 'cil' ? 16 : 4);
+        }
+        if (!(nuevo.cil >= 1)) nuevo.cil = 4;
+        if (!(nuevo.escala > 0)) nuevo.escala = 1;
+        perfil = nuevo;
+        if (ctx && n && n.gSub) fijar(n.gSub.gain, 0.25 * perfil.graves, ctx.currentTime);
+      } catch (e) { fallo(e); }
+    },
+
     evento(tipo, datos) {
       try {
         if (!listo() || !propia(EVENTOS, tipo)) return;
@@ -7800,26 +9352,34 @@ return { crearAudio };
 })();
 
 // ---- src/main.js
-__m[22] = (() => {
-const { DT, crearPartida, pasoPartida, sacarEventos, mapaPara } = __m[11]; // src/logica/partida.js
+__m[26] = (() => {
+const { DT, crearPartida, pasoPartida, sacarEventos, mapaPara } = __m[12]; // src/logica/partida.js
 const { rondaPunto, alturaRonda, alturaEn, normS } = __m[2]; // src/logica/mapa.js
-const { crearTrafico, pasoTrafico } = __m[6]; // src/logica/trafico.js
+const { crearTrafico, pasoTrafico } = __m[8]; // src/logica/trafico.js
 const { crearAzar } = __m[0]; // src/logica/azar.js
-const { restante } = __m[7]; // src/logica/ojo.js
-const { registroDe, anotarSiguiente, aTexto } = __m[12]; // src/logica/registro.js
-const { COLOR_NOCHE, crearEscena, crearTraficoVisual, crearCocheVisual, colocarCoche, crearFantasma, crearPinchosVisual } = __m[14]; // src/presentacion/escena.js
-const { texturaMancha } = __m[13]; // src/presentacion/geometria.js
-const { crearEfectos } = __m[15]; // src/presentacion/efectos.js
-const { DANIO_TRAFICO } = __m[5]; // src/logica/choques.js
-const { crearCamaras, NOMBRE_MODO } = __m[16]; // src/presentacion/camaras.js
-const { crearEntrada, vibrar, VIBRACION } = __m[18]; // src/presentacion/entrada.js
-const { crearHud } = __m[19]; // src/presentacion/hud.js
-const { crearMenu } = __m[20]; // src/presentacion/menu.js
-const { crearAudio } = __m[21]; // src/presentacion/audio.js
+const { restante } = __m[9]; // src/logica/ojo.js
+const { registroDe, anotarSiguiente, aTexto } = __m[13]; // src/logica/registro.js
+const { normalizarCarrera, anotarFuga, rangoDe, comprar, elegir, ALERTA_POTENCIA, mejorasDe, comprarMejora, modeloConMejoras, codigoMejoras } = __m[5]; // src/logica/carrera.js
+const { MODELOS, crearCoche, pasoCoche } = __m[3]; // src/logica/coche.js
+const { COLOR_NOCHE, crearEscena, crearTraficoVisual, crearCocheVisual, colocarCoche, crearFantasma, crearPinchosVisual, PINTURA, sacudirCoche, abollar, enderezar } = __m[16]; // src/presentacion/escena.js
+const { foco, sitioPlano } = __m[17]; // src/presentacion/plano.js
+const { texturaMancha } = __m[14]; // src/presentacion/geometria.js
+const { crearMarcas } = __m[18]; // src/presentacion/marcas.js
+const { crearEfectos } = __m[19]; // src/presentacion/efectos.js
+const { DANIO_TRAFICO } = __m[7]; // src/logica/choques.js
+const { crearCamaras, NOMBRE_MODO } = __m[20]; // src/presentacion/camaras.js
+const { crearEntrada, vibrar, VIBRACION } = __m[22]; // src/presentacion/entrada.js
+const { crearHud } = __m[23]; // src/presentacion/hud.js
+const { crearMenu } = __m[24]; // src/presentacion/menu.js
+const { crearAudio } = __m[25]; // src/presentacion/audio.js
 // FUGAZ · prototipo de la fase 0. Arranque y bucle del juego.
 // Une la lógica de la partida (src/logica: sin pantalla, a pasos fijos de 1/60 s) con la presentación
 // (src/presentacion: escena 3D, cámaras, controles, HUD, menú y sonido). El dibujo interpola entre los dos
 // últimos pasos, así que la física da lo mismo en un móvil a 30 fps que en uno a 120.
+
+
+
+
 
 
 
@@ -7842,7 +9402,7 @@ const dos = (n) => String(n).padStart(2, '0');
 const fechaCorta = (d) => `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())} ${dos(d.getHours())}:${dos(d.getMinutes())}`;
 
 // ------------------------------------------------------------------ lo que se guarda en el móvil
-const LS = { ajustes: 'fugaz.ajustes', registro: 'fugaz.registro', record: 'fugaz.record', pistas: 'fugaz.pistas' };
+const LS = { ajustes: 'fugaz.ajustes', registro: 'fugaz.registro', record: 'fugaz.record', pistas: 'fugaz.pistas', carrera: 'fugaz.carrera' };
 function leerLS(clave, porDefecto) {
   try {
     const v = localStorage.getItem(clave);
@@ -7856,11 +9416,14 @@ function guardarLS(clave, valor) {
 }
 
 const TACTIL = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window;
+// Dentro de otra página (por ejemplo, la de Claude) el navegador puede no dar la inclinación.
+let EN_MARCO = false;
+try { EN_MARCO = window.self !== window.top; } catch (_) { EN_MARCO = true; }
 let menosMovimiento = false;
 try { menosMovimiento = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (_) { /* sin preferencia */ }
 const TRAFICO_AVISO = ['', '', 'LA RONDA SE CARGA', 'HORA PUNTA', 'RONDA COLAPSADA'];
 const AJUSTES_BASE = {
-  control: TACTIL ? 'inclinacion' : 'botones', sensibilidad: 3, acelerador: 'auto', ayudaVolante: 'completa', camara: 'persecucion',
+  control: TACTIL ? 'inclinacion' : 'botones', sensibilidad: 3, acelerador: 'auto', ayudaVolante: 'completa', camara: 'persecucion', luz: 'noche',
   modo: 'verdad', // v6: 'verdad' (los golpes dañan) o 'practica'
   efectos: menosMovimiento ? 'suaves' : 'normales', musica: 0.8, efectosVol: 1, motor: 0.9, voz: true, vibracion: true,
 };
@@ -7908,6 +9471,7 @@ function arrancar() {
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ canvas: lienzo, antialias: !TACTIL, powerPreference: 'high-performance', stencil: false });
+    renderer.info.autoReset = false; // v8: la cuenta de llamadas incluye el retrovisor; se pone a cero en cada fotograma
   } catch (e) {
     fallo(raiz, 'Este navegador no puede dibujar en 3D (WebGL). Prueba con Chrome o Safari actualizados.');
     return;
@@ -7918,6 +9482,15 @@ function arrancar() {
   let registro = leerLS(LS.registro, []);
   if (!Array.isArray(registro)) registro = [];
   let record = Number(leerLS(LS.record, 0)) || 0;
+  // v8: tu carrera (rango, chapas ahorradas y garaje) y el coche que pruebas en Práctica.
+  let carrera = normalizarCarrera(leerLS(LS.carrera, null));
+  let prueba = null;
+  const cocheDeLaPartida = () => (ajustes.modo === 'practica' && prueba ? prueba : carrera.coche);
+  // v10: las mejoras del taller van con el coche; el que pruebas sin ser tuyo va de serie.
+  const mejorasDeLaPartida = () => {
+    const id = cocheDeLaPartida();
+    return carrera.coches.includes(id) ? mejorasDe(carrera, id) : {};
+  };
   const pistasGuardadas = leerLS(LS.pistas, []);
   const pistasVistas = new Set(Array.isArray(pistasGuardadas) ? pistasGuardadas : []);
 
@@ -7959,7 +9532,8 @@ function arrancar() {
       if (o.geometry) o.geometry.dispose();
       const ms = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
       for (const m of ms) {
-        for (const k of ['map', 'emissiveMap']) if (m[k] && m[k] !== manchaTex) m[k].dispose();
+        // Las texturas compartidas (haz de los faros, retrovisor) no se liberan con un coche.
+        for (const k of ['map', 'emissiveMap']) if (m[k] && m[k] !== manchaTex && !(m[k].userData && m[k].userData.compartida)) m[k].dispose();
         m.dispose();
       }
     });
@@ -7970,19 +9544,21 @@ function arrancar() {
     if (mundo && mundo.rampas === rampas) return mundo;
     const viejo = mundo;
     const mapa = mapaPara(rampas);
-    const esc = crearEscena(mapa, { calidad });
+    const esc = crearEscena(mapa, { calidad, luz: ajustes.luz });
     esc.escena.add(camaras.camara);
     const jugador = crearCocheVisual(esc.escena, 'rayo', { texturaMancha: manchaTex });
     camaras.atar(jugador);
     mundo = {
-      rampas, mapa, esc, jugador, policia: new Map(), trafico: null, traficoDe: null,
+      rampas, mapa, esc, jugador, jugadorTipo: 'rayo', policia: new Map(), trafico: null, traficoDe: null,
       fantasma: crearFantasma(esc.escena), pinchos: crearPinchosVisual(esc.escena),
       efectos: crearEfectos(esc.escena), // v7: fuego, humo y explosiones
+      marcas: crearMarcas(esc.escena), // v9: marcas de neumático
     };
     if (viejo) {
       if (viejo.trafico) viejo.trafico.destruir();
       viejo.pinchos.destruir();
       viejo.efectos.destruir();
+      viejo.marcas.destruir();
       liberar(viejo.esc.escena);
     }
     return mundo;
@@ -7996,14 +9572,29 @@ function arrancar() {
     m.policia.clear();
   }
 
+  // v8: tu coche (y su fantasma) con la forma del modelo que llevas.
+  function ponerTuCoche(m, tipo) {
+    if (m.jugadorTipo === tipo) return;
+    m.esc.escena.remove(m.jugador.grupo);
+    liberar(m.jugador.grupo);
+    m.jugador = crearCocheVisual(m.esc.escena, tipo, { texturaMancha: manchaTex });
+    m.esc.escena.remove(m.fantasma);
+    liberar(m.fantasma);
+    m.fantasma = crearFantasma(m.esc.escena, tipo);
+    m.jugadorTipo = tipo;
+  }
+
   function montarPartida(p) {
     const m = prepararMundo(p.mapa.rampasAbiertas);
+    ponerTuCoche(m, p.jugador.modelo);
+    enderezar(m.jugador, 1); // v9: cada fuga empieza con la chapa como nueva
     quitarPolicia(m);
     if (m.trafico) m.trafico.destruir();
-    m.trafico = crearTraficoVisual(m.esc.escena, p.trafico);
+    m.trafico = crearTraficoVisual(m.esc.escena, p.trafico, { haces: calidad >= 1 });
     m.traficoDe = p;
     m.pinchos.destruir();
     m.efectos.vaciar();
+    m.marcas.vaciar();
     m.fantasma.visible = false;
     m.jugador.grupo.visible = true;
   }
@@ -8020,10 +9611,11 @@ function arrancar() {
     }
     quitarPolicia(m);
     if (m.trafico) m.trafico.destruir();
-    m.trafico = crearTraficoVisual(m.esc.escena, fondo.tr);
+    m.trafico = crearTraficoVisual(m.esc.escena, fondo.tr, { haces: calidad >= 1 });
     m.traficoDe = 'fondo';
     m.pinchos.destruir();
     m.efectos.vaciar();
+    m.marcas.vaciar();
     m.fantasma.visible = false;
     m.jugador.grupo.visible = false;
   }
@@ -8050,6 +9642,7 @@ function arrancar() {
     cam.position.set(a.x, alturaRonda(s) + 15, -a.y);
     cam.lookAt(b.x, alturaRonda(normS(s + 75)) + 1.5, -b.y);
     audio.actualizar({ dt: paso, velocidad: 0, motorEncendido: false, sirenas: [], ojo: null, pausa: false });
+    renderer.info.reset();
     renderer.render(m.esc.escena, cam);
     contar();
   }
@@ -8125,8 +9718,9 @@ function arrancar() {
     const t0 = performance.now();
     registro = anotarSiguiente(registro, Date.now());
     guardarLS(LS.registro, registro);
-    const p = crearPartida({ escenario, semilla, modo: ajustes.modo });
+    const p = crearPartida({ escenario, semilla, modo: ajustes.modo, rango: rangoDe(carrera.acumulado), coche: cocheDeLaPartida(), mejoras: mejorasDeLaPartida() });
     montarPartida(p);
+    audio.perfilMotor(p.jugador.m.sonido);
     Object.assign(juego, {
       estado: 'juego', p, revancha, acum: 0, hitStop: 0, lento: 0, ent: null, golpeMs: 0, esperaGolpe: false,
       orbita: 0, planoT: 0, controlesAvisados: false, camaraUsada: null,
@@ -8158,11 +9752,21 @@ function arrancar() {
     fotogramaAnterior = performance.now();
   }
 
+  // Si la prueba de la inclinación falla, se repite en la siguiente partida (hasta la v7 se quedaba en «no» hasta recargar
+  // la página: Alberto, 25/09, «a veces no me deja inclinar»).
   let probandoInclinacion = null;
   function probarInclinacion() {
-    if (!probandoInclinacion) probandoInclinacion = entrada.activarInclinacion().catch(() => false);
+    if (!probandoInclinacion) {
+      probandoInclinacion = entrada.activarInclinacion().catch(() => false).then((ok) => {
+        if (!ok) probandoInclinacion = null;
+        return ok;
+      });
+    }
     return probandoInclinacion;
   }
+  const SIN_INCLINACION = EN_MARCO
+    ? 'Dentro de esta página el móvil no deja leer la inclinación: abre el juego con su enlace directo en Chrome o Safari. Ahora juegas con botones.'
+    : 'No llegan datos de inclinación: esta vez juegas con botones. Se vuelve a probar en la siguiente partida.';
 
   // En el móvil, a pantalla completa al empezar (tiene que pedirse dentro del toque; si el navegador no deja, se sigue igual).
   function pantallaCompleta() {
@@ -8170,7 +9774,13 @@ function arrancar() {
       const el = document.documentElement;
       if (!TACTIL || !el || document.fullscreenElement || !el.requestFullscreen) return;
       const p = el.requestFullscreen({ navigationUI: 'hide' });
-      if (p && p.catch) p.catch(() => {});
+      // v8: en horizontal, se bloquea el giro de pantalla: al girar el móvil como un volante no debe darse la vuelta.
+      if (p && p.then) {
+        p.then(() => {
+          const o = screen.orientation;
+          if (o && o.lock && /landscape/.test(o.type || '')) o.lock(o.type).catch(() => {});
+        }).catch(() => {});
+      }
     } catch (_) { /* sin pantalla completa: da igual */ }
   }
 
@@ -8183,7 +9793,7 @@ function arrancar() {
       if (ajustes.control === 'inclinacion') {
         const ok = await probarInclinacion();
         entrada.ponerModo(ok ? 'inclinacion' : 'botones');
-        if (!ok) menu.toast('Este navegador no da la inclinación: juegas con botones. En Ajustes puedes volver a probar.', 4500);
+        if (!ok) menu.toast(SIN_INCLINACION, 5000);
       } else entrada.ponerModo('botones');
       empezar(escenario, undefined, false);
     } finally {
@@ -8234,6 +9844,14 @@ function arrancar() {
     juego.orbita = 0;
     juego.camaraUsada = ajustes.camara;
     anotarPartida(p);
+    // v8: tu carrera. Solo cuenta De verdad: sube el rango, se ahorran las chapas y se desbloquean coches.
+    const fuga = anotarFuga(carrera, { cobro: d.cobro, modo: p.modo });
+    if (fuga.cuenta) {
+      carrera = fuga.car;
+      guardarLS(LS.carrera, carrera);
+    }
+    d.carrera = fuga;
+    d.prueba = p.modo === 'practica' ? p.jugador.modelo : null;
     let nuevo = false;
     if (p.modo !== 'practica' && d.cobro > record) { // la práctica no cuenta para el récord
       record = d.cobro;
@@ -8260,6 +9878,7 @@ function arrancar() {
       juego.estado = 'resultado';
       hud.mostrar(false);
       menu.final(d);
+      if (d.carrera && d.carrera.sube) audio.evento('rango');
       if (nuevo && d.cobro > 0) menu.toast('¡Nuevo récord de botín!', 2500);
       mantenerPantalla(false);
     }, espera);
@@ -8305,9 +9924,17 @@ function arrancar() {
         hud.grande('¡TIRACHINAS!', 'bien', 0.9, t);
         efecto.golpe = Math.max(efecto.golpe, 0.7);
         break;
-      case 'cambio':
-        audio.evento('cambio', { marcha: ev.marcha, subida: ev.subida });
+      case 'cambio': {
+        // v9: en una subida a fondo, a veces petardea: se ve (llamarada) y se oye a la vez.
+        const petardea = !!ev.subida && ev.gas > 0.6 && !p.jugador.m.electrico && Math.random() < 0.6;
+        if (petardea) llamarada(p);
+        audio.evento('cambio', { marcha: ev.marcha, subida: ev.subida, petardea });
         if (ev.subida && ev.gas > 0.5) vibra('tic');
+        break;
+      }
+      case 'petardeo': // v9: soltar el gas de golpe a muchas vueltas
+        llamarada(p);
+        audio.evento('petardeo');
         break;
       case 'apagar':
         audio.evento('apagar');
@@ -8318,6 +9945,22 @@ function arrancar() {
         break;
       case 'golpe': {
         const f = ev.fuerza || 0;
+        // v9: chispas donde toca; si es fuerte, trozos y cristales que saltan y la chapa se abolla. La carrocería rebota
+        // apartándose del golpe. Muy fuerte: un parón de 60 ms y cámara lenta; si vas dentro (capó o cabina), un plano
+        // de fuera que se salta tocando la cámara (informe de los vídeos del 25/09). Con «efectos suaves», sin lo último.
+        const j = p.jugador;
+        if (Number.isFinite(ev.x)) {
+          mundo.efectos.chispas(ev.x, ev.y, j.vx, j.vy, Math.round(clamp(f, 3, 30)));
+          if (f > 12) mundo.efectos.restos(ev.x, ev.y, j.vx, j.vy, f / 20);
+          if (f > 5) abollar(mundo.jugador, j, ev.x, ev.y, f / 20, ev.nx, ev.ny);
+        }
+        sacudirCoche(mundo.jugador, j, f / 15, ev.x, ev.y);
+        if (f > 14) juego.hitStop = Math.max(juego.hitStop, 0.06);
+        const dentro = camaras.modo !== 'persecucion';
+        if (ajustes.efectos !== 'suaves' && (f > 22 || (f > 18 && dentro))) {
+          juego.lento = Math.max(juego.lento, 0.45);
+          if (dentro) camaras.plano(sitioPlano(p.mapa, j));
+        }
         audio.evento('golpe', { fuerza: clamp(f / 14, 0.15, 1) });
         camaras.sacudir(clamp(f / 12, 0.1, 1));
         vibra(f > 6 ? 'zumbido' : 'tic');
@@ -8329,6 +9972,7 @@ function arrancar() {
         else if (ev.antes < 0.8 && ev.danio >= 0.8) { hud.aviso('Motor tocado: falla a ratos · un golpe más y es siniestro', 'peligro', 2.6, t); vibra('zumbido'); }
         else if (ev.danio - ev.antes >= 0.05) hud.aviso(`Daño ${Math.round(ev.danio * 100)} %`, 'peligro', 1.2, t);
         pista('danio', 'Modo De verdad: los golpes fuertes dañan el coche (barra roja del velocímetro): menos potencia y agarre. Al 100 %, siniestro. En Práctica no hay daño.', 7);
+        if (ev.danio >= 0.4 && p.mapa.rampasAbiertas) pista('taller', 'TALLER: en la avenida del Puerto (cuadro verde en el mapa). Para 3 s dentro y te arregla la mitad del daño. Una vez por fuga.', 7);
         break;
       case 'casiChoque':
         audio.evento('casiChoque', { lado: ev.lado === 'izquierda' ? -1 : 1, fuerza: ev.fuerza });
@@ -8438,7 +10082,31 @@ function arrancar() {
         break;
       case 'nivel':
         hud.grande(ev.nivel === 2 ? 'NIVEL 2 · LOBOS' : 'NIVEL 3 · TORO Y PINCHOS', 'rojo', 1.6, t);
+        hud.aviso(`La Metro aprieta: patrullas con +${Math.round((ALERTA_POTENCIA[ev.nivel - 1] - 1) * 100)} % de motor · si escapas, ×${ev.nivel === 2 ? '1,25' : '1,5'}`, 'peligro', 2.6, t);
         vibra('latido');
+        break;
+      // v8: el interceptor y el taller.
+      case 'interceptor':
+        audio.evento('interceptor');
+        hud.aviso(`¡INTERCEPTOR! ${ev.nombre} sale a cortarte el paso`, 'peligro', 3, t);
+        vibra('dobleTic');
+        break;
+      case 'tallerEmpieza':
+        audio.evento('taller');
+        hud.aviso('TALLER · quieto 3 s', 'bien', 3.2, t);
+        break;
+      case 'tallerCorta':
+        hud.aviso('Taller: te has movido antes de tiempo', '', 1.5, t);
+        break;
+      case 'tallerNo':
+        hud.aviso(ev.motivo === 'usado' ? 'El taller ya te atendió en esta fuga' : ev.motivo === 'practica' ? 'En Práctica no hay daño que arreglar' : 'Taller: tu coche está bien', '', 2, t);
+        break;
+      case 'taller':
+        audio.evento('tallerHecho');
+        enderezar(mundo.jugador, ev.antes > 0 ? 1 - ev.despues / ev.antes : 1); // v9: y la chapa, en la misma medida
+        hud.grande('REPARADO', 'verde', 1.4, t);
+        hud.premio(`−${Math.round((ev.antes - ev.despues) * 100)} % de daño`);
+        vibra('dobleTic');
         break;
       case 'pinchosAviso':
         hud.aviso(`PINCHOS DELANTE · pasa por el carril ${CARRIL_LIBRE[ev.libre] || 'libre'}`, 'peligro', 5, t);
@@ -8592,6 +10260,7 @@ function arrancar() {
       turbo: enJuego ? j.turbo : 0,
       nitro: enJuego && (j.nitroActivo || j.nitroGolpe > 0),
       derrape: enJuego ? derrape : 0,
+      roce: enJuego && j.roce ? clamp(Math.hypot(j.vx, j.vy) / 30, 0.25, 1) : 0, // v9: chapa contra el muro u otro coche
       motorEncendido: j.motor,
       enTunel: p.zona === 'tunel',
       marchaAtras: j.marchaAtras,
@@ -8674,6 +10343,48 @@ function arrancar() {
     lctx.globalAlpha = 1;
   }
 
+  // v9: lo que dejan las ruedas y la chapa. Marcas en el asfalto y humo blanco cuando patinan (tu coche, las patrullas y
+  // el tráfico que va suelto) y chispas mientras se roza un muro u otro coche. Solo a menos de 160 m.
+  function ruedas(dt, p) {
+    const m = mundo, j = p.jugador;
+    if (juego.estado === 'pausa' || juego.estado === 'cuenta') { m.marcas.actualizar(); return; }
+    const cerca = (c) => Math.abs(c.x - j.x) < 160 && Math.abs(c.y - j.y) < 160;
+    const dejar = (llave, c, patina) => {
+      const fx = Math.sin(c.h), fy = Math.cos(c.h), rx = Math.cos(c.h), ry = -Math.sin(c.h);
+      const atras = c.largo * 0.32, lado = c.ancho / 2 - 0.2;
+      for (const s of [-1, 1]) {
+        const x = c.x - fx * atras + rx * lado * s, y = c.y - fy * atras + ry * lado * s;
+        m.marcas.anotar(llave + (s > 0 ? 'd' : 'i'), x, y, patina);
+        if (patina > 0.35) m.efectos.humoRueda(llave + s, x, y, patina - 0.3, dt);
+      }
+    };
+    dejar('j', j, j.patina || 0);
+    if (j.roce && j.tocaEn) m.efectos.roce('j', j.tocaEn.x, j.tocaEn.y, j.vx, j.vy, dt);
+    for (const u of p.policia) {
+      const c = u.coche;
+      if (!cerca(c)) continue;
+      dejar('u' + u.id, c, c.patina || 0);
+      if (c.roce && c.tocaEn) m.efectos.roce('u' + u.id, c.tocaEn.x, c.tocaEn.y, c.vx, c.vy, dt);
+    }
+    for (const lista of [p.trafico.ronda, p.trafico.barrio]) {
+      for (const t of lista) {
+        if (!t.suelto || !cerca(t)) continue;
+        const lat = Math.abs(t.vx * Math.cos(t.h) - t.vy * Math.sin(t.h));
+        dejar('t' + t.id, t, Math.max(clamp((lat - 2) / 6, 0, 1), clamp(Math.abs(t.w || 0) - 0.5, 0, 1)));
+      }
+    }
+    m.marcas.actualizar();
+  }
+
+  // v9: llamarada por el escape de tu coche (dos salidas; el F1, una en el centro y más alta).
+  function llamarada(p) {
+    const j = p.jugador, fx = Math.sin(j.h), fy = Math.cos(j.h), rx = Math.cos(j.h), ry = -Math.sin(j.h);
+    const atras = j.largo / 2 + 0.05, f1 = j.modelo === 'f1';
+    for (const s of f1 ? [0] : [-0.38, 0.38]) {
+      mundo.efectos.llamarada(j.x - fx * atras + rx * s, j.y - fy * atras + ry * s, -fx, -fy, j.vx, j.vy, f1 ? 0.55 : 0.33);
+    }
+  }
+
   // Humo y fuego (v7): de los coches tocados, los que arden, los restos de las patrullas y el tuyo si está muy dañado.
   // Solo lo que está a menos de 160 m: más lejos no se ve y gastaría partículas.
   function emitirHumo(dt, p, pose) {
@@ -8701,6 +10412,11 @@ function arrancar() {
     const alpha = juego.estado === 'juego' ? clamp(juego.acum / DT, 0, 1) : 1;
     const pose = colocarCoche(m.jugador, j, alpha, t, false);
     pose.z = m.jugador.grupo.position.y;
+    // v9: muy tocado, un faro falla: el haz pierde fuerza y a ratos se apaga (sin parpadeo con «efectos suaves»).
+    if (m.jugador.destello) {
+      const fallo = j.danio > 0.6 && ajustes.efectos !== 'suaves' && Math.sin(t * 17) * Math.sin(t * 2.3) > 0.8;
+      m.jugador.destello.material.opacity = fallo ? 0.2 : 1 - clamp((j.danio - 0.6) / 0.4, 0, 1) * 0.45;
+    }
     let cerca = false;
     for (const u of p.policia) {
       let v = m.policia.get(u.id);
@@ -8727,6 +10443,7 @@ function arrancar() {
     }
     m.trafico.actualizar(alpha);
     emitirHumo(dt, p, pose);
+    ruedas(dt, p);
     m.pinchos.actualizar(p.pinchos);
     // El fantasma: tu coche donde la policía cree que estás.
     const o = p.ojo;
@@ -8741,13 +10458,18 @@ function arrancar() {
       camaras.actualizar(dt, pose, j, {
         mirarAtras: !!ent.mirarAtras, angVolante: ent.angVolante || 0, policiaCerca: cerca,
         reducir: ajustes.efectos === 'suaves', t,
+        // v9: la cabeza del piloto se va hacia lo que se mueve cerca (Alberto, 25/09: «va donde hay movimiento»).
+        foco: camaras.modo === 'cabina' && ajustes.efectos !== 'suaves' ? foco(j, p.policia.map((u) => u.coche), p.trafico.ronda, p.trafico.barrio) : 0,
       });
     }
     if (!juego.esperaGolpe && juego.estado !== 'pausa' && juego.estado !== 'cuenta' && juego.estado !== 'resultado') hud.actualizar(p, pose, t);
     audio.actualizar(estadoAudio(p, dt));
     efectos(dt, p, cerca);
     m.efectos.actualizar(juego.estado === 'pausa' || juego.estado === 'cuenta' ? 0 : dt, camaras.camara);
-    renderer.render(m.esc.escena, camaras.camara); // una sola vez por fotograma
+    // v8: en cabina, primero el retrovisor (una textura pequeña, uno de cada tres fotogramas) y luego la imagen.
+    renderer.info.reset();
+    camaras.espejo(renderer, m.esc.escena, calidad >= 1 && (juego.estado === 'juego' || juego.estado === 'pausa' || juego.estado === 'cuenta'));
+    renderer.render(m.esc.escena, camaras.camara);
     contar();
   }
 
@@ -8819,6 +10541,27 @@ function arrancar() {
   }
 
   // ---------------------------------------------------------------- menú
+  // v8: la ficha de cada coche para el garaje: punta y 0-100 medidos con la misma física del juego.
+  // v10: con las mejoras del taller (m: el modelo mejorado, para las barras de agarre, aguante y discreción).
+  const fichas = new Map();
+  function fichaCoche(id, mejoras = {}) {
+    if (!MODELOS[id]) return null;
+    const llave = id + ':' + codigoMejoras(mejoras);
+    if (!fichas.has(llave)) {
+      const m = modeloConMejoras(id, mejoras);
+      const c = crearCoche(m, 0, 0, 0, 0);
+      c.agil = 1.5;
+      let t = 0;
+      while (c.vf < 100 / 3.6 && t < 20) { pasoCoche(c, { gas: 1 }, 1 / 60); t += 1 / 60; }
+      fichas.set(llave, {
+        m, punta: Math.round(m.vMax * 3.6), cero100: Math.round(t * 10) / 10, pintura: (PINTURA[id] || PINTURA.rayo)[0],
+        frena: Math.round((100 / 3.6) ** 2 / (2 * m.frenada)), // metros de 100 a 0
+        radio: Math.round((m.ejes / Math.tan(m.giroMax)) * 10) / 10, // radio de giro en parado (m)
+      });
+    }
+    return fichas.get(llave);
+  }
+
   function revancha() {
     const p = juego.p;
     if (!p) return;
@@ -8831,6 +10574,43 @@ function arrancar() {
     ajustes,
     record: () => record,
     alJugar: (esc) => { jugar(esc); },
+    // v8: la carrera y el garaje.
+    carrera: () => carrera,
+    prueba: () => prueba,
+    comprarCoche(id) {
+      const r = comprar(carrera, id);
+      if (r.ok) {
+        carrera = r.car;
+        guardarLS(LS.carrera, carrera);
+        if (prueba === id) prueba = null;
+      }
+      return r.ok;
+    },
+    // v10: el taller de mejoras (una pieza, un nivel más). Gasta chapas, no rango.
+    mejorarCoche(id, pieza) {
+      const r = comprarMejora(carrera, id, pieza);
+      if (r.ok) {
+        carrera = r.car;
+        guardarLS(LS.carrera, carrera);
+      }
+      return r.ok;
+    },
+    mejorasDe: (id) => mejorasDe(carrera, id),
+    elegirCoche(id) {
+      carrera = elegir(carrera, id);
+      guardarLS(LS.carrera, carrera);
+      if (prueba === id) prueba = null;
+    },
+    probarCoche(id) {
+      if (!MODELOS[id]) return;
+      prueba = id;
+      if (ajustes.modo !== 'practica') {
+        ajustes.modo = 'practica';
+        guardarLS(LS.ajustes, ajustes);
+      }
+    },
+    quitarPrueba() { prueba = null; },
+    fichaCoche,
     cambiarAjuste(k, v) {
       ajustes[k] = v;
       guardarLS(LS.ajustes, ajustes);
@@ -8854,6 +10634,7 @@ function arrancar() {
           break;
         case 'ayudaVolante': entrada.ponerAyuda(v); break;
         case 'camara': camaras.ponerModo(v); break;
+        case 'luz': if (mundo) mundo.esc.ponerLuz(v); break;
         case 'musica': case 'efectosVol': case 'motor': aplicarVolumen(); break;
         default: break;
       }
@@ -8976,6 +10757,10 @@ function arrancar() {
     juego, ajustes, renderer, rend,
     get mundo() { return mundo; },
     get registro() { return registro; },
+    get carrera() { return carrera; }, // v8
+    camaras, // v9: para la prueba de humo (cabina y plano de choque)
+    menu,
+    probarCoche(id) { if (MODELOS[id]) { prueba = id; ajustes.modo = 'practica'; } },
     empezar: (esc = 'mixta', semilla) => empezar(esc, semilla, false),
     pausar, seguir, alMenu, revancha,
     // Avanza n fotogramas a mano (para probar con la pestaña oculta) y devuelve los ms de CPU por fotograma.
