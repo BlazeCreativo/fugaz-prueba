@@ -105,6 +105,18 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
 .premio.cadena { color: var(--ambar); }
 .premio.hueco { color: var(--cian); font-size: 28px; }
 @keyframes sube { 0% { transform: translateY(6px) scale(0.8); opacity: 0; } 15% { transform: translateY(0) scale(1.1); opacity: 1; } 100% { transform: translateY(-34px) scale(1); opacity: 0; } }
+/* v12 (HORA PUNTA): el barrido del coche que rebasas rozando, en el lateral por donde pasa (cabina y capó). */
+.h-barrido {
+  position: absolute; top: 22%; bottom: 26%; width: 24%; pointer-events: none; opacity: 0;
+  background: repeating-linear-gradient(180deg, transparent 0 9px, var(--color, #fff) 9px 11px, transparent 11px 23px);
+  filter: blur(1.2px);
+}
+.h-barrido.izq { left: 0; -webkit-mask-image: linear-gradient(90deg, #000 10%, transparent); mask-image: linear-gradient(90deg, #000 10%, transparent); }
+.h-barrido.der { right: 0; -webkit-mask-image: linear-gradient(270deg, #000 10%, transparent); mask-image: linear-gradient(270deg, #000 10%, transparent); }
+.h-barrido.on { animation: barrido 0.34s ease-out; }
+.h-barrido.der.on { animation-name: barridoDer; }
+@keyframes barrido { 0% { opacity: var(--fuerza, 0.5); transform: translateX(30%) scaleY(0.9); } 100% { opacity: 0; transform: translateX(-35%) scaleY(1.15); } }
+@keyframes barridoDer { 0% { opacity: var(--fuerza, 0.5); transform: translateX(-30%) scaleY(0.9); } 100% { opacity: 0; transform: translateX(35%) scaleY(1.15); } }
 
 /* Horizontal (lo normal): arriba el botín, el retrovisor con el Ojo y el minimapa; abajo el velocímetro. */
 .h-mapa {
@@ -2167,7 +2179,7 @@ const TASA = [5, 9, 14]; // chapas por segundo con el Ojo en rojo, según el niv
 const FINALES = { FANTASMA: 2, LIMPIO: 1, CLAVE9: 0.5, DETENIDO: 0.25, SINIESTRO: 0.25 };
 
 function crearBotin() {
-  return { enJuego: 0, cadena: 0, mult: 1, tCadena: 0, casiChoques: 0, huecos: 0, derrape: 0, estilo: 0 };
+  return { enJuego: 0, cadena: 0, mult: 1, tCadena: 0, casiChoques: 0, huecos: 0, muros: 0, derrape: 0, estilo: 0 };
 }
 
 function pasoBotin(b, dt, ojo, nivel) {
@@ -2203,6 +2215,18 @@ function hueco(b, extra = 1) {
   return g;
 }
 
+// v12 (HORA PUNTA): cruzar un muro de tráfico limpio por su puerta.
+function muro(b, extra = 1) {
+  b.cadena += 2;
+  b.tCadena = 0;
+  b.mult = Math.min(2.5, 1 + 0.08 * b.cadena);
+  const g = Math.round(80 * b.mult * extra);
+  b.enJuego += g;
+  b.estilo += g;
+  b.muros++;
+  return g;
+}
+
 function romperCadena(b) {
   b.cadena = 0;
   b.mult = 1;
@@ -2226,7 +2250,7 @@ function premio(b, cantidad) {
 function cobro(b, final) {
   return Math.round(b.enJuego * (FINALES[final] ?? 1));
 }
-return { FINALES, crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, premio, cobro };
+return { FINALES, crearBotin, pasoBotin, casiChoque, hueco, muro, romperCadena, derrape, premio, cobro };
 })();
 
 // ---- src/logica/carrera.js
@@ -2914,6 +2938,18 @@ function pasoRonda(tr, dt, cuerpos) {
     }
     return true;
   };
+  // v12 (HORA PUNTA): el de un muro solo se cruza a la puerta si nadie viene por ella; mira atrás más lejos cuanto más
+  // deprisa se acerque lo que viene (tú a 250 km/h: unos 60 m). Así la puerta nunca se te cierra encima.
+  const libreMuro = (c, d) => {
+    for (const o of obs) {
+      if (o.ref === c) continue;
+      if (Math.abs(o.d - d) > (o.ancho + c.ancho) / 2 + 0.7) continue;
+      const ds = difS(o.s, c.s);
+      const guarda = o.sirena ? HORA_PUNTA.guardaPatrulla : 1.4; // a la patrulla se le guarda menos (ajuste del banco)
+      if (ds >= 0 ? ds < 20 : -ds < 12 + Math.max(0, o.v - c.v) * guarda) return false;
+    }
+    return true;
+  };
   for (const c of tr.ronda) {
     if (c.cuerpo) {
       // v11 (REALISTA): volcando o volando lo mueve cuerpo3d; aquí, solo dónde está para los que vienen detrás.
@@ -2944,6 +2980,8 @@ function pasoRonda(tr, dt, cuerpos) {
     }
     // Velocidad deseada: algo menos en las curvas; casi parado si le acaban de dar.
     let vObj = c.vDes * (esCurva(c.s) ? 0.93 : 1) * (c.aturdido > 0 ? 0.35 : 1);
+    // v12: el de un muro va a la velocidad del muro y a su altura en él (±3 m del compañero).
+    if (c.muro) vObj = Math.max(0, c.muro.v + clamp(difS(c.muro.s + c.muroOff, c.s) * 0.8, -4, 4)) * (c.aturdido > 0 ? 0.35 : 1);
     if (lider) {
       const seguro = 5 + c.v * 1.1;
       if (gap < seguro) vObj = Math.min(vObj, Math.max(0, lider.v + (gap - seguro) * 0.6));
@@ -2957,10 +2995,13 @@ function pasoRonda(tr, dt, cuerpos) {
       // Con el intermitente puesto: cambia cuando acaba el aviso y solo si el hueco sigue libre.
       c.aviso.t -= dt;
       if (c.aviso.t <= 0) {
-        if (c.aturdido <= 0 && libre(c, CARRILES[c.aviso.carril], c.aviso.atras, 24)) c.carril = c.aviso.carril;
+        const puede = c.muro ? libreMuro(c, CARRILES[c.aviso.carril]) : libre(c, CARRILES[c.aviso.carril], c.aviso.atras, 24);
+        if (c.aturdido <= 0 && puede) c.carril = c.aviso.carril;
         else c.intermitente = 0;
         c.aviso = null;
       }
+    } else if (c.muro) {
+      // v12: dentro de un muro nadie se aparta para la sirena ni adelanta: a la patrulla no le abren pasillo.
     } else if (sirenaDetras && c.aturdido <= 0) {
       // Apartarse para la sirena es inmediato; el intermitente se pone igual.
       if (c.carril < 2 && Math.abs(c.d - CARRILES[c.carril]) < 0.4 && libre(c, CARRILES[c.carril + 1], 12, 18)) { c.carril++; c.intermitente = 1; }
@@ -3060,6 +3101,217 @@ function pasoBarrio(tr, dt, cuerpos, mapa, azar) {
     }
     colocarBarrio(c, mapa, dt);
   }
+}
+
+// ------------------------------------------------------------------ v12 · HORA PUNTA (decisión 69)
+// En la parte difícil de la huida, la Ronda se llena de muros: dos vehículos en paralelo y el tercer carril libre (la
+// puerta). Cada pocos segundos, uno de los de al lado de la puerta pone el intermitente y se cruza: la puerta pasa al
+// carril que deja. Dentro de un muro nadie se aparta para la sirena. Sin coches nuevos: se recolocan los que quedan
+// lejos, en la niebla, así que tampoco hay más dibujo.
+const HORA_PUNTA = {
+  delante: [340, 460],   // m por delante de ti donde se forman (en la niebla)
+  separacion: [60, 170], // m entre un muro y el siguiente
+  eslalon: 70,           // m: dos muros más cerca que esto tienen las puertas como mucho a un carril
+  atras: 150,            // m por detrás de ti: el muro se deshace en tráfico normal
+  lejosDelante: 700,     // m por delante (en la niebla): también (si vas por el barrio o a contramano, se alejan)
+  lejos: 330,            // m: de más atrás (o de más de 600 m por delante) salen los vehículos que se recolocan
+  despeje: 30,           // m: alrededor del sitio del muro no queda nadie más (la puerta está abierta de verdad)
+  v: [22, 25],           // m/s: 79-90 km/h
+  cambio: [3.5, 6],      // s entre dos movimientos de la puerta
+  camion: 0.5,           // probabilidad de que lleve un camión (nunca en el carril rápido)
+  reintento: 0.25,       // s entre dos intentos de formar un muro
+  guardaPatrulla: 0.4,   // s de ventaja que se le guardan a una patrulla con sirena (a ti, 1,4): a ella se le cierra
+  vaciar: true,          // entre un muro y el anterior no queda tráfico suelto (lo que está a más de `lejos`, en la niebla)
+};
+
+function crearHoraPunta(t = 0) {
+  return { desde: t, muros: [], ultimo: null, sep: 0, n: 0, intentoT: 0 };
+}
+
+// Un paso: mueve los muros que hay, su puerta, deshace los que quedan atrás y forma los nuevos (solo si vas por la
+// Ronda). otros: las patrullas (no se forma un muro encima de ellas); evitarS: puntos de la Ronda donde no se forma
+// (la barricada). Devuelve los muros.
+function pasoHoraPunta(tr, hp, jugador, enRonda, dt, azar, otros = [], evitarS = []) {
+  const sJ = rondaProyectar(jugador.x, jugador.y).s;
+  for (let i = hp.muros.length - 1; i >= 0; i--) {
+    const w = hp.muros[i];
+    // Un golpe fuerte saca al vehículo del muro (suelto, en 3D o quemado).
+    w.miembros = w.miembros.filter((c) => {
+      const sigue = c.muro === w && !c.suelto && !c.cuerpo && !c.quemado && !c.oculto;
+      if (!sigue && c.muro === w) liberar(c);
+      return sigue;
+    });
+    // Se deshace si queda atrás o muy lejos por delante, si le falta uno o si le han montado una barricada encima.
+    const rel = difS(w.s, sJ);
+    if (w.miembros.length < 2 || rel < -HORA_PUNTA.atras || rel > HORA_PUNTA.lejosDelante || evitarS.some((e) => Math.abs(difS(e, w.s)) < 80)) {
+      deshacerMuro(hp, i);
+      continue;
+    }
+    // Avanza a su velocidad, sin dejar atrás al que va más lento (algo le ha frenado).
+    w.s = normS(w.s + w.v * dt);
+    let retraso = 0;
+    for (const c of w.miembros) retraso = Math.max(retraso, difS(w.s + c.muroOff, c.s));
+    if (retraso > 6) w.s = normS(w.s - (retraso - 6));
+    moverPuerta(hp, w, dt, azar);
+    // Un golpe que no lo suelta lo deja en el carril más cercano (golpeado): si ha caído en la puerta, la puerta pasa
+    // al carril que queda libre; si los dos han acabado en el mismo, ya no es un muro.
+    if (!w.mueve && w.miembros.some((c) => c.carril === w.puerta)) {
+      const libres = [0, 1, 2].filter((k) => w.miembros.every((c) => c.carril !== k));
+      if (libres.length !== 1) {
+        deshacerMuro(hp, i);
+        continue;
+      }
+      w.puerta = libres[0];
+    }
+  }
+  hp.intentoT -= dt;
+  if (enRonda && hp.intentoT <= 0) {
+    hp.intentoT = HORA_PUNTA.reintento;
+    formarMuro(tr, hp, sJ, azar, otros, evitarS);
+  }
+  return hp.muros;
+}
+
+function liberar(c) {
+  c.muro = null;
+  c.muroOff = 0;
+  if (c.vDesLibre !== undefined) {
+    c.vDes = c.vDesLibre;
+    c.vDesLibre = undefined;
+  }
+  c.cambioT = 2;
+}
+
+function deshacerMuro(hp, i) {
+  const w = hp.muros[i];
+  for (const c of w.miembros) if (c.muro === w) liberar(c);
+  hp.muros.splice(i, 1);
+  if (hp.ultimo === w) hp.ultimo = null;
+}
+
+// La puerta: cada 3,5-6 s, uno de los de al lado se cruza a ella con 1 s de intermitente (si nadie viene por ella).
+function moverPuerta(hp, w, dt, azar) {
+  if (w.mueve) {
+    const c = w.mueve.c;
+    if (c.carril === w.mueve.a) {
+      w.puerta = w.mueve.de;
+      w.mueve = null;
+      w.cambioT = azar.rango(HORA_PUNTA.cambio[0], HORA_PUNTA.cambio[1]);
+    } else if (!c.aviso) {
+      w.mueve = null; // no pudo: venía alguien por la puerta; lo intenta enseguida
+      w.cambioT = 1;
+    }
+    return;
+  }
+  w.cambioT -= dt;
+  if (w.cambioT > 0) return;
+  // Pueden los de al lado de la puerta que estén bien (un camión nunca va al carril rápido). Con otro muro a menos de
+  // 70 m, la puerta nueva (el carril que deja) queda como mucho a un carril de la del otro: el eslalon se puede hacer.
+  const vale = w.miembros.filter((c) => Math.abs(c.carril - w.puerta) === 1 && !(c.tipo === 'camion' && w.puerta === 0) &&
+    c.aturdido <= 0 && !c.aviso && Math.abs(c.d - CARRILES[c.carril]) < 0.4 &&
+    hp.muros.every((o) => o === w || Math.abs(difS(o.s, w.s)) >= HORA_PUNTA.eslalon || Math.abs(c.carril - o.puerta) <= 1));
+  if (!vale.length) {
+    w.cambioT = 1;
+    return;
+  }
+  const c = vale.length > 1 ? azar.elegir(vale) : vale[0];
+  w.mueve = { c, de: c.carril, a: w.puerta };
+  avisar(c, w.puerta, 0);
+}
+
+// Forma el siguiente muro si su sitio ya está a menos de 460 m por delante de ti. Devuelve si lo ha formado.
+function formarMuro(tr, hp, sJ, azar, otros, evitarS) {
+  const H = HORA_PUNTA;
+  // El siguiente va detrás del muro de más adelante (si hay alguno por delante de ti).
+  let previo = null;
+  for (const o of hp.muros) if (difS(o.s, sJ) > 0 && (!previo || difS(o.s, sJ) > difS(previo.s, sJ))) previo = o;
+  let s = previo ? normS(previo.s + hp.sep) : null;
+  if (s !== null && difS(s, sJ) > H.delante[1]) return false; // aún lejos
+  if (s === null || difS(s, sJ) < H.delante[0]) s = normS(sJ + azar.rango(H.delante[0], H.delante[0] + 60));
+  // Encima de una patrulla, no; cerca de la barricada o de un accidente, tampoco (se prueba luego).
+  for (const o of otros) if (Math.abs(difS(rondaProyectar(o.x, o.y).s, s)) < 40) s = normS(s + 50);
+  if (evitarS.some((e) => Math.abs(difS(e, s)) < 120)) return false;
+  if (tr.ronda.some((o) => (o.suelto || o.quemado || o.cuerpo) && Math.abs(difS(o.s, s)) < 60)) return false;
+  // Los que se recolocan: libres, sanos y lejos de ti (fuera de la vista).
+  const lejos = (c) => {
+    const ds = difS(c.s, sJ);
+    return ds < -H.lejos || ds > 600;
+  };
+  const libres = tr.ronda.filter((c) => !c.muro && !c.suelto && !c.cuerpo && !c.quemado && !c.oculto && !c.aviso &&
+    c.aturdido <= 0 && !(c.danio > 0) && lejos(c));
+  const cam = libres.filter((c) => c.tipo === 'camion'), coches = libres.filter((c) => c.tipo !== 'camion');
+  const conCamion = cam.length > 0 && coches.length > 0 && azar.probabilidad(H.camion);
+  if (!conCamion && coches.length < 2) return false;
+  // La puerta: con camión, en el rápido o el central (el camión va al lento). Pegado al anterior, a un carril de su puerta.
+  let puertas = conCamion ? [0, 1] : [0, 1, 2];
+  const cerca = previo && Math.abs(difS(s, previo.s)) < H.eslalon;
+  if (cerca) puertas = puertas.filter((k) => Math.abs(k - previo.puerta) <= 1);
+  const puerta = azar.elegir(puertas);
+  const carriles = [0, 1, 2].filter((k) => k !== puerta);
+  const a = azar.elegir(coches);
+  const b = conCamion ? azar.elegir(cam) : azar.elegir(coches.filter((c) => c !== a));
+  const w = {
+    id: hp.n++, s, v: azar.rango(H.v[0], H.v[1]), puerta, miembros: [a, b],
+    cambioT: azar.rango(H.cambio[0], H.cambio[1]), mueve: null, tocado: false, detras: false, pasado: false,
+  };
+  const carrilDe = conCamion ? { a: carriles.find((k) => k !== 2), b: 2 } : { a: carriles[0], b: carriles[1] };
+  // Despeje: nadie más a menos de 30 m del sitio (se mandan atrás, a la niebla).
+  // v12b: y entre este muro y el anterior (o, si es el primero, desde la niebla), tampoco: la hora punta va en bloques,
+  // y entre uno y otro se acelera. Con el tráfico suelto de entre medias, el que se colaba iba a 27-28 m/s de media,
+  // casi como los muros, y colarse no le separaba de nadie (banco del 28/09). Solo lo que está a más de `lejos`.
+  const hasta = difS(s, sJ) - H.despeje;
+  const desde = Math.max(H.lejos, previo ? difS(previo.s, sJ) + H.despeje : H.lejos);
+  for (const o of [...tr.ronda]) {
+    if (o === a || o === b || o.muro || o.oculto || o.suelto || o.cuerpo || o.quemado) continue;
+    const ds = difS(o.s, sJ);
+    if (Math.abs(difS(o.s, s)) < H.despeje || (H.vaciar && ds > desde && ds < hasta)) mandarAtras(tr, o, sJ, azar);
+  }
+  ponerEnMuro(a, w, carrilDe.a, azar.rango(-3, 3));
+  ponerEnMuro(b, w, carrilDe.b, azar.rango(-3, 3));
+  hp.muros.push(w);
+  hp.ultimo = w;
+  hp.sep = azar.rango(H.separacion[0], H.separacion[1]);
+  return true;
+}
+
+function ponerEnMuro(c, w, carril, off) {
+  c.muro = w;
+  c.muroOff = off;
+  c.vDesLibre = c.vDes;
+  c.vDes = w.v;
+  c.s = normS(w.s + off);
+  c.carril = carril;
+  c.d = CARRILES[carril];
+  c.v = w.v;
+  c.aviso = null;
+  c.intermitente = 0;
+  c.apartado = 0;
+  c.latV = 0;
+  c.giro = 0;
+  c.cambioT = 99;
+  colocarRonda(c, c.d, 1);
+}
+
+// Lo manda a la niebla de detrás (400-900 m); sin sitio, a la reserva (escondido), de donde vuelve si sube el tráfico.
+function mandarAtras(tr, c, sJ, azar) {
+  for (let intento = 0; intento < 12; intento++) {
+    const s = normS(sJ - azar.rango(HORA_PUNTA.lejos + 70, 900));
+    if (tr.ronda.some((o) => o !== c && !o.oculto && o.carril === c.carril && Math.abs(difS(o.s, s)) < (o.largo + c.largo) / 2 + 22)) continue;
+    c.s = s;
+    c.d = CARRILES[c.carril];
+    c.v = c.vDes;
+    c.aviso = null;
+    c.intermitente = 0;
+    c.apartado = 0;
+    c.latV = 0;
+    colocarRonda(c, c.d, 1);
+    return true;
+  }
+  const i = tr.ronda.indexOf(c);
+  if (i >= 0) tr.ronda.splice(i, 1);
+  c.oculto = true;
+  tr.reserva.push(c);
+  return false;
 }
 
 // ------------------------------------------------------------------ coches sueltos (v7)
@@ -3229,7 +3481,7 @@ function camiones(tr) {
   for (const c of tr.ronda) if (c.tipo === 'camion') out.push({ x: c.x, y: c.y, h: c.h, ml: c.largo / 2, ma: c.ancho / 2 });
   return out;
 }
-return { TIPOS_TRAFICO, NIVELES_TRAFICO, crearTrafico, subirTrafico, pasoTrafico, soltar, grua, golpeado, cercaDe, camiones };
+return { TIPOS_TRAFICO, NIVELES_TRAFICO, crearTrafico, subirTrafico, pasoTrafico, HORA_PUNTA, crearHoraPunta, pasoHoraPunta, soltar, grua, golpeado, cercaDe, camiones };
 })();
 
 // ---- src/logica/ojo.js
@@ -3612,9 +3864,11 @@ function pasoUnidad(u, ctx, dt) {
         }
         u.ruta = prepararRuta([[c.x, c.y], [tx, ty]]);
         e = pilotar(c, u.ruta, { ...op, vObj: Math.max(vObj, 0) });
-      } else if (terreno(zonaU) === 'ronda' && terreno(ctx.zonaJugador) === 'ronda' && difS(rondaProyectar(j.x, j.y).s, rondaProyectar(c.x, c.y).s) < -3 && vJ < 4 && dJ < 45) {
+      } else if (terreno(zonaU) === 'ronda' && terreno(ctx.zonaJugador) === 'ronda' && difS(rondaProyectar(j.x, j.y).s, rondaProyectar(c.x, c.y).s) < -3 && vJ < 4) {
         // v11: te has quedado parado por detrás de ella (un choque, un trompo, empotrado): se acerca marcha atrás para
         // detenerte. Antes se quedaba esperando a que la adelantaras y la detención no llegaba nunca (banco de estrés).
+        // v12: a cualquier distancia de la persecución directa, no solo a menos de 45 m: parado en la hora punta, o a
+        // contramano, a 45-70 m, se quedaba esperando (estrés largo, 28/09).
         const lonT = (j.x - c.x) * Math.sin(c.h) + (j.y - c.y) * Math.cos(c.h);
         const latT = (j.x - c.x) * Math.cos(c.h) - (j.y - c.y) * Math.sin(c.h);
         if (lonT < 0 && dJ > 7) {
@@ -3687,8 +3941,21 @@ function pasoUnidad(u, ctx, dt) {
       // Algo parado o casi (un accidente, unos restos): frena a tiempo para poder pararse, mientras se abre a un lado.
       if (esq.v < 8) e.vObjEsq = Math.min(e.vObjEsq ?? Infinity, Math.sqrt(esq.v * esq.v + 13 * Math.max(0, esq.gap - 5)));
     } else if (u.esquivaT <= -1) u.esquiva = 0;
-    if (u.esquiva && u.ruta && u.modo !== 'directo' && u.modo !== 'detener') {
-      e = pilotar(c, u.ruta, { torpeza: u.tipo === 'lobo' ? 1.12 : 1, margen: 0.85, desvio: u.esquiva, vMax: ojo === 'rojo' || ctx.busquedaRapida ? undefined : c.m.vMax * 0.72 });
+    // v12 (HORA PUNTA): pegada a ti, si lo que tiene delante es de un muro (la puerta se le ha cerrado), también se abre a
+    // un lado, sin dejar de frenar lo que haga falta ni de guardar la distancia. Se cuela peor que tú: frena y rodea.
+    // En curva, un coche del carril de al lado queda «delante» en línea recta: solo cuenta si va de verdad por su carril.
+    const conMuro = u.modo === 'directo' && !!esq && esq.muro && !u.pit && !u.emb &&
+      Math.abs(rondaProyectar(esq.o.x, esq.o.y).d - rondaProyectar(c.x, c.y).d) < (esq.o.ancho + c.ancho) / 2 + 0.4;
+    if (u.esquiva && u.ruta && (u.modo !== 'directo' || conMuro) && u.modo !== 'detener') {
+      const antes = e;
+      e = pilotar(c, u.ruta, { torpeza: u.tipo === 'lobo' ? 1.12 : 1, margen: 0.85, desvio: u.esquiva, vMax: ojo === 'rojo' || ctx.busquedaRapida ? undefined : c.m.vMax * 0.72, vObj: conMuro ? antes.vT : undefined });
+      if (conMuro && antes.vObjEsq !== undefined) e.vObjEsq = antes.vObjEsq;
+    }
+    // v12 (HORA PUNTA): la patrulla no se la juega entre los muros: llega a cada uno frenando, a como mucho
+    // MURO_PATRULLA.vPuerta más que el muro, y así pasa la puerta. Tú puedes pasarla a lo que te atrevas.
+    if (ctx.muros && ctx.muros.length && zonaU === 'ronda') {
+      const vCap = limiteMuros(c, ctx.muros);
+      if (vCap < Infinity) e.vObjEsq = Math.min(e.vObjEsq ?? Infinity, vCap);
     }
     if (e.vObjEsq !== undefined && c.vf > e.vObjEsq + 1) { e.gas = 0; e.freno = clamp((c.vf - e.vObjEsq) * 0.25, 0.2, 1); }
 
@@ -3724,6 +3991,25 @@ function pasoUnidad(u, ctx, dt) {
   return ev;
 }
 
+// v12: a cuánto puede ir para llegar a la puerta del muro que tiene delante a como mucho su velocidad + vPuerta,
+// frenando a MURO_PATRULLA.frenada. Infinity si no hay ninguno en 160 m o ya lo está pasando por delante.
+// Con 15 m/s y 6 m/s² solo perdía 7 m por muro; con 10 y 4, unos 30 (escena de la prueba, 27/09).
+const MURO_PATRULLA = { vPuerta: 10, frenada: 4 }; // 36 km/h más que el muro (Infinity: sin tope)
+function limiteMuros(c, muros) {
+  if (MURO_PATRULLA.vPuerta === Infinity) return Infinity;
+  const s = rondaProyectar(c.x, c.y).s;
+  let vCap = Infinity;
+  for (const w of muros) {
+    let largo = 0;
+    for (const m of w.miembros) largo = Math.max(largo, m.largo);
+    const rel = difS(w.s, s);
+    if (rel < -(largo / 2 + c.largo / 2) || rel > 160) continue;
+    const vP = w.v + MURO_PATRULLA.vPuerta;
+    vCap = Math.min(vCap, Math.sqrt(vP * vP + 2 * MURO_PATRULLA.frenada * Math.max(0, rel - largo / 2 - c.largo / 2 - 3)));
+  }
+  return vCap;
+}
+
 // Lo primero que tiene delante en su trayectoria (tráfico u otra unidad).
 function obstaculoDelante(c, otros, u) {
   const fx = Math.sin(c.h), fy = Math.cos(c.h), rx = Math.cos(c.h), ry = -Math.sin(c.h);
@@ -3742,7 +4028,7 @@ function obstaculoDelante(c, otros, u) {
     const v = o.vx * fx + o.vy * fy;
     if (v > c.vf - 1.5) continue;
     const gap = lon - (largo + c.largo) / 2;
-    if (!mejor || gap < mejor.gap) mejor = { gap, v, lat };
+    if (!mejor || gap < mejor.gap) mejor = { gap, v, lat, muro: !!o.muro, o }; // v12: si es de un muro de la hora punta
   }
   return mejor;
 }
@@ -3849,7 +4135,7 @@ function puntoAparicion(mapa, j, azar, zonaJugador, extraVisible, rol = 'persegu
   const n = nodos[0];
   return { x: n.x, y: n.y, h: 0, v: 0 };
 }
-return { NOMBRES, EMBESTIDA, PIT_ADAPTA, EMBESTIDA_TIPO, crearUnidad, prepararRuta, puntoRuta, pilotar, rutaRonda, pasoUnidad, puntoBusqueda, puntoAparicion };
+return { NOMBRES, EMBESTIDA, PIT_ADAPTA, EMBESTIDA_TIPO, crearUnidad, prepararRuta, puntoRuta, pilotar, rutaRonda, pasoUnidad, MURO_PATRULLA, limiteMuros, puntoBusqueda, puntoAparicion };
 })();
 
 // ---- src/logica/radio.js
@@ -3947,12 +4233,22 @@ const LINEAS = {
     ['CENTRAL', 'Aumenta el tráfico en la Ronda. Que nadie se la juegue.'],
   ],
   trafico3: [
-    ['CENTRAL', 'Hora punta en la Ronda. Hay camiones también por el carril central.'],
+    ['CENTRAL', 'La Ronda se está llenando. Hay camiones también por el carril central.'],
     ['{unidad}', 'Esto está hasta arriba. Lo sigo como puedo.'],
   ],
   trafico4: [
     ['CENTRAL', 'La Ronda está colapsada. Si se mete entre los coches, no arriesguéis.'],
     ['{unidad}', '¡Se mete entre los camiones! Está loco.'],
+  ],
+  // v12 (HORA PUNTA, decisión 69): los muros de tráfico.
+  horaPunta: [
+    ['CENTRAL', 'Hora punta en la Ronda: van en paralelo, no hay por dónde apartarse. Ojo con los camiones.'],
+    ['CENTRAL', 'Ronda colapsada, hora punta. Nadie os va a abrir paso: paciencia.'],
+  ],
+  muro: [
+    ['{unidad}', '¡Se ha colado entre los dos! Yo por ahí no paso.'],
+    ['{unidad}', '¡Por el hueco! Me he quedado detrás del muro.'],
+    ['{unidad}', 'Lo pierdo entre los camiones, ¡está loco!'],
   ],
   relevo: [
     ['{unidad}', 'Me lo tapa un camión. Cógelo tú, eres principal.'],
@@ -4071,6 +4367,7 @@ const PRIORIDAD = {
   trafico2: 5, trafico3: 5, trafico4: 6, embisteAviso: 6, embestida: 7, embisteFallo: 4,
   humo: 5, siniestro: 10, fueraCombate: 8, explosion: 6, accidente: 5,
   radar: 8, barricada: 7, barricadaHueco: 5,
+  horaPunta: 7, muro: 4,
 };
 
 function rellenar(texto, datos) {
@@ -4951,11 +5248,11 @@ const { pasoBordillos, perdidaBordillo, bordeCercano, FAROLA } = __m[3]; // src/
 const { crearCoche, pasoCoche, choqueFijo, choqueEntre, circulosDe, ASISTENCIA, modeloMejorado } = __m[5]; // src/logica/coche.js
 const { reglasDelRango, desglose, cochePorId, ALERTA_POTENCIA, modeloConMejoras, codigoMejoras } = __m[7]; // src/logica/carrera.js
 const { crearAyuda, asistir } = __m[8]; // src/logica/asistencia.js
-const { crearTrafico, pasoTrafico, golpeado, cercaDe, camiones, subirTrafico, soltar, grua } = __m[10]; // src/logica/trafico.js
+const { crearTrafico, pasoTrafico, golpeado, cercaDe, camiones, subirTrafico, soltar, grua, crearHoraPunta, pasoHoraPunta } = __m[10]; // src/logica/trafico.js
 const { SUELTO, DANIO_TRAFICO, EXPLOSION, TUMBAR, danioTrafico, danioPatrulla, alcance, empuje, giroGolpe } = __m[9]; // src/logica/choques.js
 const { crearUnidad, pasoUnidad, puntoAparicion, EMBESTIDA, EMBESTIDA_TIPO } = __m[12]; // src/logica/policia.js
 const { crearOjo, pasoOjo, finalDeEscape, LIMITE_FANTASMA } = __m[11]; // src/logica/ojo.js
-const { crearBotin, pasoBotin, casiChoque, hueco, romperCadena, derrape, premio } = __m[6]; // src/logica/botin.js
+const { crearBotin, pasoBotin, casiChoque, hueco, muro, romperCadena, derrape, premio } = __m[6]; // src/logica/botin.js
 const { lineaRadio, PRIORIDAD } = __m[13]; // src/logica/radio.js
 const { crearVigilancia, pasoVigilancia, montarBarricada, BARRICADA } = __m[14]; // src/logica/vigilancia.js
 const { crearAverias, golpeRealista, pasoAverias, mandosConAverias, lugarDelGolpe, DV, AVERIA } = __m[15]; // src/logica/averias.js
@@ -5063,6 +5360,7 @@ function crearPartida(op = {}) {
     reserva: crearAzar(subSemilla(semilla, 5)),
     vigilancia: crearAzar(subSemilla(semilla, 6)), // v11: radares y barricadas (una serie aparte: no mueve las demás)
     averias: crearAzar(subSemilla(semilla, 7)),    // v11: las averías de REALISTA
+    horaPunta: crearAzar(subSemilla(semilla, 8)),  // v12: los muros de la hora punta
   };
   let jugador, lince, s0 = 0;
   if (escenario === 'barrio') {
@@ -5116,6 +5414,7 @@ function crearPartida(op = {}) {
     restos: [], usados: new Set([lince.id]), explosionT: -99, accidenteT: -99, estruendoT: -99, gruaT: 1, ultimaCausa: null,
     farolasCaidas: new Set(), // v11: las farolas tumbadas de esta partida (el mapa se comparte entre partidas)
     vigilancia: crearVigilancia(), // v11: radares y barricadas de la Ronda
+    horaPunta: null, sinTrafico, horaPuntaNunca: op.horaPunta === false, // v12: la hora punta (decisión 69)
     cuerpos: [], // v11 (REALISTA): los coches que vuelcan o vuelan (cuerpo3d.js): tu coche y 3 patrullas como mucho
     finalPendiente: null, // v11: el final que espera a que tu coche en 3D se pare
     final: null,
@@ -5126,12 +5425,21 @@ function crearPartida(op = {}) {
       pinchazos: 0, pits: 0, contraSeg: 0, escondidoSeg: 0, traficoMax: 1, embestidas: 0, embestidasEsquivadas: 0,
       danioMax: 0, sueltos: 0, cadenas: 0, explosiones: 0, tumbadas: 0, taller: 0,
       vuelcos: 0, averias: [], // v11: REALISTA
+      muros: 0, horaPunta: 0, // v12: muros cruzados limpios y a qué segundo llegó la hora punta
     },
   };
   // Desde el rango 7, la Ronda empieza más cargada.
   if (reglas.trafico > 1 && !sinTrafico) {
     subirTrafico(trafico, reglas.trafico, [jugador], azar.reserva);
     p.traficoNivel = p.stats.traficoMax = reglas.trafico;
+  }
+  // v12: la hora punta desde el principio (pruebas y banco de fuga), con el tráfico al máximo; traficoInicial: el
+  // tráfico al nivel que se diga desde el principio (el banco, para comparar sin muros).
+  const hasta = Math.min(4, Math.max(op.traficoInicial || 0, op.horaPunta ? 4 : 0));
+  if (!sinTrafico) {
+    for (let n = p.traficoNivel + 1; n <= hasta; n++) subirTrafico(trafico, n, [jugador], azar.reserva); // nivel a nivel
+    if (hasta > p.traficoNivel) p.traficoNivel = p.stats.traficoMax = hasta;
+    if (op.horaPunta) activarHoraPunta(p, false);
   }
   // La radio te reconoce desde el rango 3.
   decir(p, reglas.rango >= 7 ? 'inicioBuscado' : reglas.rango >= 3 ? 'inicioFichado' : 'inicio', { unidad: lince.nombre });
@@ -5925,17 +6233,25 @@ function pasoPartida(p, entrada = {}, dt = DT) {
 
   // Cuanto más dura la huida, más tráfico en la Ronda (idea de Alberto, 25/09).
   if (p.traficoNivel < 4 && p.t >= TRAFICO_T[p.traficoNivel + 1]) subirNivelTrafico(p);
+  // v12: la hora punta (decisión 69), a los 110 s; desde el rango 7, a los 60 s.
+  if (!p.horaPunta && !p.sinTrafico && !p.horaPuntaNunca && p.t >= horaPuntaT(p.rango)) activarHoraPunta(p);
 
   // 2. Tráfico y policía.
   const cuerpos = [j];
   for (const u of p.policia) { u.coche.sirena = u.sirena; cuerpos.push(u.coche); }
   for (const r of p.restos) cuerpos.push(r.coche);
   pasoTrafico(tr, dt, cuerpos, mapa, p.azar.trafico);
+  // v12: los muros de la hora punta, después del tráfico: así la puerta que se acaba de mover queda apuntada ya.
+  if (p.horaPunta) {
+    const b = p.vigilancia.barricada;
+    pasoHoraPunta(tr, p.horaPunta, j, p.zona === 'ronda', dt, p.azar.horaPunta, p.policia.map((u) => u.coche), b && !b.pasada ? [b.s] : []);
+  }
   // Las patrullas fuera de combate se deslizan hasta pararse (el trompo lo hace coche.js) y estorban a todos.
   for (const r of p.restos) if (!r.coche.volcado && !r.coche.cuerpo) pasoCoche(r.coche, { gas: 0, freno: 0.7, dir: 0 }, dt);
   // v11: si te perdieron corriendo por la Ronda (a más de 108 km/h), te buscan a toda velocidad; en el barrio, despacio.
   const busquedaRapida = p.ojo.estado === 'ambar' && p.ojo.ultima.v > 30 && mapa.zonaEn(p.ojo.ultima.x, p.ojo.ultima.y) === 'ronda';
-  const ctx = { jugador: j, mapa, ojo: p.ojo, zonaJugador: p.zona, azar: p.azar.policia, pinchos: p.pinchos, otros: [], orden: 0, busquedaRapida };
+  const ctx = { jugador: j, mapa, ojo: p.ojo, zonaJugador: p.zona, azar: p.azar.policia, pinchos: p.pinchos, otros: [], orden: 0, busquedaRapida,
+    muros: p.horaPunta ? p.horaPunta.muros : null };
   p.policia.forEach((u, i) => {
     if (u.coche.cuerpo) {
       // v11: volcando o volando no conduce ni ve (ni cuenta para detenerte).
@@ -6017,6 +6333,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
     if (f > DANIO.umbral) daniar(p, danioGolpe(f, t.masa, j.masa), t.quemado ? 'restos' : 'trafico');
     const seg = p.casi.get(t.id);
     if (seg) seg.tocado = true;
+    if (t.muro) t.muro.tocado = true; // v12: ese muro ya no da MURO
     if (f > 1.5) {
       romperCadena(p.botin);
       p.stats.choques++;
@@ -6123,6 +6440,7 @@ function pasoPartida(p, entrada = {}, dt = DT) {
 
   // 5. Estilo: casi-choques, huecos, rebufo y derrape. Y el taller (v8).
   estilo(p, cercanos, dt);
+  if (p.horaPunta) cruzarMuros(p);
   pasoTaller(p, dt);
 
   // 6. Te ven: línea de visión de cada unidad. Y la vigilancia de la Ronda (v11): radares y barricadas.
@@ -6176,6 +6494,47 @@ function grabar(p, en) {
 // Segundos de huida para subir el tráfico a los niveles 2, 3 y 4. Lejos de los Lobos (35 s) y del Toro (80 s), que llegan
 // con el Ojo en rojo: dos sustos a la vez no se leen (informe 10, 25/09).
 const TRAFICO_T = [0, 0, 25, 60, 110];
+// v12: cuándo llega la hora punta (decisión 69): con el tráfico al máximo; desde el rango 7, antes.
+const horaPuntaT = (rango) => (rango >= 7 ? 60 : 110);
+
+function activarHoraPunta(p, avisar = true) {
+  p.horaPunta = crearHoraPunta(p.t);
+  p.stats.horaPunta = Math.round(p.t);
+  if (!avisar) return;
+  emitir(p, 'horaPunta', {});
+  decir(p, 'horaPunta', { unidad: cercana(p) });
+}
+
+// MURO: pasar de detrás a delante de un muro sin tocarlo, a más de 72 km/h y más rápido que él (decisión 69).
+function cruzarMuros(p) {
+  const j = p.jugador;
+  if (p.zona !== 'ronda') {
+    // Fuera de la Ronda no se cruza ningún muro: saliendo por una rampa y volviendo por delante no hay MURO.
+    for (const w of p.horaPunta.muros) w.detras = false;
+    return;
+  }
+  const pr = rondaProyectar(j.x, j.y);
+  const vJ = Math.abs(j.vf);
+  for (const w of p.horaPunta.muros) {
+    if (w.pasado) continue;
+    let largo = 0;
+    for (const c of w.miembros) largo = Math.max(largo, c.largo);
+    const rel = difS(pr.s, w.s);
+    if (rel < -(largo / 2 + 5)) {
+      w.detras = true;
+      continue;
+    }
+    if (rel <= largo / 2 + 5 || !w.detras) continue;
+    w.pasado = true;
+    if (w.tocado || p.contra || j.vf < 20 || j.vf < w.v + 3) continue;
+    const g = muro(p.botin, premioTrafico(p.traficoNivel));
+    j.nitro = Math.min(1, j.nitro + 0.1);
+    p.stats.muros++;
+    const cerca = p.policia.find((u) => u.distJugador < 60 && !u.coche.cuerpo);
+    emitir(p, 'muro', { gana: g, cadena: p.botin.cadena, mult: p.botin.mult, puerta: w.puerta, v: vJ - w.v });
+    if (cerca && p.ojo.estado === 'rojo') decir(p, 'muro', { unidad: cerca.nombre });
+  }
+}
 const premioTrafico = (nivel) => 1 + 0.25 * (nivel - 1); // cada rebase vale más cuanto más tráfico
 
 function subirNivelTrafico(p) {
@@ -6219,7 +6578,7 @@ function estilo(p, cercanos, dt) {
     const gap = Math.abs(lat) - (t.ancho + j.ancho) / 2;
     let seg = p.casi.get(t.id);
     if (solape && gap < 1.6) {
-      if (!seg) { seg = { min: gap, lat, vRel: 0, tocado: false }; p.casi.set(t.id, seg); }
+      if (!seg) { seg = { min: gap, lat, vRel: 0, tocado: false, color: t.color }; p.casi.set(t.id, seg); }
       if (gap < seg.min) { seg.min = gap; seg.lat = lat; }
       seg.vRel = Math.max(seg.vRel, Math.abs(j.vx * fx + j.vy * fy - (t.vx * fx + t.vy * fy)));
     } else if (seg) {
@@ -6285,7 +6644,7 @@ function terminarCasi(p, seg, vJ) {
   const gana = casiChoque(p.botin, fuerza, premioTrafico(p.traficoNivel));
   p.jugador.nitro = Math.min(1, p.jugador.nitro + 0.05);
   p.stats.casiChoques++;
-  emitir(p, 'casiChoque', { lado, fuerza, gana, cadena: p.botin.cadena, mult: p.botin.mult });
+  emitir(p, 'casiChoque', { lado, fuerza, gana, cadena: p.botin.cadena, mult: p.botin.mult, vRel: seg.vRel, color: seg.color }); // v12: para el barrido y el zas
   // HUECO: dos casi-choques por lados opuestos en 0,4 s, con menos de medio metro en cada uno.
   const u = p.ultimoCasi;
   if (u && p.t - u.t < 0.4 && u.lado !== lado && u.min < 0.55 && seg.min < 0.55) {
@@ -6707,7 +7066,7 @@ function averiasArreglables(j) {
   if (j.pinchado) r.push('rueda');
   return r;
 }
-return { DT, ESCENARIOS, DANIO, danioGolpe, MODOS, PAGO_REALISTA, NIVEL2, NIVEL3, TALLER_REGLAS, mapaPara, crearPartida, sacarEventos, EN3D, pasoPartida, cuantizar, entradaDeCinta, TRAFICO_T, premioTrafico, alcanceDeteccion, resumen };
+return { DT, ESCENARIOS, DANIO, danioGolpe, MODOS, PAGO_REALISTA, NIVEL2, NIVEL3, TALLER_REGLAS, mapaPara, crearPartida, sacarEventos, EN3D, pasoPartida, cuantizar, entradaDeCinta, TRAFICO_T, horaPuntaT, premioTrafico, alcanceDeteccion, resumen };
 })();
 
 // ---- src/logica/registro.js
@@ -6750,6 +7109,9 @@ function registroDe(p, extra = {}) {
     esp: p.modo === 'realista' ? (p.asistencia && p.asistencia.esp === false ? 'quitado' : 'puesto') : '',
     vuelcos: p.stats.vuelcos ?? 0,
     averias: (p.stats.averias || []).join('+'),
+    // v12: a qué segundo llegó la hora punta (vacío si no llegó) y los muros que cruzaste limpio.
+    horaPunta: p.horaPunta ? p.stats.horaPunta ?? 0 : '',
+    muros: p.stats.muros ?? 0,
   };
 }
 
@@ -6760,7 +7122,7 @@ function anotarSiguiente(lista, ahoraMs) {
   return lista;
 }
 
-const COLUMNAS = ['fecha', 'escenario', 'semilla', 'duracion', 'final', 'capturas', 'casiChoques', 'huecos', 'nivelMax', 'cobro', 'camara', 'control', 'revancha', 'siguienteEn', 'fps', 'fpsPeor', 'trafico', 'modo', 'danio', 'tumbadas', 'explosiones', 'causa', 'coche', 'rango', 'taller', 'mejoras', 'esp', 'vuelcos', 'averias'];
+const COLUMNAS = ['fecha', 'escenario', 'semilla', 'duracion', 'final', 'capturas', 'casiChoques', 'huecos', 'nivelMax', 'cobro', 'camara', 'control', 'revancha', 'siguienteEn', 'fps', 'fpsPeor', 'trafico', 'modo', 'danio', 'tumbadas', 'explosiones', 'causa', 'coche', 'rango', 'taller', 'mejoras', 'esp', 'vuelcos', 'averias', 'horaPunta', 'muros'];
 
 // Texto para copiar y pegar en un mensaje o una hoja de cálculo (separado por punto y coma).
 function aTexto(lista) {
@@ -8907,6 +9269,20 @@ function crearCabina(texEspejo) {
   espejo.grupo.rotation.set(-0.1, -0.35, 0, 'YXZ');
   g.add(espejo.grupo);
   caja(0.02, 0.1, 0.02, 0, 1.45, -0.67, oscuro);
+  // v12 (HORA PUNTA): un ambientador colgado del retrovisor que se balancea con los giros y los frenazos (el del vídeo
+  // de Alberto del 27/09). Un solo dibujo: el hilo y el arbolito van en la misma silueta.
+  const colgante = new THREE.Group();
+  colgante.position.set(0.03, 1.315, -0.655);
+  const forma = new THREE.Shape();
+  const silueta = [[0.0025, 0], [0.0025, -0.07], [0.02, -0.095], [0.009, -0.095], [0.03, -0.125], [0.013, -0.125],
+    [0.036, -0.155], [0.004, -0.155], [0.004, -0.167]];
+  forma.moveTo(-0.0025, 0);
+  for (const [x, y] of silueta) forma.lineTo(x, y);
+  for (const [x, y] of silueta.slice().reverse()) forma.lineTo(-x, y);
+  const arbolito = new THREE.Mesh(new THREE.ShapeGeometry(forma), new THREE.MeshLambertMaterial({ color: '#1F9E57', emissive: '#0B3D22', side: THREE.DoubleSide }));
+  arbolito.rotation.y = -0.5; // de cara al conductor
+  colgante.add(arbolito);
+  g.add(colgante);
   // v9: tira de luz a lo largo del salpicadero y pantalla central encendida.
   const led = new THREE.MeshBasicMaterial({ color: '#2F7BFF' });
   const tira = new THREE.Mesh(new THREE.BoxGeometry(1.56, 0.012, 0.012), led);
@@ -8917,7 +9293,7 @@ function crearCabina(texEspejo) {
   pantalla.rotation.x = -0.22;
   g.add(pantalla);
   return {
-    grupo: g, volante, capo, led, espejo: espejo.grupo, pintar: velo.pintar,
+    grupo: g, volante, capo, led, espejo: espejo.grupo, pintar: velo.pintar, colgante,
     materiales: [oscuro, medio, guante, espejo.marco],
     ojo: { lat: -0.37, lon: -0.15, alt: 1.18 },
   };
@@ -8985,6 +9361,7 @@ function crearCamaras(escena) {
     modo: 'persecucion', yaw: 0, atras: 0, muelle: 0, muelleV: 0, cabeceo: 0, fovExtra: 0, sacudida: 0,
     iniciada: false, aspecto: 1, alto: 1, tinte: 0, espejoN: 0,
     mirar: 0, ladeo: 0, plano: null, // v9: la cabeza del piloto y el plano de choque
+    colg: { rx: 0, rz: 0, vx: 0, vz: 0 }, // v12: el ambientador del retrovisor (ángulos y giros)
     choque: null, // v11: la cámara de choque (vuelcos, vuelos y golpes muy fuertes), en las tres vistas
   };
   const tmp = new THREE.Vector3(), mira = new THREE.Vector3();
@@ -9005,6 +9382,7 @@ function crearCamaras(escena) {
   return {
     camara,
     get modo() { return e.modo; },
+    colgante() { return { rx: e.colg.rx, rz: e.colg.rz }; }, // v12: para la prueba de humo
     // El coche del jugador: la cabina va dentro de él (la del F1 si llevas el F1; el capó, de su color).
     atar(v) {
       if (cocheVisual) cocheVisual.grupo.remove(cabina.grupo);
@@ -9149,7 +9527,9 @@ function crearCamaras(escena) {
         const vivo = cab && reduce === 1;
         const objMirar = vivo ? clamp((c.w || 0) * 0.1, -0.08, 0.08) + clamp(o.foco || 0, -0.16, 0.16) : 0;
         e.mirar += (objMirar - e.mirar) * Math.min(1, dt * 2.5);
-        e.ladeo += ((vivo ? clamp((c.vf || 0) * (c.w || 0) * 0.0035, -0.035, 0.035) : 0) - e.ladeo) * Math.min(1, dt * 4);
+        // v12 (HORA PUNTA): a más de 150 km/h se ladea algo más, hasta 2,9° a partir de 250 (antes, 2° siempre).
+        const maxLadeo = 0.035 + 0.015 * clamp((Math.abs(c.vf || 0) - 42) / 28, 0, 1);
+        e.ladeo += ((vivo ? clamp((c.vf || 0) * (c.w || 0) * 0.0035, -maxLadeo, maxLadeo) : 0) - e.ladeo) * Math.min(1, dt * 4);
         const yaw = pose.h + giro + e.mirar;
         const pendiente = cocheVisual ? cocheVisual.grupo.rotation.x : 0;
         mira.set(camara.position.x + Math.sin(yaw) * 10, camara.position.y - 0.35 + Math.tan(pendiente + e.cabeceo) * 10, camara.position.z - Math.cos(yaw) * 10);
@@ -9177,6 +9557,19 @@ function crearCamaras(escena) {
       // Cabina: el volante gira lo mismo que el móvil; con la policía a menos de 40 m, el interior se tiñe.
       if (e.modo === 'cabina') {
         cabina.volante.rotation.z = -(o.angVolante || 0);
+        // v12: el ambientador es un péndulo: al girar se va hacia fuera y al frenar, hacia delante. Con «efectos
+        // suaves», quieto.
+        if (cabina.colgante) {
+          const k = e.colg, L = 0.3, w0 = Math.sqrt(9.8 / L), paso = Math.min(dt, 1 / 30);
+          if (reduce === 1) {
+            const aLat = (c.vf || 0) * (c.w || 0), aLon = c.ax || 0;
+            k.vz += (-w0 * w0 * k.rz - clamp(aLat, -14, 14) / L - 1.6 * k.vz) * paso;
+            k.vx += (-w0 * w0 * k.rx - clamp(aLon, -14, 14) / L - 1.6 * k.vx) * paso;
+            k.rz = clamp(k.rz + k.vz * paso, -0.9, 0.9);
+            k.rx = clamp(k.rx + k.vx * paso, -0.9, 0.9);
+          } else k.rz = k.rx = k.vz = k.vx = 0;
+          cabina.colgante.rotation.set(k.rx, 0, k.rz);
+        }
         cabina.pintar(kmh, c.marchaAtras ? 'R' : String(c.marcha), o.t || 0);
         const tinte = o.policiaCerca ? (Math.floor((o.t || 0) * 6) % 2 ? 1 : -1) : 0;
         if (tinte !== e.tinte) {
@@ -9704,7 +10097,8 @@ function crearHud(raiz, ajustes) {
     <div class="h-aviso" hidden></div>
     <div class="h-grande" aria-live="polite"></div>
     <div class="h-radio" hidden><b class="quien"></b><span class="texto"></span></div>
-    <div class="h-pista" hidden></div>`;
+    <div class="h-pista" hidden></div>
+    <div class="h-barrido izq"></div><div class="h-barrido der"></div>`;
   raiz.appendChild(h);
   const $ = (s) => h.querySelector(s);
   const el = {
@@ -9714,6 +10108,7 @@ function crearHud(raiz, ajustes) {
     lanzada: $('.h-lanzada'), aguja: $('.h-lanzada .aguja'), detencion: $('.h-detencion'), detBarra: $('.h-detencion i'),
     aviso: $('.h-aviso'), grande: $('.h-grande'), radio: $('.h-radio'), quien: $('.h-radio .quien'), texto: $('.h-radio .texto'),
     pista: $('.h-pista'), premios: $('.premios'), crucero: $('.h-velo .crucero'), modo: $('.h-modo'),
+    barIzq: $('.h-barrido.izq'), barDer: $('.h-barrido.der'),
   };
   const cache = {};
   const poner = (k, v, fn) => { if (cache[k] !== v) { cache[k] = v; fn(v); } };
@@ -9885,6 +10280,15 @@ function crearHud(raiz, ajustes) {
     while (el.premios.children.length > 4) el.premios.firstChild.remove();
     setTimeout(() => d.remove(), 1100);
   }
+  // v12 (HORA PUNTA): el barrido del coche que rebasas, por su lado, con su color (en cabina y capó).
+  function barrido(lado, fuerza, color = '#FFFFFF') {
+    const b = lado < 0 ? el.barIzq : el.barDer;
+    b.style.setProperty('--fuerza', String(clamp(fuerza, 0.15, 0.85)));
+    b.style.setProperty('--color', /^#[0-9a-f]{6}$/i.test(color) ? color : '#FFFFFF');
+    b.classList.remove('on');
+    void b.offsetWidth;
+    b.classList.add('on');
+  }
   let voz = null;
   function elegirVoz() {
     try {
@@ -9977,6 +10381,7 @@ function crearHud(raiz, ajustes) {
     aviso,
     pista,
     premio,
+    barrido,
     radio,
     callar,
     mostrar(si) { h.hidden = !si; },
@@ -10112,7 +10517,7 @@ function crearMenu(raiz, api) {
           <span class="nota-modo">${NOTA_MODO[a.modo] || NOTA_MODO.verdad}</span>
         </div>
         ${rec || recR ? `<p class="record">${rec ? `Tu mejor botín: <b>${fmt(rec)}</b> chapas` : ''}${rec && recR ? ' · ' : ''}${recR ? `en Realista: <b>${fmt(recR)}</b>` : ''}</p>` : ''}
-        <p class="pie">Beta v11 · 26/09 · prototipo de la fase 0 · todo el sonido y la ciudad se generan en tu móvil · coches con nombre real solo en esta beta privada</p>
+        <p class="pie">Beta v12 · 28/09 · prototipo de la fase 0 · todo el sonido y la ciudad se generan en tu móvil · coches con nombre real solo en esta beta privada</p>
       </div>`, 'portada-on');
     capa.querySelectorAll('.esc').forEach((b) => b.addEventListener('click', () => api.alJugar(b.dataset.esc)));
     capa.querySelectorAll('[data-control]').forEach((b) => b.addEventListener('click', () => {
@@ -10876,11 +11281,13 @@ function crearAudio() {
     rafaga({ t, ataque: 0.01, dur: 0.35, pico: 0.13, tipo: 'highpass', f: 1000, f2: 4000, q: 0.7, destino: n.volMotor });
   }
 
-  // El «zas» de un casi-choque: el tirón que se tiene que oír.
-  function zas(t, lado, fuerza) {
+  // El «zas» de un casi-choque: el tirón que se tiene que oír. v12 (HORA PUNTA): cuanto más deprisa lo pasas (vRel, m/s),
+  // más fuerte, más agudo y más corto, como en el vídeo de Alberto.
+  function zas(t, lado, fuerza, vRel = 20) {
+    const k = lim(num(vRel, 20) / 40, 0, 1, 0.5);
     rafaga({
-      t, ataque: 0.01, dur: 0.3, pico: 0.35 * fuerza * RUIDO_BANDA, tipo: 'bandpass',
-      f: 3200, f2: 500, q: 1.5, destino: n.volEfectos, pan: lado * 0.85,
+      t, ataque: 0.01, dur: 0.34 - 0.12 * k, pico: 0.35 * fuerza * (0.7 + 0.6 * k) * RUIDO_BANDA, tipo: 'bandpass',
+      f: 2600 + 1600 * k, f2: 500, q: 1.5, destino: n.volEfectos, pan: lado * 0.85,
     });
   }
 
@@ -11077,8 +11484,16 @@ function crearAudio() {
   const EVENTOS = {
     cambio: (t, d) => cambio(t, d),
     petardeo: (t) => petardeo(t, 0.8),
-    casiChoque: (t, d) => zas(t, num(d.lado, 1) < 0 ? -1 : 1, lim(d.fuerza, 0, 1, 0.7)),
+    casiChoque: (t, d) => zas(t, num(d.lado, 1) < 0 ? -1 : 1, lim(d.fuerza, 0, 1, 0.7), d.vRel),
     hueco: (t) => enHueco(t),
+    // v12 (HORA PUNTA): cruzar un muro limpio: los dos lados a la vez, un golpe de aire grave y una subida.
+    muro: (t, d) => {
+      const k = lim(num(d.v, 15) / 35, 0, 1, 0.5);
+      zas(t, -1, 0.9, 20 + 20 * k);
+      zas(t + 0.04, 1, 0.9, 20 + 20 * k);
+      rafaga({ t, ataque: 0.02, dur: 0.4, pico: 0.25 * RUIDO_BANDA, tipo: 'lowpass', f: 380, f2: 140, q: 0.8, destino: n.volEfectos });
+      tono({ f: 880, f2: 1760, t: t + 0.05, ataque: 0.01, caida: 0.3, pico: 0.05, destino: n.volEfectos });
+    },
     golpe: (t, d) => golpe(t, lim(d.fuerza, 0, 1, 0.6)),
     choque: (t, d) => choque(t, lim(d.fuerza, 0, 1, 0.6), !!d.cristal),
     pieza: (t, d) => pieza(t, lim(d.fuerza, 0, 1, 0.5), d.dist),
@@ -11928,7 +12343,8 @@ let EN_MARCO = false;
 try { EN_MARCO = window.self !== window.top; } catch (_) { EN_MARCO = true; }
 let menosMovimiento = false;
 try { menosMovimiento = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (_) { /* sin preferencia */ }
-const TRAFICO_AVISO = ['', '', 'LA RONDA SE CARGA', 'HORA PUNTA', 'RONDA COLAPSADA'];
+// v12: el nivel 3 ya no se llama HORA PUNTA: ahora es la de los muros (decisión 69), que llega con el nivel 4.
+const TRAFICO_AVISO = ['', '', 'LA RONDA SE CARGA', 'LA RONDA SE LLENA', 'RONDA COLAPSADA'];
 const AJUSTES_BASE = {
   control: TACTIL ? 'inclinacion' : 'botones', sensibilidad: 3, acelerador: 'auto', ayudaVolante: 'completa', camara: 'persecucion', luz: 'noche',
   modo: 'verdad', // v6: 'verdad' (los golpes dañan) o 'practica'; v11: 'realista' (la física de verdad)
@@ -12247,7 +12663,9 @@ function arrancar() {
     const t0 = performance.now();
     registro = anotarSiguiente(registro, Date.now());
     guardarLS(LS.registro, registro);
-    const p = crearPartida({ escenario, semilla, modo: ajustes.modo, esp: ajustes.esp !== 'quitado', rango: rangoDe(carrera.acumulado), coche: cocheDeLaPartida(), mejoras: mejorasDeLaPartida() });
+    // v12: con #horapunta en el enlace, la hora punta desde el principio (para probarla sin aguantar 110 s, como #debug).
+    const horaPuntaYa = typeof location !== 'undefined' && /horapunta/.test(location.search + location.hash);
+    const p = crearPartida({ escenario, semilla, modo: ajustes.modo, esp: ajustes.esp !== 'quitado', rango: rangoDe(carrera.acumulado), coche: cocheDeLaPartida(), mejoras: mejorasDeLaPartida(), ...(horaPuntaYa ? { horaPunta: true } : {}) });
     montarPartida(p);
     audio.perfilMotor(p.jugador.m.sonido);
     Object.assign(juego, {
@@ -12557,8 +12975,12 @@ function arrancar() {
         if (ev.danio >= 0.4 && p.mapa.rampasAbiertas) pista('taller', 'TALLER: en la avenida del Puerto (cuadro verde en el mapa). Para 3 s dentro y te arregla la mitad del daño. Una vez por fuga.', 7);
         break;
       case 'casiChoque':
-        audio.evento('casiChoque', { lado: ev.lado === 'izquierda' ? -1 : 1, fuerza: ev.fuerza });
+        audio.evento('casiChoque', { lado: ev.lado === 'izquierda' ? -1 : 1, fuerza: ev.fuerza, vRel: ev.vRel });
         hud.premio(`+${ev.gana}`, ev.cadena >= 3 ? 'cadena' : '');
+        // v12 (HORA PUNTA): desde dentro, el coche rebasado pasa como un barrido por su lado (más cuanto más deprisa).
+        if (ajustes.efectos !== 'suaves' && camaras.modo !== 'persecucion') {
+          hud.barrido(ev.lado === 'izquierda' ? -1 : 1, ev.fuerza * Math.min(1, Math.max(0.35, (ev.vRel || 0) / 28)), ev.color);
+        }
         vibra('tic');
         pista('casi', 'Rebase rozando: llena el nitro y alarga la cadena que multiplica el botín. Si tocas un coche, se rompe.', 5.5);
         break;
@@ -12567,6 +12989,18 @@ function arrancar() {
         hud.grande('¡HUECO!', 'hueco', 1.1, t);
         hud.premio(`HUECO +${ev.gana}`, 'hueco');
         juego.lento = 0.5;
+        vibra('dobleTic');
+        break;
+      case 'horaPunta':
+        // v12 (decisión 69): la parte difícil: la Ronda va en muros.
+        hud.aviso('HORA PUNTA · la Ronda va en muros: busca la puerta', 'peligro', 3.2, t);
+        vibra('dobleTic');
+        pista('horaPunta', 'Hora punta: los coches van de dos en dos, en paralelo. El carril libre es la puerta, y se mueve: mira los intermitentes. Cruzarla limpio da MURO. A la policía ya nadie le abre paso.', 8);
+        break;
+      case 'muro':
+        audio.evento('muro', { v: ev.v });
+        hud.grande('¡MURO!', 'hueco', 0.9, t);
+        hud.premio(`MURO +${ev.gana}`, 'hueco');
         vibra('dobleTic');
         break;
       case 'trafico':
