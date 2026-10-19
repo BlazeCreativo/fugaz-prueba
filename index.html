@@ -7,9 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#070A12">
 <meta name="description" content="FUGAZ, prototipo de la fase 0: pierde a la policía rompiendo su línea de visión.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Overpass+Mono:wght@500;700&family=Overpass:wght@400;600;800&family=Saira+Extra+Condensed:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/fuentes/fuentes.css">
 <style>
 :root {
   color-scheme: dark;
@@ -452,7 +450,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cian); outl
   <div id="capas"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="vendor/three.min.js"></script>
 <script>
 (() => {
 'use strict';
@@ -12328,7 +12326,13 @@ const LS = { ajustes: 'fugaz.ajustes', registro: 'fugaz.registro', record: 'fuga
 function leerLS(clave, porDefecto) {
   try {
     const v = localStorage.getItem(clave);
-    return v === null ? porDefecto : JSON.parse(v);
+    if (v === null) return porDefecto;
+    const dato = JSON.parse(v);
+    // Validación: un dato guardado de otro tipo (o manipulado a mano) se descarta.
+    if (porDefecto !== null && porDefecto !== undefined &&
+        (typeof dato !== typeof porDefecto || Array.isArray(dato) !== Array.isArray(porDefecto) || dato === null)) return porDefecto;
+    if (typeof dato === 'number' && !Number.isFinite(dato)) return porDefecto;
+    return dato;
   } catch (_) {
     return porDefecto;
   }
