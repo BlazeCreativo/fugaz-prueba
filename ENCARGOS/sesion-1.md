@@ -1,0 +1,2 @@
+# Encargo · sesión 1 · fugaz-prueba
+Lee AUDITORIA.md (auditoría del 19-oct-2026) y el README si existe. Ejecuta su hoja de ruta en orden: primero lo que haga que la app arranque y funcione de verdad, después seguridad (claves fuera del código, validaciones), después pruebas automáticas y README con instalación y uso en español. Commits pequeños. No publiques nada ni uses servicios de pago. Deja TODO.md con lo que falta y una línea final en README: "Estado: funciona / no funciona, y por qué".
