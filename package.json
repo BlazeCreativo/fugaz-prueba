@@ -1,10 +1,10 @@
 {
   "name": "fugaz-prueba",
   "version": "1.0.0",
-  "description": "",
+  "description": "FUGAZ: persecución policial en el navegador y prototipo «persecución y escape»",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "playwright test"
   },
   "repository": {
     "type": "git",

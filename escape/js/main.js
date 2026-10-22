@@ -268,6 +268,7 @@ pulsar($('logo'), () => {
   if (toquesLogo.length >= 5) { toquesLogo = []; abrirPanel(); }
 });
 function abrirPanel() {
+  if (estado !== 'inicio' && estado !== 'fin') return; // nunca a mitad de partida
   $('panelTexto').textContent = JSON.stringify(metricas.resumen(), null, 2);
   $('panel').hidden = false;
 }

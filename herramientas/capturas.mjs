@@ -53,9 +53,12 @@ await sesion('pc', { viewport: { width: 1280, height: 720 } }, async (page, foto
   await avanzar(page, 25);
   await page.waitForTimeout(300);
   await foto('1-persecucion');
+  await page.evaluate(() => window.__escape.avanzar(120));
+  await page.waitForTimeout(1000);
+  await foto('2-final');
   await page.keyboard.press('Shift+M');
   await page.waitForTimeout(300);
-  await foto('2-metricas');
+  await foto('3-metricas');
 });
 
 await navegador.close();
