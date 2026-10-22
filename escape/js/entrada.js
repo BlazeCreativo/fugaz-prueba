@@ -13,7 +13,7 @@ export function crearEntrada(zona) {
     e.x0 = ev.clientX;
     e.tocando = true;
     e.tipo = ev.pointerType;
-    zona.setPointerCapture?.(ev.pointerId);
+    try { zona.setPointerCapture(ev.pointerId); } catch { /* puntero sintético o ya soltado */ }
   });
   zona.addEventListener('pointermove', (ev) => {
     if (ev.pointerId !== e.puntero) return;

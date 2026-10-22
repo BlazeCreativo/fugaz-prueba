@@ -264,7 +264,7 @@ document.addEventListener('visibilitychange', () => {
 let toquesLogo = [];
 pulsar($('logo'), () => {
   const t = performance.now();
-  toquesLogo = toquesLogo.filter((x) => t - x < 2500).concat(t);
+  toquesLogo = toquesLogo.filter((x) => t - x < 4000).concat(t);
   if (toquesLogo.length >= 5) { toquesLogo = []; abrirPanel(); }
 });
 function abrirPanel() {
