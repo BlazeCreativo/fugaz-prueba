@@ -195,7 +195,7 @@ export function crearEscena(lienzo) {
 
     // Cámara: detrás y arriba. En vertical (móvil) más alta para ver los cuatro carriles.
     const vertical = camara.aspect < 1;
-    const alturaCam = vertical ? 15 : 6.5, atras = vertical ? 14 : 11, delante = vertical ? 30 : 34;
+    const alturaCam = vertical ? 15 : 8.5, atras = vertical ? 14 : 13, delante = vertical ? 30 : 30;
     const fov = (vertical ? 80 : 56) + Math.max(0, v.v - 30) * 0.35 + (lenta ? -8 : 0);
     if (Math.abs(camara.fov - fov) > 0.05) { camara.fov = fov; camara.updateProjectionMatrix(); }
     const sx = sacudida ? (hash01(Math.floor(v.t * 60)) - 0.5) * sacudida : 0;
