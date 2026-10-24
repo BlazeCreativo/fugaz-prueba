@@ -73,7 +73,7 @@ test('roce: pasar rozando suma puntos y sube el multiplicador; frenar pierde el 
   expect(m.roces).toBe(1);
   expect(m.mult).toBeGreaterThan(1);
   expect(m.combo).toBe(1);
-  await expect(page.locator('.aviso').first()).toContainText(/AL LÍMITE|ROCE/);
+  await expect(page.locator('#avisos')).toHaveAttribute('data-ultimo', /AL LÍMITE|ROCE/);
   // pasar lejos no cuenta
   await page.evaluate(() => { window.__noche.mundo.ponerCoche(30, 4.5); window.__noche.avanzar(2); });
   expect((await mundo(page)).roces).toBe(1);

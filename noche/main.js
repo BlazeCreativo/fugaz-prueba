@@ -137,6 +137,7 @@
     const d = document.createElement('div');
     d.className = 'aviso ' + (clase || ''); d.textContent = texto;
     $('avisos').appendChild(d);
+    $('avisos').dataset.ultimo = texto;
     setTimeout(() => d.remove(), 950);
   }
   let pulsoT = 0;

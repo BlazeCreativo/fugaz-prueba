@@ -187,9 +187,10 @@ function tratarSucesos(lista) {
 let ultimo = performance.now();
 function bucle(ahora) {
   requestAnimationFrame(bucle);
-  const dtReal = Math.min(0.1, (ahora - ultimo) / 1000);
+  const dtReloj = Math.min(1, Math.max(0, (ahora - ultimo) / 1000));
+  const dtReal = Math.min(0.1, dtReloj);
   ultimo = ahora;
-  tEstado += dtReal;
+  tEstado += dtReloj; // cuenta atrás y pausas con el reloj de verdad, aunque el dispositivo vaya lento
   const mando = entrada.leer(dtReal);
 
   if (estado === 'inicio') {
