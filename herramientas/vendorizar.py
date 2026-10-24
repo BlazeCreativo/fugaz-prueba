@@ -26,12 +26,12 @@ for clave, (nombre, pesos) in FAMILIAS.items():
                 "src:url('%s') format('woff2')}\n" % (nombre, peso, archivo))
 open("vendor/fuentes/fuentes.css", "w").write(css)
 
-s = open("index.html").read()
+s = open("v12/index.html").read()
 if "fonts.googleapis.com" in s:
     a = s.index('<link rel="preconnect" href="https://fonts.googleapis.com">')
     cierre = 'rel="stylesheet">'
     b = s.index(cierre, a) + len(cierre)
     s = s[:a] + '<link rel="stylesheet" href="vendor/fuentes/fuentes.css">' + s[b:]
 s = s.replace("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js", "vendor/three.min.js")
-open("index.html", "w").write(s)
+open("v12/index.html", "w").write(s)
 print("listo")
