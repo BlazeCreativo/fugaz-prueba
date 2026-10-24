@@ -1,5 +1,15 @@
 # Pendiente
 
+## v13 «Noche en autopista» (`index.html` + `noche/`)
+
+- **Medir en aparatos reales** (solo Alberto): un PC normal y un móvil de gama media. Abrir con `?fps=1` y apuntar los fps y el nivel de calidad que elige «Auto». Aquí solo se ha medido con GPU por software (ver el informe).
+- **Dificultad con personas**: el piloto automático prudente llega al final casi siempre (frena mucho y puntúa poco); el que busca roces hace unos 6 roces y 1,7 golpes por partida. Ajustar en `noche/config.js`: densidad, velocidad del tráfico, hueco de roce (1,25 m) y vida del combo (4,5 s).
+- **iPhone/Safari**: la inclinación pide permiso y solo va por https; no probado en un iPhone real.
+- **Mando**: probado con un mando simulado en las pruebas; falta uno de verdad (Xbox/PlayStation por USB o Bluetooth).
+- **Aspecto**: los coches son cajas con sombreado fijo. Siguientes mejoras baratas: faros del tráfico que iluminan el asfalto delante, retrovisor que refleje, lluvia ligera.
+- **Sonido**: no hay (decisión de Alberto: «lo del audio, déjalo tranquilo de momento»).
+- **Publicar**: no se ha tocado GitHub Pages ni `main`. Si se publica, `main` pasa a abrir v13 en la raíz y v12 queda en `v12/`.
+
 ## Prototipo «persecución y escape» (`escape/`)
 
 - **Probar en 2 o 3 móviles reales** (Android medio y un iPhone) y apuntar:
@@ -24,7 +34,7 @@
 - **Métricas**: se guardan solo en este navegador. Para juntar las de varias personas hay que exportar a mano cada JSON y combinarlo; no hay ningún servidor, y así lo pide el encargo.
 - El contexto de la tarea 140 (`/home/alberto/empresa/handoff/cola/tarea-140.md`) está fuera de la carpeta del proyecto. Las normas del taller no permiten salir de ella, así que no se ha leído. Las métricas se han sacado de la lista del encargo. Revisar que coinciden con las definiciones exactas de la tarea 140.
 
-## FUGAZ original (`index.html`)
+## FUGAZ v12 (`v12/index.html`)
 
 - Recuperar la carpeta `src/` (el código fuente original; `index.html` es un archivo generado). No está en este repositorio.
   - Los módulos se ven marcados dentro de `index.html` (`// ---- src/...`), así que se podría escribir un separador automático.

@@ -86,7 +86,7 @@
   }
   function avisoMenu(t) { $('ayuda').textContent = t; }
   escena.ponerVista(ajustes.camara);
-  if (ajustes.control === 'inclinar') entrada.pedirInclinacion(); // en Android no hace falta permiso; en iOS se vuelve a pedir al tocar
+  if (ajustes.control === 'inclinar') entrada.pedirInclinacion(); // en Android no hace falta permiso; en iOS se vuelve a pedir al pulsar JUGAR
   pintarOpciones();
 
   // ---------------------------------------------------------------- partida
@@ -122,9 +122,17 @@
     ajustes.camara = ajustes.camara === 'cabina' ? 'fuera' : 'cabina';
     guardarAjustes(); escena.ponerVista(ajustes.camara); pintarOpciones();
   }
-  $('jugar').addEventListener('click', (ev) => { ev.stopPropagation(); nuevaPartida(); });
-  $('unamas').addEventListener('click', (ev) => { ev.stopPropagation(); nuevaPartida(); });
-  $('menu').addEventListener('click', () => { $('fin').hidden = true; $('inicio').hidden = false; $('hud').hidden = true; pintarOpciones(); cambiar('inicio'); $('jugar').focus(); });
+  $('jugar').addEventListener('click', async (ev) => {
+    ev.stopPropagation();
+    // iPhone: el permiso de inclinación solo se puede pedir tras un toque; si no lo da, pasamos a pulgar
+    if (entrada.modo === 'inclinar' && !entrada.hayInclinacion && !(await entrada.pedirInclinacion())) {
+      entrada.modo = ajustes.control = 'pulgar'; guardarAjustes(); pintarOpciones();
+    }
+    empezar();
+  });
+  $('unamas').addEventListener('click', (ev) => { ev.stopPropagation(); empezar(); });
+  $('menu').addEventListener('click', () => {
+    if (estado !== 'fin' || performance.now() - ultimoFin < 350) return; $('fin').hidden = true; $('inicio').hidden = false; $('hud').hidden = true; pintarOpciones(); cambiar('inicio'); $('jugar').focus(); });
   $('btnCam').addEventListener('pointerdown', (ev) => ev.stopPropagation());
   $('btnCam').addEventListener('click', (ev) => { ev.stopPropagation(); cambiarCamara(); });
 
@@ -189,8 +197,10 @@
   }
 
   // ---------------------------------------------------------------- bucle
+  const PILOTO = PRUEBA && params.get('piloto') === '1';
+  const MANUAL = PRUEBA && params.get('manual') === '1'; // fotogramas a mano (para grabar el clip a ritmo fijo)
   const PASO = 1 / 60;
-  let acumulado = 0, ant = performance.now();
+  let acumulado = 0, ant = performance.now(), relojesT = 1;
   const NEUTRO = { giro: 0, freno: 0, gas: 0 };
   let entradaActual = NEUTRO;
   // mundo de decorado para el menú (sin tráfico peligroso: solo pasa)
@@ -219,11 +229,12 @@
       entrada.leer(dtReal); // descarta lo que haya
     } else if (estado === 'jugando') {
       entradaActual = entrada.leer(dtReal);
+      if (PILOTO) entradaActual = N.pilotoRoce(mundo);
       acumulado += dtReal;
       while (acumulado >= PASO) { mundo.paso(PASO, entradaActual); acumulado -= PASO; if (mundo.fin) break; }
       eventos();
       if (mundo.t > 6 && !$('guia').hidden) $('guia').hidden = true;
-      if (mundo.fin) { cambiar(mundo.fin.final === 'choque' ? 'golpe' : 'golpe'); tGolpe = 0; acumulado = 0; }
+      if (mundo.fin) { cambiar('golpe'); tGolpe = 0; acumulado = 0; }
       pintarHud(dtReal);
     } else if (estado === 'golpe') {
       // medio segundo a cámara lenta antes de la pantalla final
@@ -232,14 +243,25 @@
       if (tGolpe > (mundo.fin.final === 'choque' ? 0.6 : 0.2)) mostrarFin();
     }
     const turbo = estado === 'jugando' && entradaActual.gas > 0.5;
-    const relojesNuevos = relojes.dibujar(visible.jug, turbo, dtReal);
+    relojesT += dtReloj;
+    const relojesNuevos = relojesT >= 1 / 30;
+    if (relojesNuevos) { relojes.dibujar(visible.jug, turbo, relojesT); relojesT = 0; }
     escena.dibujar(visible, dtVista, { turbo: turbo ? 1 : 0, relojesNuevos });
     if (mostrarFps) $('fps').textContent = `${fps.media.toFixed(0)} fps · ${escena.nivel} · ${escena.info().llamadas} llamadas`;
-    requestAnimationFrame(cuadro);
+    if (!MANUAL) requestAnimationFrame(cuadro);
   }
   const mostrarFps = params.get('fps') === '1';
   $('fps').hidden = !mostrarFps;
-  requestAnimationFrame(cuadro);
+  // los carteles se pintan con Saira: esperar a la fuente (como mucho 1,5 s) antes del primer fotograma
+  const fuentes = document.fonts ? Promise.race([Promise.all([document.fonts.load('800 54px "Saira Extra Condensed"'),
+    document.fonts.load('600 44px "Saira Extra Condensed"')]), new Promise((r) => setTimeout(r, 1500))]) : Promise.resolve();
+  fuentes.catch(() => {}).then(() => { ant = performance.now(); if (!MANUAL) requestAnimationFrame(cuadro); });
+
+  // al volver de otra pestaña o app: cuenta atrás corta antes de seguir
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && estado === 'jugando') { cambiar('cuenta'); acumulado = 0; }
+    if (!document.hidden) ant = performance.now();
+  });
 
   // ---------------------------------------------------------------- para las pruebas
   window.__noche = {
@@ -247,12 +269,17 @@
     get mundo() { return mundo; },
     get fps() { return fps.media; },
     get nivel() { return escena.nivel; },
+    // modo manual: dibuja n fotogramas de dt segundos
+    fotogramas(n, dt = 1 / 30) {
+      const gl = escena.renderer.getContext(), px = new Uint8Array(4);
+      for (let i = 0; i < n; i++) { cuadro(ant + dt * 1000); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); } // espera a la GPU
+    },
     escena, entrada,
     // simula segundos de partida de golpe (con la entrada que se le pase)
     avanzar(seg, ent = NEUTRO) {
       if (estado === 'cuenta') { cambiar('jugando'); $('cuenta').hidden = true; }
       if (estado !== 'jugando') return;
-      for (let i = 0; i < Math.round(seg / PASO) && !mundo.fin; i++) mundo.paso(PASO, ent);
+      for (let i = 0; i < Math.round(seg / PASO) && !mundo.fin; i++) mundo.paso(PASO, PILOTO ? N.pilotoRoce(mundo) : ent);
     },
   };
 })(window.N = window.N || {});

@@ -79,19 +79,22 @@
       for (const c of m.coches) {
         if (c.fijo) { c.s += c.v * dt; continue; }
         if (c.chocado) { // tras un golpe: se frena y se queda donde está
-          c.v = Math.max(0, c.v - 14 * dt); c.s += c.v * dt; c.golpeado += dt; continue;
+          c.v = Math.max(N.ms(35), c.v - 14 * dt); c.s += c.v * dt; c.golpeado += dt; continue;
         }
         // seguir al de delante en el mismo carril
         let delante = null, dist = 1e9;
         for (const o of m.coches) {
-          if (o === c || Math.abs(o.x - c.x) > 2.2) continue;
+          if (o === c || o.chocado || Math.abs(o.x - c.x) > 2.2) continue;
           const d = o.s - c.s;
           if (d > 0 && d < dist) { dist = d; delante = o; }
         }
+        // el jugador también cuenta: si frenas, el de detrás frena (no te embiste sin verlo)
+        const dj = jug.s - c.s;
+        if (Math.abs(jug.x - c.x) < 2.4 && dj > 0 && dj < dist) { dist = dj; delante = jug; }
         let vObj = c.vObj;
-        if (delante && dist < 32) vObj = Math.min(vObj, delante.v - (dist < 14 ? 3 : 0));
+        if (delante && dist < (delante === jug ? 45 : 32)) vObj = Math.min(vObj, delante.v - (dist < 14 ? 3 : 0));
         const antes = c.v;
-        c.v += Math.max(-9 * dt, Math.min(3 * dt, vObj - c.v));
+        c.v += Math.max(-(delante === jug ? 16 : 9) * dt, Math.min(3 * dt, vObj - c.v));
         c.frenando = c.v < antes - 0.02 ? 0.4 : Math.max(0, c.frenando - dt);
         c.s += c.v * dt;
         // cambio de carril con intermitente
@@ -107,7 +110,7 @@
           if (c.cambio) c.intermitente = k.dir;
         } else {
           c.proxCambio -= dt;
-          const quiere = c.proxCambio < 0 || (delante && dist < 24 && delante.v < c.v - 2);
+          const quiere = c.proxCambio < 0 || (delante && delante !== jug && dist < 24 && delante.v < c.v - 2);
           if (quiere) {
             c.proxCambio = rnd.entre(C.cambioCarril[0], C.cambioCarril[1]);
             const dir = rnd() < 0.5 ? -1 : 1;
@@ -265,5 +268,28 @@
     const cierre = J.v - vDel; // m/s con los que te acercas
     const frena = delante > 2 && delante < 250 && cierre > 0 && cierre * cierre / (2 * C.frenada) > delante - 10;
     return { giro, freno: frena ? 1 : 0, gas: 0 };
+  };
+  // Piloto que busca roces (para el clip y la demo): se pega al lado del coche que tiene delante si ese lado
+  // está libre; si no, conduce como el piloto prudente.
+  N.pilotoRoce = function (m) {
+    const J = m.jug, C = N.C, P = m.pista;
+    const base = N.piloto(m);
+    if (base.freno) return base;
+    let obj = null, mejor = 1e9;
+    for (const c of m.coches) {
+      const ds = c.s - J.s;
+      if (ds < 12 || ds > 70 || c.cambio || c.pasado) continue;
+      for (const lado of [-1, 1]) {
+        const x = c.x + lado * ((c.ancho + J.ancho) / 2 + 0.3);
+        if (Math.abs(x) > P.muro - J.ancho / 2 - 0.1) continue;
+        let libre = true;
+        for (const o of m.coches) if (o !== c && Math.abs(o.x - x) < (o.ancho + J.ancho) / 2 + 0.3 && o.s - J.s > -6 && o.s - J.s < ds + 25) libre = false;
+        const coste = ds + Math.abs(x - J.x) * 6;
+        if (libre && coste < mejor && Math.abs(x - J.x) < 7) { mejor = coste; obj = x; }
+      }
+    }
+    if (obj === null) return base;
+    m._obj = obj;
+    return { giro: Math.max(-1, Math.min(1, (obj - J.x) * 1.6 - J.vx * 0.08)), freno: 0, gas: 0 };
   };
 })(typeof window !== 'undefined' ? (window.N = window.N || {}) : (globalThis.N = globalThis.N || {}));

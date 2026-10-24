@@ -46,7 +46,12 @@
       if (d.x - d.x0 < -RECORRIDO) d.x0 = d.x + RECORRIDO;
       if (Math.abs(d.x - d.x0) > 10) e.usado = true;
     });
-    const soltar = (ev) => { e.dedos.delete(ev.pointerId); };
+    const soltar = (ev) => {
+      const eraPrimero = e.dedos.keys().next().value === ev.pointerId;
+      e.dedos.delete(ev.pointerId);
+      // si el que queda pasa a mandar, empieza desde donde está: sin saltos de volante
+      if (eraPrimero) for (const d of e.dedos.values()) { d.x0 = d.x; d.y0 = d.y; break; }
+    };
     zona.addEventListener('pointerup', soltar);
     zona.addEventListener('pointercancel', soltar);
 

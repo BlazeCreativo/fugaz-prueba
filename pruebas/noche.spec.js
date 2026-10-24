@@ -210,3 +210,12 @@ test.describe('móvil', () => {
     expect(v.errores).toEqual([]);
   });
 });
+
+test('se abre con doble clic (file://) sin servidor', async ({ page }) => {
+  const errores = [];
+  page.on('pageerror', (e) => errores.push(e.message));
+  await page.goto('file://' + require('path').join(__dirname, '..', 'index.html') + '?prueba=1&invulnerable=1');
+  await page.locator('#jugar').click();
+  await expect.poll(() => estado(page), { timeout: 5000 }).toBe('jugando');
+  expect(errores).toEqual([]);
+});

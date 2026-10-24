@@ -200,9 +200,11 @@
       for (const t of pista.tuneles) for (const sb of [t.s0, t.s1]) {
         if (sb < s0 || sb >= s1) continue;
         const p = pista.punto(sb, a);
-        caja(sol, p, 0, p.y + 6.5, p.y + 13, 2 * mu + 14, 2, [0.13, 0.13, 0.15], [0.2, 0.2, 0.22]);
-        for (const d of [1, -1]) caja(sol, p, d * (mu + 4), p.y - 1.6, p.y + 13, 7, 2, [0.11, 0.11, 0.13]);
-        pT.poner(W(p, 0, 7.5), [0.9, 0.2, 0.15]);
+        caja(sol, p, 0, p.y + 6.5, p.y + 12, 2 * mu + 14, 2, [0.07, 0.07, 0.085], [0.1, 0.1, 0.11]);
+        for (const d of [1, -1]) caja(sol, p, d * (mu + 4), p.y - 1.6, p.y + 12, 7, 2, [0.06, 0.06, 0.075]);
+        const pc = pista.punto(sb - 1.05, tmp2);
+        for (let x = -mu; x <= mu + 0.01; x += mu / 4) pT.poner(W(pc, x, 7.1), [1, 0.75, 0.4]);
+        pT.poner(W(pc, -mu - 2, 9.5), [0.9, 0.15, 0.1]); pT.poner(W(pc, mu + 2, 9.5), [0.9, 0.15, 0.1]);
       }
       // edificios, neones y luces de la ciudad de abajo
       const todoTunel = pista.enTunel(s0) && pista.enTunel(s1);
@@ -326,8 +328,13 @@
     // ---------------------------------------------------------------- coche del jugador y cabina
     const COLOR_JUG = new THREE.Color(0x19c6d8);
     let cocheJug, pilotosJug, haz;
+    // La cabina va en una escena aparte que se dibuja encima al final: así el desenfoque de velocidad y la
+    // niebla no la tocan y los relojes se leen siempre.
     const cabina = new THREE.Group(), cabBajo = new THREE.Group(), cabAlto = new THREE.Group();
     cabina.add(cabBajo, cabAlto);
+    const escenaCabina = new THREE.Scene();
+    cabina.matrixAutoUpdate = false;
+    escenaCabina.add(cabina);
     const lienzoRelojes = op.lienzoRelojes;
     let relojesTex = null, volante = null;
     function crearCabina() {
@@ -338,11 +345,12 @@
       c(0, -0.66, -0.43, 2.6, 0.6, 0.98, NEGRO, GRIS);     // salpicadero
       c(0, -1.0, -0.62, 2.6, 0.35, 0.55, NEGRO, NEGRO);     // parte baja
       c(0, -0.19, -0.16, 0.62, 0.22, 0.7, NEGRO, GRIS);     // visera de los relojes
-      cabBajo.add(new THREE.Mesh(H.geometria(), M.solido));
+      const mCab = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide, fog: false });
+      cabBajo.add(new THREE.Mesh(H.geometria(), mCab));
       const H2 = new Hacedor();
       caja(H2, Object.assign({}, p0, { z: -0.1 }), 0, 0.52, 0.6, 2.6, 0.9, NEGRO, NEGRO);                  // techo
       caja(H2, Object.assign({}, p0, { z: -0.72 }), 0.05, 0.36, 0.42, 0.24, 0.03, [0.05, 0.06, 0.09]);     // retrovisor
-      cabAlto.add(new THREE.Mesh(H2.geometria(), M.solido));
+      cabAlto.add(new THREE.Mesh(H2.geometria(), mCab));
       // montantes del parabrisas
       for (const sx of [-1, 1]) {
         const m = new THREE.Mesh(new THREE.BoxGeometry(0.07, 1.1, 0.07), new THREE.MeshBasicMaterial({ color: 0x08090c }));
@@ -366,8 +374,7 @@
       relojesTex = new THREE.CanvasTexture(lienzoRelojes);
       const pantalla = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.25), new THREE.MeshBasicMaterial({ map: relojesTex, fog: false }));
       pantalla.position.set(0, -0.3, -0.655); pantalla.rotation.x = -0.12; cabBajo.add(pantalla);
-      cabina.traverse((o) => { o.renderOrder = 10; if (o.material) { o.material.fog = false; } });
-      camara.add(cabina);
+      cabina.traverse((o) => { if (o.material) { o.material.fog = false; } });
     }
 
     // ---------------------------------------------------------------- rayas de velocidad (espacio de cámara)
@@ -458,7 +465,7 @@
     }
 
     function base(s) { return pista.punto(s, tmp); }
-    const mat4 = new THREE.Matrix4(), q = new THREE.Quaternion(), eu = new THREE.Euler(0, 0, 0, 'YXZ'), v3 = new THREE.Vector3(), esc1 = new THREE.Vector3(1, 1, 1), col = new THREE.Color();
+    const mat4 = new THREE.Matrix4(), q = new THREE.Quaternion(), eu = new THREE.Euler(0, 0, 0, 'YXZ'), v3 = new THREE.Vector3(), esc1 = new THREE.Vector3(1, 1, 1), escRef = new THREE.Vector3(), col = new THREE.Color();
 
     function pintarTrafico(mundo, t) {
       const cuenta = [0, 0, 0];
@@ -492,7 +499,7 @@
           const sr = c.s - c.largo / 2 - 3.2, pr = base(sr);
           eu.set(0, -pr.a, 0); q.setFromEuler(eu);
           v3.set(pr.x + pr.rx * c.x, pr.y + 0.05, pr.z + pr.rz * c.x);
-          mat4.compose(v3, q, new THREE.Vector3(c.ancho * 1.1, 1, 6.5));
+          mat4.compose(v3, q, escRef.set(c.ancho * 1.1, 1, 6.5));
           reflejos.setMatrixAt(nr, mat4);
           col.setRGB(0.55 * fr, 0.04, 0.02); reflejos.setColorAt(nr, col); nr++;
         }
@@ -546,7 +553,9 @@
       }
       const pos = chispas.geometry.attributes.position.array, cl = chispas.geometry.attributes.color.array;
       let n = 0;
-      chispasDatos = chispasDatos.filter((c) => (c.vida -= dt) > 0);
+      let vivas = 0;
+      for (const c of chispasDatos) if ((c.vida -= dt) > 0) chispasDatos[vivas++] = c;
+      chispasDatos.length = vivas;
       for (const c of chispasDatos) {
         c.x += c.vx * dt; c.y += c.vy * dt; c.z += c.vz * dt; c.vy -= 9.8 * dt;
         pos[n * 3] = c.x; pos[n * 3 + 1] = c.y; pos[n * 3 + 2] = c.z;
@@ -651,9 +660,9 @@
         pintarChispas(mundo, dt);
         const f = ponerCamara(mundo, dt, extra);
         M.pRojo.opacity = 0.55 + 0.45 * Math.sin(cam.t * 3);
-        if (relojesTex && extra.relojesNuevos) relojesTex.needsUpdate = true;
+        if (relojesTex && extra.relojesNuevos && vista === 'cabina') relojesTex.needsUpdate = true;
         if (nivel.post && post) {
-          renderer.setRenderTarget(post.rtEscena); renderer.render(escena, camara); infoEscena = Object.assign({}, renderer.info.render);
+          renderer.setRenderTarget(post.rtEscena); renderer.render(escena, camara); infoEscena.calls = renderer.info.render.calls; infoEscena.triangles = renderer.info.render.triangles;
           const w = post.rtEscena.width, h = post.rtEscena.height;
           post.brillo.uniforms.t.value = post.rtEscena.texture; post.brillo.uniforms.px.value.set(1 / w, 1 / h);
           pasada(post.brillo, post.rtA);
@@ -664,7 +673,14 @@
           post.final.uniforms.vel.value = f * f; pasada(post.final, null);
         } else {
           renderer.setRenderTarget(null);
-          renderer.render(escena, camara); infoEscena = Object.assign({}, renderer.info.render);
+          renderer.render(escena, camara); infoEscena.calls = renderer.info.render.calls; infoEscena.triangles = renderer.info.render.triangles;
+        }
+        if (cabina.visible) {
+          camara.updateMatrixWorld();
+          cabina.matrix.copy(camara.matrixWorld); cabina.matrixWorldNeedsUpdate = true;
+          renderer.autoClear = false; renderer.clearDepth();
+          renderer.render(escenaCabina, camara);
+          renderer.autoClear = true;
         }
       },
       info() { const i = infoEscena; return { llamadas: i.calls, triangulos: i.triangles, trozos: trozos.size }; },
