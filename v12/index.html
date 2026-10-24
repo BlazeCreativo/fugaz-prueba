@@ -1573,7 +1573,7 @@ const TRACCION = {
   a5sb: 'total', a5c: 'total', p911: 'total', m5: 'total', tesla: 'total',
 };
 // Parte del peso sobre las ruedas de delante y altura del centro de gravedad (m). Motor delante: más peso delante; el
-// 911 lo lleva detrás; el Countach y el R5 Turbo, en medio; el F1, pegado al suelo.
+// Tiburón lo lleva detrás; el Escorpión y la Avispa, en medio; el F1, pegado al suelo.
 const PESOS = {
   rayo: [0.62, 0.52], ibiza: [0.62, 0.52], a5sb: [0.56, 0.52], a5c: [0.56, 0.5], bmw330: [0.51, 0.5], m3: [0.52, 0.48],
   m4: [0.52, 0.47], m5: [0.53, 0.5], mustang: [0.54, 0.5], tesla: [0.48, 0.46], p911: [0.39, 0.45], db11: [0.51, 0.47],
@@ -1760,41 +1760,41 @@ const { dinamicaRealista } = __m[4]; // src/logica/realista.js
 // - danioMotor: potencia que pierde el motor con el daño al 100 % (0,3 = normal);
 // - aguante: por cuánto se multiplica el daño que recibes (1 = normal; más de 1, más frágil);
 // - carga: agarre extra que dan los alerones a toda velocidad (el Fórmula 1);
-// - respuesta: lo rápido que gira el coche cuando giras el volante (1 = el Golf; v10, Alberto 25/09: «que pueda girar
-//   más de golpe, parar más de golpe»). Las frenadas van de 32 m (911) a 46 m (Mustang) de 100 a 0; el Golf, 42 m;
+// - respuesta: lo rápido que gira el coche cuando giras el volante (1 = el Halcón; v10, Alberto 25/09: «que pueda girar
+//   más de golpe, parar más de golpe»). Las frenadas van de 32 m (Tiburón) a 46 m (Bisonte) de 100 a 0; el Halcón, 42 m;
 // - nitroDura: por cuánto dura más el nitro (1 = normal; el taller de mejoras lo sube);
 // - sonido: cilindros, escala de vueltas, brillo, volumen, graves y silbido del turbo (audio.js).
 // Nunca discreción y velocidad a la vez: eso mantiene vivos a los coches baratos (informe 06).
 const BASE = {
-  rayo: { nombre: 'Volkswagen Golf GTI', masa: 1250, largo: 4.2, ancho: 1.8, potencia: 120, traccion: 6.6, vMax: 57, agarre: 9.3, frenada: 9.2, giroMax: 0.6, ejes: 2.55, turbo: true },
+  rayo: { nombre: 'Halcón', masa: 1250, largo: 4.2, ancho: 1.8, potencia: 120, traccion: 6.6, vMax: 57, agarre: 9.3, frenada: 9.2, giroMax: 0.6, ejes: 2.55, turbo: true },
   // Utilitario de los 90: te ven a tres cuartos de la distancia y tardan el doble en fijarte. En recta, el más lento (180 km/h).
-  ibiza: { nombre: 'SEAT Ibiza 1.2', masa: 950, largo: 3.85, ancho: 1.64, potencia: 90, traccion: 6.4, vMax: 50, agarre: 9.7, frenada: 8.8, giroMax: 0.64, respuesta: 1.2, ejes: 2.35, turbo: false, visibilidad: 0.75, fijar: 0.6, sonido: { cil: 4, escala: 0.9, brillo: 0.75, volumen: 0.8, graves: 0.7, turbo: 0 } },
-  // Berlina de todos los días con tracción quattro: discreta (te ven un poco más tarde) y muy estable.
-  a5sb: { nombre: 'Audi A5 Sportback', masa: 1600, largo: 4.76, ancho: 1.84, potencia: 125, traccion: 7.0, vMax: 60, agarre: 9.8, frenada: 9.6, giroMax: 0.57, respuesta: 0.9, ejes: 2.76, turbo: true, visibilidad: 0.9, aguante: 0.9, sonido: { cil: 4, escala: 1, brillo: 0.9, volumen: 0.9, graves: 1, turbo: 0.8 } },
+  ibiza: { nombre: 'Grillo', masa: 950, largo: 3.85, ancho: 1.64, potencia: 90, traccion: 6.4, vMax: 50, agarre: 9.7, frenada: 8.8, giroMax: 0.64, respuesta: 1.2, ejes: 2.35, turbo: false, visibilidad: 0.75, fijar: 0.6, sonido: { cil: 4, escala: 0.9, brillo: 0.75, volumen: 0.8, graves: 0.7, turbo: 0 } },
+  // Berlina de todos los días con tracción total: discreta (te ven un poco más tarde) y muy estable.
+  a5sb: { nombre: 'Búho Familiar', masa: 1600, largo: 4.76, ancho: 1.84, potencia: 125, traccion: 7.0, vMax: 60, agarre: 9.8, frenada: 9.6, giroMax: 0.57, respuesta: 0.9, ejes: 2.76, turbo: true, visibilidad: 0.9, aguante: 0.9, sonido: { cil: 4, escala: 1, brillo: 0.9, volumen: 0.9, graves: 1, turbo: 0.8 } },
   // La berlina deportiva de siempre: propulsión, se ve como un coche más.
-  bmw330: { nombre: 'BMW 330i', masa: 1500, largo: 4.71, ancho: 1.83, potencia: 135, traccion: 7.2, vMax: 62, agarre: 9.5, frenada: 10.0, giroMax: 0.58, respuesta: 1.05, ejes: 2.85, turbo: true, visibilidad: 0.9, sonido: { cil: 4, escala: 1.05, brillo: 1, volumen: 1, graves: 1, turbo: 1 } },
-  // El A5 de dos puertas: algo más rápido y más llamativo que el Sportback.
-  a5c: { nombre: 'Audi A5 Coupé', masa: 1550, largo: 4.7, ancho: 1.85, potencia: 130, traccion: 7.6, vMax: 61, agarre: 9.9, frenada: 9.9, giroMax: 0.58, ejes: 2.76, turbo: true, sonido: { cil: 4, escala: 1.05, brillo: 1, volumen: 0.95, graves: 1, turbo: 0.9 } },
+  bmw330: { nombre: 'Zorro', masa: 1500, largo: 4.71, ancho: 1.83, potencia: 135, traccion: 7.2, vMax: 62, agarre: 9.5, frenada: 10.0, giroMax: 0.58, respuesta: 1.05, ejes: 2.85, turbo: true, visibilidad: 0.9, sonido: { cil: 4, escala: 1.05, brillo: 1, volumen: 1, graves: 1, turbo: 1 } },
+  // El Búho de dos puertas: algo más rápido y más llamativo que la Familiar.
+  a5c: { nombre: 'Búho Cupé', masa: 1550, largo: 4.7, ancho: 1.85, potencia: 130, traccion: 7.6, vMax: 61, agarre: 9.9, frenada: 9.9, giroMax: 0.58, ejes: 2.76, turbo: true, sonido: { cil: 4, escala: 1.05, brillo: 1, volumen: 0.95, graves: 1, turbo: 0.9 } },
   // Turbo de rally de los 80: salida brutal (0-100 en unos 3,5 s); la caja es de cristal: con el daño pierde el doble de motor.
-  r5: { nombre: 'Renault 5 Turbo', masa: 1000, largo: 3.66, ancho: 1.75, potencia: 150, traccion: 8.4, vMax: 59, agarre: 9.4, frenada: 9.3, giroMax: 0.6, respuesta: 1.3, ejes: 2.43, turbo: true, danioMotor: 0.6, sonido: { cil: 4, escala: 1.05, brillo: 1.2, volumen: 1.1, graves: 0.9, turbo: 2.2 } },
+  r5: { nombre: 'Avispa', masa: 1000, largo: 3.66, ancho: 1.75, potencia: 150, traccion: 8.4, vMax: 59, agarre: 9.4, frenada: 9.3, giroMax: 0.6, respuesta: 1.3, ejes: 2.43, turbo: true, danioMotor: 0.6, sonido: { cil: 4, escala: 1.05, brillo: 1.2, volumen: 1.1, graves: 0.9, turbo: 2.2 } },
   // Eléctrico: empuja desde parado sin cambios de marcha y casi no se oye (te ven más tarde); la batería pesa.
-  tesla: { nombre: 'Tesla Model 3', masa: 1850, largo: 4.69, ancho: 1.85, potencia: 190, traccion: 8.8, vMax: 65, agarre: 9.6, frenada: 10.2, giroMax: 0.58, respuesta: 0.9, ejes: 2.88, turbo: false, electrico: true, visibilidad: 0.8, aguante: 0.85, sonido: { cil: 16, escala: 2, brillo: 1.4, volumen: 0.35, graves: 0, turbo: 0, admision: 0 } },
+  tesla: { nombre: 'Luciérnaga', masa: 1850, largo: 4.69, ancho: 1.85, potencia: 190, traccion: 8.8, vMax: 65, agarre: 9.6, frenada: 10.2, giroMax: 0.58, respuesta: 0.9, ejes: 2.88, turbo: false, electrico: true, visibilidad: 0.8, aguante: 0.85, sonido: { cil: 16, escala: 2, brillo: 1.4, volumen: 0.35, graves: 0, turbo: 0, admision: 0 } },
   // V8: el más rápido de los de calle (238 km/h) y aguanta golpes (pesa); se oye: te ven desde más lejos y te fijan antes.
-  mustang: { nombre: 'Ford Mustang GT', masa: 1700, largo: 4.79, ancho: 1.92, potencia: 170, traccion: 7.0, vMax: 66, agarre: 8.9, frenada: 8.4, giroMax: 0.56, respuesta: 0.85, ejes: 2.72, turbo: false, visibilidad: 1.25, fijar: 0.2, aguante: 0.7, sonido: { cil: 8, escala: 0.8, brillo: 0.85, volumen: 1.3, graves: 1.8, turbo: 0 } },
-  // BMW M: la berlina (M3), el cupé (M4, más llamativo) y la grande con V8 y tracción total (M5, aguanta más).
-  m3: { nombre: 'BMW M3', masa: 1700, largo: 4.79, ancho: 1.9, potencia: 200, traccion: 8.4, vMax: 70, agarre: 10, frenada: 11.3, giroMax: 0.58, respuesta: 1.15, ejes: 2.86, turbo: true, visibilidad: 1.05, aguante: 0.95, sonido: { cil: 6, escala: 1.1, brillo: 1.3, volumen: 1.2, graves: 1.1, turbo: 1.2 } },
-  m4: { nombre: 'BMW M4', masa: 1650, largo: 4.79, ancho: 1.89, potencia: 205, traccion: 8.4, vMax: 71, agarre: 10.1, frenada: 11.3, giroMax: 0.58, respuesta: 1.15, ejes: 2.86, turbo: true, visibilidad: 1.15, sonido: { cil: 6, escala: 1.12, brillo: 1.35, volumen: 1.2, graves: 1.1, turbo: 1.2 } },
-  m5: { nombre: 'BMW M5', masa: 1950, largo: 4.98, ancho: 1.9, potencia: 215, traccion: 9.2, vMax: 72, agarre: 9.9, frenada: 11.0, giroMax: 0.56, respuesta: 0.85, ejes: 2.98, turbo: true, aguante: 0.8, sonido: { cil: 8, escala: 1, brillo: 1.1, volumen: 1.3, graves: 1.4, turbo: 1.2 } },
+  mustang: { nombre: 'Bisonte', masa: 1700, largo: 4.79, ancho: 1.92, potencia: 170, traccion: 7.0, vMax: 66, agarre: 8.9, frenada: 8.4, giroMax: 0.56, respuesta: 0.85, ejes: 2.72, turbo: false, visibilidad: 1.25, fijar: 0.2, aguante: 0.7, sonido: { cil: 8, escala: 0.8, brillo: 0.85, volumen: 1.3, graves: 1.8, turbo: 0 } },
+  // Pantera: la berlina, el cupé (más llamativo) y la grande con V8 y tracción total (Mayor, aguanta más).
+  m3: { nombre: 'Pantera Berlina', masa: 1700, largo: 4.79, ancho: 1.9, potencia: 200, traccion: 8.4, vMax: 70, agarre: 10, frenada: 11.3, giroMax: 0.58, respuesta: 1.15, ejes: 2.86, turbo: true, visibilidad: 1.05, aguante: 0.95, sonido: { cil: 6, escala: 1.1, brillo: 1.3, volumen: 1.2, graves: 1.1, turbo: 1.2 } },
+  m4: { nombre: 'Pantera Cupé', masa: 1650, largo: 4.79, ancho: 1.89, potencia: 205, traccion: 8.4, vMax: 71, agarre: 10.1, frenada: 11.3, giroMax: 0.58, respuesta: 1.15, ejes: 2.86, turbo: true, visibilidad: 1.15, sonido: { cil: 6, escala: 1.12, brillo: 1.35, volumen: 1.2, graves: 1.1, turbo: 1.2 } },
+  m5: { nombre: 'Pantera Mayor', masa: 1950, largo: 4.98, ancho: 1.9, potencia: 215, traccion: 9.2, vMax: 72, agarre: 9.9, frenada: 11.0, giroMax: 0.56, respuesta: 0.85, ejes: 2.98, turbo: true, aguante: 0.8, sonido: { cil: 8, escala: 1, brillo: 1.1, volumen: 1.3, graves: 1.4, turbo: 1.2 } },
   // Tracción total: acelera y gira como ninguno (263 km/h); el daño le quita más motor que a un coche normal.
-  p911: { nombre: 'Porsche 911 Turbo', masa: 1600, largo: 4.54, ancho: 1.9, potencia: 230, traccion: 9.6, vMax: 73, agarre: 10.4, frenada: 12.0, giroMax: 0.6, respuesta: 1.25, ejes: 2.45, turbo: true, visibilidad: 1.1, danioMotor: 0.45, sonido: { cil: 6, escala: 1.05, brillo: 1.15, volumen: 1.1, graves: 1.1, turbo: 1.4 } },
+  p911: { nombre: 'Tiburón', masa: 1600, largo: 4.54, ancho: 1.9, potencia: 230, traccion: 9.6, vMax: 73, agarre: 10.4, frenada: 12.0, giroMax: 0.6, respuesta: 1.25, ejes: 2.45, turbo: true, visibilidad: 1.1, danioMotor: 0.45, sonido: { cil: 6, escala: 1.05, brillo: 1.15, volumen: 1.1, graves: 1.1, turbo: 1.4 } },
   // Gran turismo inglés con V12: rapidísimo y elegante; la policía duda antes de fijarte (0,45 s), pero te ve de lejos.
-  db11: { nombre: 'Aston Martin DB11', masa: 1800, largo: 4.74, ancho: 1.95, potencia: 245, traccion: 8.2, vMax: 77, agarre: 9.7, frenada: 10.5, giroMax: 0.55, respuesta: 0.85, ejes: 2.8, turbo: true, visibilidad: 1.2, fijar: 0.45, aguante: 0.9, sonido: { cil: 12, escala: 0.95, brillo: 1.3, volumen: 1.2, graves: 1.1, turbo: 0.8 } },
+  db11: { nombre: 'Cisne', masa: 1800, largo: 4.74, ancho: 1.95, potencia: 245, traccion: 8.2, vMax: 77, agarre: 9.7, frenada: 10.5, giroMax: 0.55, respuesta: 0.85, ejes: 2.8, turbo: true, visibilidad: 1.2, fijar: 0.45, aguante: 0.9, sonido: { cil: 12, escala: 0.95, brillo: 1.3, volumen: 1.2, graves: 1.1, turbo: 0.8 } },
   // El póster de los 80: 288 km/h y un V12 que grita. Te ven desde muy lejos, gira peor y la carrocería es delicada.
-  countach: { nombre: 'Lamborghini Countach', masa: 1500, largo: 4.14, ancho: 2.0, potencia: 260, traccion: 8.2, vMax: 80, agarre: 9.8, frenada: 10.3, giroMax: 0.52, respuesta: 0.95, ejes: 2.45, turbo: false, visibilidad: 1.5, fijar: 0.15, aguante: 1.15, sonido: { cil: 12, escala: 1, brillo: 1.6, volumen: 1.3, graves: 0.9, turbo: 0 } },
+  countach: { nombre: 'Escorpión', masa: 1500, largo: 4.14, ancho: 2.0, potencia: 260, traccion: 8.2, vMax: 80, agarre: 9.8, frenada: 10.3, giroMax: 0.52, respuesta: 0.95, ejes: 2.45, turbo: false, visibilidad: 1.5, fijar: 0.15, aguante: 1.15, sonido: { cil: 12, escala: 1, brillo: 1.6, volumen: 1.3, graves: 0.9, turbo: 0 } },
   // Un Fórmula 1 en la ciudad: 331 km/h, frenada de otro mundo y más agarre cuanto más corre. Un golpe fuerte lo destroza,
   // se ve desde lejísimos y gira poco a baja velocidad (las esquinas del barrio, despacio). Aguante 1,5 (el más frágil):
-  // con 2,2, el piloto automático del banco lo destrozaba en 18 s de media, 8 de 8 (el Golf, en 75 s).
-  f1: { nombre: 'Monoplaza de Fórmula 1', masa: 800, largo: 5.6, ancho: 2.0, potencia: 420, traccion: 12, vMax: 92, agarre: 11, carga: 0.6, frenada: 16, giroMax: 0.42, respuesta: 1.6, ejes: 3.6, turbo: false, visibilidad: 1.6, fijar: 0.15, aguante: 1.5, danioMotor: 0.6, sonido: { cil: 10, escala: 2.2, brillo: 2.4, volumen: 1.4, graves: 0.5, turbo: 0 } },
+  // con 2,2, el piloto automático del banco lo destrozaba en 18 s de media, 8 de 8 (el Halcón, en 75 s).
+  f1: { nombre: 'Monoplaza', masa: 800, largo: 5.6, ancho: 2.0, potencia: 420, traccion: 12, vMax: 92, agarre: 11, carga: 0.6, frenada: 16, giroMax: 0.42, respuesta: 1.6, ejes: 3.6, turbo: false, visibilidad: 1.6, fijar: 0.15, aguante: 1.5, danioMotor: 0.6, sonido: { cil: 10, escala: 2.2, brillo: 2.4, volumen: 1.4, graves: 0.5, turbo: 0 } },
   lince: { nombre: 'Lince', masa: 1450, largo: 4.6, ancho: 1.86, potencia: 100, traccion: 6.0, vMax: 51.4, agarre: 9.0, frenada: 8.6, giroMax: 0.58, ejes: 2.7, turbo: false },
   lobo: { nombre: 'Lobo', masa: 1600, largo: 4.8, ancho: 1.9, potencia: 175, traccion: 6.8, vMax: 64, agarre: 7.9, frenada: 8.2, giroMax: 0.55, ejes: 2.8, turbo: true },
   toro: { nombre: 'Toro', masa: 2300, largo: 4.9, ancho: 2.1, potencia: 95, traccion: 5.6, vMax: 48.6, agarre: 8.3, frenada: 7.8, giroMax: 0.55, ejes: 2.9, turbo: false },
@@ -1908,7 +1908,7 @@ function pasoCoche(c, e, dt, asist = ASISTENCIA) {
 
   // Pisar a fondo de golpe: el tirón (la presentación hace la pausa de 40 ms y el empujón de cámara).
   if (gas > 0.9 && c.gasAntes < 0.3 && vAbs < 25 && freno < 0.5) ev.push({ tipo: 'tiron' });
-  // v9: soltar el gas de golpe a muchas vueltas escupe una llamarada por el escape (el BMW del vídeo del 25/09).
+  // v9: soltar el gas de golpe a muchas vueltas escupe una llamarada por el escape (el Zorro del vídeo del 25/09).
   // Vale también con el pedal o inclinando: basta con haber ido a fondo en el último cuarto de segundo.
   if (gas >= 0.8) c.gasAltoT = 0.25;
   else {
@@ -2329,24 +2329,24 @@ function desglose(final, botin, nivel = 1, pagoRango = 1, fisica = 1) {
 }
 
 // El garaje (Alberto, 25/09: coches de verdad, cada uno con sus diferencias, y uno flipado: un Fórmula 1).
-// El Golf y el Ibiza, desde el principio; los demás se desbloquean con el rango y se compran con tus chapas.
+// El Halcón y el Grillo, desde el principio; los demás se desbloquean con el rango y se compran con tus chapas.
 // En Práctica puedes probar cualquiera, aunque no sea tuyo. Las cifras de cada coche están en coche.js.
 const GARAJE = [
   { id: 'rayo', rango: 1, precio: 0, lema: 'Equilibrado: el de siempre.' },
   { id: 'ibiza', rango: 1, precio: 0, lema: 'Discreto: te ven a menos distancia y tardan el doble en fijarte. El más lento en recta.' },
-  { id: 'a5sb', rango: 2, precio: 3000, lema: 'Berlina de diario con tracción quattro: discreta, estable y aguanta bien.' },
+  { id: 'a5sb', rango: 2, precio: 3000, lema: 'Berlina de diario con tracción total: discreta, estable y aguanta bien.' },
   { id: 'bmw330', rango: 2, precio: 3500, lema: 'La berlina deportiva de siempre: rápida y pasa por un coche más.' },
-  { id: 'a5c', rango: 3, precio: 5000, lema: 'El A5 de dos puertas: algo más rápido y más llamativo.' },
+  { id: 'a5c', rango: 3, precio: 5000, lema: 'El Búho de dos puertas: algo más rápido y más llamativo.' },
   { id: 'r5', rango: 3, precio: 6000, lema: 'Salida brutal. Frágil: el daño le quita punta antes que a nadie.' },
   { id: 'tesla', rango: 4, precio: 9000, lema: 'Eléctrico: empuja desde parado, sin cambios, y casi no se oye. Pesa.' },
   { id: 'mustang', rango: 5, precio: 14000, lema: 'V8: muy rápido y aguanta golpes. Se oye: te ven desde más lejos.' },
-  { id: 'm3', rango: 5, precio: 15000, lema: 'BMW M3: berlina con seis cilindros y turbo. Rápida en todo.' },
-  { id: 'm4', rango: 6, precio: 19000, lema: 'BMW M4: el cupé del M3, un poco más rápido y más llamativo.' },
-  { id: 'm5', rango: 7, precio: 24000, lema: 'BMW M5: V8 y tracción total en una berlina grande. Aguanta como ninguna.' },
-  { id: 'p911', rango: 7, precio: 28000, lema: 'Porsche 911 Turbo: acelera y gira como ninguno. El daño le quita motor.' },
-  { id: 'db11', rango: 8, precio: 36000, lema: 'Aston Martin DB11: V12 elegante; la policía duda antes de fijarte, pero te ve de lejos.' },
+  { id: 'm3', rango: 5, precio: 15000, lema: 'Pantera Berlina: berlina con seis cilindros y turbo. Rápida en todo.' },
+  { id: 'm4', rango: 6, precio: 19000, lema: 'Pantera Cupé: el cupé de la Berlina, un poco más rápido y más llamativo.' },
+  { id: 'm5', rango: 7, precio: 24000, lema: 'Pantera Mayor: V8 y tracción total en una berlina grande. Aguanta como ninguna.' },
+  { id: 'p911', rango: 7, precio: 28000, lema: 'Tiburón: acelera y gira como ninguno. El daño le quita motor.' },
+  { id: 'db11', rango: 8, precio: 36000, lema: 'Cisne: V12 elegante; la policía duda antes de fijarte, pero te ve de lejos.' },
   { id: 'countach', rango: 9, precio: 45000, lema: 'El póster de los 80: rapidísimo y con un V12 que grita. Te ven desde muy lejos y gira peor.' },
-  { id: 'f1', rango: 10, precio: 70000, lema: 'Un Fórmula 1 en la ciudad: 331 km/h y frenada de otro mundo. Un golpe fuerte lo destroza y se ve desde lejísimos.' },
+  { id: 'f1', rango: 10, precio: 70000, lema: 'Un monoplaza en la ciudad: 331 km/h y frenada de otro mundo. Un golpe fuerte lo destroza y se ve desde lejísimos.' },
 ];
 const cochePorId = (id) => GARAJE.find((c) => c.id === id);
 
@@ -4163,7 +4163,7 @@ const LINEAS = {
     ['{unidad}', 'Aquí {unidad}, el interceptor. Voy hacia {lugar}: a este lo paro yo.'],
   ],
   formula1: [
-    ['{unidad}', 'Central, confirmo: es un Fórmula 1. Sí, un Fórmula 1. No, no es una broma.'],
+    ['{unidad}', 'Central, confirmo: es un monoplaza de carreras. Sí, un monoplaza. No, no es una broma.'],
     ['{unidad}', 'Central... ¿Un monoplaza por {lugar}? Esto no viene en el manual.'],
   ],
   refuerzo: [
@@ -5304,21 +5304,21 @@ const TALLER_REGLAS = { segundos: 3, arregla: 0.5, minimo: 0.02, parado: 1 };
 
 // v8: cómo llama la radio a cada coche del garaje, y su color.
 const EN_RADIO = {
-  rayo: { coche: 'Golf', color: 'rojo' },
-  ibiza: { coche: 'Seat Ibiza', color: 'blanco' },
-  a5sb: { coche: 'Audi A5', color: 'gris' },
-  bmw330: { coche: 'BMW', color: 'azul' },
-  a5c: { coche: 'Audi A5 Coupé', color: 'negro' },
-  r5: { coche: 'Renault 5 Turbo', color: 'amarillo' },
-  tesla: { coche: 'Tesla', color: 'blanco' },
-  mustang: { coche: 'Mustang', color: 'naranja' },
-  m3: { coche: 'BMW M3', color: 'verde' },
-  m4: { coche: 'BMW M4', color: 'azul' },
-  m5: { coche: 'BMW M5', color: 'gris' },
-  p911: { coche: 'Porsche', color: 'plateado' },
-  db11: { coche: 'Aston Martin', color: 'verde' },
-  countach: { coche: 'Lamborghini', color: 'verde' },
-  f1: { coche: 'Fórmula 1', color: 'rojo' },
+  rayo: { coche: 'Halcón', color: 'rojo' },
+  ibiza: { coche: 'Grillo', color: 'blanco' },
+  a5sb: { coche: 'Búho Familiar', color: 'gris' },
+  bmw330: { coche: 'Zorro', color: 'azul' },
+  a5c: { coche: 'Búho Cupé', color: 'negro' },
+  r5: { coche: 'Avispa', color: 'amarillo' },
+  tesla: { coche: 'Luciérnaga', color: 'blanco' },
+  mustang: { coche: 'Bisonte', color: 'naranja' },
+  m3: { coche: 'Pantera Berlina', color: 'verde' },
+  m4: { coche: 'Pantera Cupé', color: 'azul' },
+  m5: { coche: 'Pantera Mayor', color: 'gris' },
+  p911: { coche: 'Tiburón', color: 'plateado' },
+  db11: { coche: 'Cisne', color: 'verde' },
+  countach: { coche: 'Escorpión', color: 'verde' },
+  f1: { coche: 'Monoplaza', color: 'rojo' },
 };
 
 // Las patrullas de este rango y este nivel de alerta: un modelo por tipo, compartido por todas las unidades de la partida.
@@ -7432,23 +7432,23 @@ function ruedas(largo, ancho, r = 0.34) {
 
 // pintura: el color de la carrocería; con instancias se pasa blanco y el color va por instancia.
 // Forma de cada coche: largo, ancho, alto y cabina [largo, desplazamiento hacia atrás], y sus detalles (v8, el garaje):
-// rejilla: bmw (dos riñones), audi (una grande) o aston (ancha) · escapes: 2 o 4 · aleron: golf, lobo, techo, labio,
+// rejilla: dos (dos huecos), grande (una grande) o ancha · escapes: 2 o 4 · aleron: recto, lobo, techo, labio,
 // ballena o ala · franjas: dos franjas negras de punta a punta · toma: toma de aire en el capó · aletas: aletas traseras
 // anchas · tomas: tomas de aire en los costados · techo: color del techo (cristal o negro).
 const FORMA = {
-  rayo: { L: 4.2, A: 1.8, alto: 1.42, cab: [2.1, 0.25], aleron: 'golf' },
+  rayo: { L: 4.2, A: 1.8, alto: 1.42, cab: [2.1, 0.25], aleron: 'recto' },
   ibiza: { L: 3.85, A: 1.64, alto: 1.42, cab: [2.0, 0.3] },
-  a5sb: { L: 4.76, A: 1.84, alto: 1.39, cab: [2.3, 0.2], rejilla: 'audi', escapes: 2 },
-  a5c: { L: 4.7, A: 1.85, alto: 1.35, cab: [1.95, 0.3], rejilla: 'audi', escapes: 2 },
-  bmw330: { L: 4.71, A: 1.83, alto: 1.43, cab: [2.2, 0.15], rejilla: 'bmw', escapes: 2 },
+  a5sb: { L: 4.76, A: 1.84, alto: 1.39, cab: [2.3, 0.2], rejilla: 'grande', escapes: 2 },
+  a5c: { L: 4.7, A: 1.85, alto: 1.35, cab: [1.95, 0.3], rejilla: 'grande', escapes: 2 },
+  bmw330: { L: 4.71, A: 1.83, alto: 1.43, cab: [2.2, 0.15], rejilla: 'dos', escapes: 2 },
   r5: { L: 3.66, A: 1.75, alto: 1.33, cab: [1.75, 0.2], aletas: true, tomas: true, aleron: 'techo' },
   tesla: { L: 4.69, A: 1.85, alto: 1.44, cab: [2.4, 0.1], techo: CRISTAL },
   mustang: { L: 4.79, A: 1.92, alto: 1.38, cab: [1.85, 0.55], franjas: true, toma: true, escapes: 4 },
-  m3: { L: 4.79, A: 1.9, alto: 1.43, cab: [2.2, 0.15], rejilla: 'bmw', escapes: 4, aleron: 'labio' },
-  m4: { L: 4.79, A: 1.89, alto: 1.39, cab: [1.9, 0.35], rejilla: 'bmw', escapes: 4, aleron: 'labio', techo: '#1B1D22' },
-  m5: { L: 4.98, A: 1.9, alto: 1.47, cab: [2.35, 0.15], rejilla: 'bmw', escapes: 4 },
+  m3: { L: 4.79, A: 1.9, alto: 1.43, cab: [2.2, 0.15], rejilla: 'dos', escapes: 4, aleron: 'labio' },
+  m4: { L: 4.79, A: 1.89, alto: 1.39, cab: [1.9, 0.35], rejilla: 'dos', escapes: 4, aleron: 'labio', techo: '#1B1D22' },
+  m5: { L: 4.98, A: 1.9, alto: 1.47, cab: [2.35, 0.15], rejilla: 'dos', escapes: 4 },
   p911: { L: 4.54, A: 1.9, alto: 1.3, cab: [1.9, 0.45], aleron: 'ballena' },
-  db11: { L: 4.74, A: 1.95, alto: 1.28, cab: [1.8, 0.55], rejilla: 'aston', escapes: 2 },
+  db11: { L: 4.74, A: 1.95, alto: 1.28, cab: [1.8, 0.55], rejilla: 'ancha', escapes: 2 },
   countach: { L: 4.14, A: 2.0, alto: 1.07, cab: [1.7, 0.05], aleron: 'ala', tomas: true },
   f1: { L: 5.6, A: 2.0 },
   lince: { L: 4.6, A: 1.86, alto: 1.45, cab: [2.3, 0.1] },
@@ -7466,14 +7466,14 @@ function detalles(f, partes, pintura) {
   const baja = alto * 0.48;
   const cubierta = 0.25 + baja;
   const frente = -L / 2 - 0.01;
-  if (f.rejilla === 'bmw') for (const s of [-1, 1]) partes.push({ w: 0.24, h: 0.2, d: 0.04, x: s * 0.16, y: 0.25 + baja * 0.62, z: frente, color: NEGRO });
-  if (f.rejilla === 'audi') partes.push({ w: 0.66, h: 0.3, d: 0.04, x: 0, y: 0.25 + baja * 0.5, z: frente, color: NEGRO });
-  if (f.rejilla === 'aston') partes.push({ w: 0.9, h: 0.22, d: 0.04, x: 0, y: 0.25 + baja * 0.42, z: frente, color: GRIS });
+  if (f.rejilla === 'dos') for (const s of [-1, 1]) partes.push({ w: 0.24, h: 0.2, d: 0.04, x: s * 0.16, y: 0.25 + baja * 0.62, z: frente, color: NEGRO });
+  if (f.rejilla === 'grande') partes.push({ w: 0.66, h: 0.3, d: 0.04, x: 0, y: 0.25 + baja * 0.5, z: frente, color: NEGRO });
+  if (f.rejilla === 'ancha') partes.push({ w: 0.9, h: 0.22, d: 0.04, x: 0, y: 0.25 + baja * 0.42, z: frente, color: GRIS });
   if (f.escapes) {
     const xs = f.escapes === 4 ? [-0.72, -0.56, 0.56, 0.72] : [-0.6, 0.6];
     for (const x of xs) partes.push({ w: 0.11, h: 0.09, d: 0.06, x: (x * A) / 1.9, y: 0.32, z: L / 2 + 0.01, color: NEGRO });
   }
-  if (f.aleron === 'golf') partes.push({ w: A * 0.9, h: 0.06, d: 0.35, x: 0, y: alto - 0.05, z: L / 2 - 0.2, color: GRIS });
+  if (f.aleron === 'recto') partes.push({ w: A * 0.9, h: 0.06, d: 0.35, x: 0, y: alto - 0.05, z: L / 2 - 0.2, color: GRIS });
   if (f.aleron === 'lobo') partes.push({ w: A * 0.95, h: 0.08, d: 0.3, x: 0, y: baja + 0.45, z: L / 2 - 0.15, color: GRIS });
   if (f.aleron === 'techo') partes.push({ w: A * 0.8, h: 0.05, d: 0.3, x: 0, y: alto + 0.03, z: cab[1] + cab[0] / 2 - 0.1, color: GRIS });
   if (f.aleron === 'labio') partes.push({ w: A * 0.7, h: 0.04, d: 0.16, x: 0, y: cubierta + 0.02, z: L / 2 - 0.12, color: NEGRO });
@@ -9135,13 +9135,13 @@ function angLerp(a, b, t) {
 // Material de la cabina: se tiñe de azul y rojo cuando la policía está cerca.
 const mate = (color) => new THREE.MeshLambertMaterial({ color, emissive: '#000000' });
 
-// v9: la tira de luz del salpicadero, del color de cada marca (los BMW de los vídeos del 25/09, en azul).
+// v9: la tira de luz del salpicadero, del color de cada marca (los Pantera de los vídeos del 25/09, en azul).
 const LED = {
   rayo: '#FF2A3A', ibiza: '#FF8A2A', a5sb: '#FF3040', a5c: '#FF3040', r5: '#FFD020', bmw330: '#2F7BFF', m3: '#2F7BFF',
   m4: '#2F7BFF', m5: '#2F7BFF', tesla: '#E8F0FF', mustang: '#FF5A1A', p911: '#FFB020', db11: '#E8E2D0', countach: '#7CFF4A',
 };
 
-// v9: la pantalla central encendida con los modos de conducción (como la del BMW del vídeo del 25/09).
+// v9: la pantalla central encendida con los modos de conducción (como la del Zorro del vídeo del 25/09).
 function texPantalla() {
   const c = document.createElement('canvas');
   c.width = 256;

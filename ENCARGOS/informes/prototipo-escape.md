@@ -77,7 +77,7 @@ Rama: `prototipo-escape` (sale de `sesion-1`, que ya tenía three.js y las fuent
   - quejas «no entiendo qué me mata», por causa;
   - además, fps medios, roces, patrullas fuera y abandonos (cerrar o cambiar de app a mitad de partida).
 - Las definiciones exactas están en el README.
-- **Aviso:** la tarea 140 (`/home/alberto/empresa/handoff/cola/tarea-140.md`) está fuera de la carpeta. Las normas del taller no dejan salir de ella, así que no la he leído. Las métricas salen de la lista del encargo; conviene cotejarlas.
+- **Aviso:** la tarea 140 está fuera de la carpeta. Las normas del taller no dejan salir de ella, así que no la he leído. Las métricas salen de la lista del encargo; conviene cotejarlas.
 
 ## 5. Clip compartible
 

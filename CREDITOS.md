@@ -1,6 +1,6 @@
 # Créditos y licencias
 
-Todo lo que se ve en FUGAZ v13 «Noche en autopista» está hecho con código del propio juego, salvo lo que sale en esta tabla. No hay modelos, texturas, sonidos, logotipos ni marcas de Assetto Corsa ni de ningún fabricante de coches.
+Todo lo que se ve en FUGAZ v13 «Noche en autopista» está hecho con código del propio juego, salvo lo que sale en esta tabla. No hay modelos, texturas, sonidos, logotipos ni marcas de Assetto Corsa ni de ningún fabricante de coches. Lo mismo vale para el resto del juego (`v12/`): todos los coches del garaje llevan nombres inventados (Halcón, Zorro, Pantera, Tiburón…), sin marcas ni modelos reales, y los carteles y rótulos son inventados.
 
 ## Recursos de terceros que van dentro del juego
 
@@ -17,7 +17,7 @@ Las fuentes se copiaron de los paquetes `@fontsource/*` de npm (`herramientas/ve
 
 - **Autopista, túneles, pórticos, farolas, edificios, coches y cabina**: cajas y planos generados en `noche/escena.js`.
 - **Texturas**: se dibujan con canvas al arrancar (`noche/texturas.js`): asfalto con rayas, ventanas, azulejo del túnel, carteles verdes, silueta de la ciudad y halos de luz.
-- **Carteles**: los textos son inventados («RONDA LITORAL», «SALIDA 14 · PUERTO»…). No copian la señalización real de ninguna ciudad.
+- **Carteles**: los textos son inventados («RONDA DEL FARO», «SALIDA 14 · PUERTO»…). No copian la señalización real de ninguna ciudad.
 - **Relojes del salpicadero**: dibujados con canvas (`noche/relojes.js`).
 - **Brillo y desenfoque de velocidad**: shaders propios (`noche/escena.js`, calidad alta).
 - **Sonido**: v13 no tiene sonido.

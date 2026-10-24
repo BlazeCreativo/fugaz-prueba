@@ -31,7 +31,7 @@ if "fonts.googleapis.com" in s:
     a = s.index('<link rel="preconnect" href="https://fonts.googleapis.com">')
     cierre = 'rel="stylesheet">'
     b = s.index(cierre, a) + len(cierre)
-    s = s[:a] + '<link rel="stylesheet" href="vendor/fuentes/fuentes.css">' + s[b:]
-s = s.replace("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js", "vendor/three.min.js")
+    s = s[:a] + '<link rel="stylesheet" href="../vendor/fuentes/fuentes.css">' + s[b:]
+s = s.replace("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js", "../vendor/three.min.js")
 open("v12/index.html", "w").write(s)
 print("listo")

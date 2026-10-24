@@ -32,7 +32,7 @@
   - si se añade un enlace o un código QR, cuando haya un enlace aprobado por el despacho;
   - el formato definitivo para TikTok o Reels (ahora 405×720 en webm o mp4).
 - **Métricas**: se guardan solo en este navegador. Para juntar las de varias personas hay que exportar a mano cada JSON y combinarlo; no hay ningún servidor, y así lo pide el encargo.
-- El contexto de la tarea 140 (`/home/alberto/empresa/handoff/cola/tarea-140.md`) está fuera de la carpeta del proyecto. Las normas del taller no permiten salir de ella, así que no se ha leído. Las métricas se han sacado de la lista del encargo. Revisar que coinciden con las definiciones exactas de la tarea 140.
+- El contexto de la tarea 140 está fuera de la carpeta del proyecto. Las normas del taller no permiten salir de ella, así que no se ha leído. Las métricas se han sacado de la lista del encargo. Revisar que coinciden con las definiciones exactas de la tarea 140.
 
 ## FUGAZ v12 (`v12/index.html`)
 

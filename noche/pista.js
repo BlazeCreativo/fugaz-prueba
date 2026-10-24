@@ -47,8 +47,8 @@
       return suma / 9;
     }
     const TEXTOS = [
-      ['RONDA LITORAL', '↑ 2 km'], ['SALIDA 14', 'PUERTO ↗'], ['CENTRO', '↑ TÚNEL'], ['AEROPUERTO', '↑ 18 km'],
-      ['SALIDA 9', 'ESTADIO ↗'], ['RONDA NORTE', '← 4 km'], ['ZONA FRANCA', '↑ 6 km'], ['SALIDA 21', 'PLAYAS ↗'],
+      ['RONDA DEL FARO', '↑ 2 km'], ['SALIDA 14', 'PUERTO ↗'], ['CENTRO', '↑ TÚNEL'], ['AEROPUERTO', '↑ 18 km'],
+      ['SALIDA 9', 'ESTADIO ↗'], ['RONDA NORTE', '← 4 km'], ['POLÍGONO SUR', '↑ 6 km'], ['SALIDA 21', 'PLAYAS ↗'],
     ];
     function asegurar(sMax) {
       while ((xs.length - 1) * P < sMax) {
